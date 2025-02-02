@@ -16,8 +16,7 @@ try:
 except:
     pass
 
-# base
-chainid = 8453
+chainid = 1 # OP 10 # Scroll 534352 # Polygon zkEVM 1101 # Arbitrum One 42161 # Base 8453
 address = "0x4e1dcf7ad4e460cfd30791ccc4f9c8a4f820ec67"
 # ProxyCreation (index_topic_1 address proxy, address singleton)
 topic0 = "0x4f51faf6c4561ff95f067657e43439f0f856d97c04d9ec9070a6199ad418e235"
