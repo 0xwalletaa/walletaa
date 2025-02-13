@@ -3,4 +3,5 @@ proxy.json
 */test.py
 safe/src/
 entry_point/src/
+entry_point/account_deployed/
 *.csv
