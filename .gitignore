@@ -2,4 +2,5 @@ etherscan.key
 proxy.json
 */test.py
 safe/src/
+entry_point/src/
 *.csv
