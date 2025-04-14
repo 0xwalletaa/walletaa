@@ -23,6 +23,9 @@ print(chainids)
 
 chainids.sort()
 
+last_blocknum = 0
+last_logindex = 0
+
 for chainid in chainids:
     f = open(f'account_deplyed/{chainid}.csv', "w")
     files = glob.glob(f'src/{chainid}_{address}_*.json')
@@ -31,8 +34,19 @@ for chainid in chainids:
         print(file)
         data = json.loads(open(file).read())
         for one in data["result"]:
+            
+            # avoid duplicate in source log data
+            blocknum = int(one["blockNumber"], 16)
+            logindex = 0
+            if one["logIndex"] != "0x":
+                int(one["logIndex"], 16) 
+            if blocknum == last_blocknum and logindex <= last_logindex:
+                continue
+            else:
+                last_blocknum = blocknum
+                last_logindex = logindex
+
             if one["topics"][0] == "0xd51a9c61267aa6196961883ecf5ff2da6619c37dac0fa92122513fb32c032d2d":
-                blocknum = int(one["blockNumber"], 16)
                 timestamp = int(one["timeStamp"], 16)
                 sender = "0x" + one["topics"][2][26:]
                 factory = "0x" + one["data"][26:66]
