@@ -7,10 +7,16 @@ import time
 from web3 import Web3
 from collections import Counter
 from hexbytes import HexBytes
-
+import random
 # 连接到Sepolia测试网
-INFURA_URL = "https://api.zan.top/eth-sepolia"  # 替换为你的API密钥
-web3 = Web3(Web3.HTTPProvider(INFURA_URL))
+web3s = [
+    Web3(Web3.HTTPProvider("https://api.zan.top/eth-sepolia")),
+    Web3(Web3.HTTPProvider("https://endpoints.omniatech.io/v1/eth/sepolia/public")),
+    Web3(Web3.HTTPProvider("https://eth-sepolia.public.blastapi.io")),
+    Web3(Web3.HTTPProvider("https://sepolia.drpc.org")),
+    Web3(Web3.HTTPProvider("https://0xrpc.io/sep"))
+]
+
 START_BLOCK = 8000000
 
 # 辅助函数：处理HexBytes对象的JSON序列化
@@ -76,7 +82,7 @@ def is_block_exists(conn, block_number):
 def process_block(conn, block_number):
     try:
         # 获取完整区块信息
-        block = web3.eth.get_block(block_number, full_transactions=True)
+        block = random.choice(web3s).eth.get_block(block_number, full_transactions=True)
         transactions = block.transactions
         
         # 计算type=4的交易数量
@@ -116,20 +122,13 @@ def process_block(conn, block_number):
         return False
 
 def main():
-    # 检查连接
-    if not web3.is_connected():
-        print("无法连接到Sepolia测试网，请检查你的API密钥")
-        return
-    
-    print(f"已连接到Sepolia测试网，链ID: {web3.eth.chain_id}")
     
     # 初始化数据库
     conn = init_db()
     
     try:
         # 获取最新区块号
-        latest_block = web3.eth.block_number
-        latest_block = 8091781
+        latest_block = random.choice(web3s).eth.block_number
         print(f"当前最新区块: {latest_block}")
         
         # 从最新区块倒序遍历到起始区块
@@ -146,11 +145,7 @@ def main():
                     break
                 else:
                     print(f"重试处理区块 #{block_number}，第 {retry+1}/{max_retries} 次尝试")
-                    time.sleep(2)  # 等待一段时间后重试
             
-            # 每处理20个区块等待一下，避免API限制
-            if block_number % 20 == 0 and block_number > 0:
-                time.sleep(5)
         
         # 输出统计结果
         cursor = conn.cursor()
