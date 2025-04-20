@@ -112,8 +112,8 @@ def main():
         latest_block = web3.eth.block_number
         print(f"当前最新区块: {latest_block}")
         
-        # 从0遍历到最新区块
-        for block_number in range(START_BLOCK, latest_block + 1):
+        # 从最新区块倒序遍历到起始区块
+        for block_number in range(latest_block, START_BLOCK - 1, -1):
             # 检查区块是否已存在于数据库中
             if is_block_exists(conn, block_number):
                 print(f"区块 #{block_number} 已存在于数据库中，跳过")
