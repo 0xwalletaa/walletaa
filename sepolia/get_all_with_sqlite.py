@@ -6,11 +6,29 @@ import sqlite3
 import time
 from web3 import Web3
 from collections import Counter
+from hexbytes import HexBytes
 
 # 连接到Sepolia测试网
 INFURA_URL = "https://api.zan.top/eth-sepolia"  # 替换为你的API密钥
 web3 = Web3(Web3.HTTPProvider(INFURA_URL))
 START_BLOCK = 8000000
+
+# 辅助函数：处理HexBytes对象的JSON序列化
+def serialize_web3_tx(tx_dict):
+    result = {}
+    for key, value in tx_dict.items():
+        if isinstance(value, HexBytes):
+            result[key] = value.hex()
+        elif isinstance(value, list):
+            result[key] = [serialize_web3_tx(item) if hasattr(item, 'items') else 
+                          item.hex() if isinstance(item, HexBytes) else item 
+                          for item in value]
+        elif hasattr(value, 'items'):
+            # 处理任何类似字典的对象(包括AttributeDict)
+            result[key] = serialize_web3_tx(dict(value))
+        else:
+            result[key] = value
+    return result
 
 # 初始化数据库
 def init_db():
@@ -70,7 +88,8 @@ def process_block(conn, block_number):
             if tx_type == 4:
                 type4_count += 1
                 tx_hash = tx.hash.hex()
-                tx_data = json.dumps(dict(tx))
+                # 使用自定义函数处理HexBytes序列化问题
+                tx_data = json.dumps(serialize_web3_tx(dict(tx)))
                 type4_txs.append((tx_hash, block_number, tx_data))
         
         # 存储区块信息
@@ -110,6 +129,7 @@ def main():
     try:
         # 获取最新区块号
         latest_block = web3.eth.block_number
+        latest_block = 8091781
         print(f"当前最新区块: {latest_block}")
         
         # 从最新区块倒序遍历到起始区块
