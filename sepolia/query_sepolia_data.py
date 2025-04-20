@@ -40,11 +40,11 @@ def query_database():
     
     # 查询type=4交易的哈希
     print("\n===== Type=4交易哈希 =====")
-    cursor.execute("SELECT tx_hash, block_number FROM type4_transactions ORDER BY block_number")
+    cursor.execute("SELECT tx_hash, block_number, tx_data FROM type4_transactions ORDER BY block_number")
     type4_txs = cursor.fetchall()
     
-    for i, (tx_hash, block_number) in enumerate(type4_txs):
-        print(f"区块 #{block_number} - 交易哈希: {tx_hash}")
+    for i, (tx_hash, block_number, tx_data) in enumerate(type4_txs):
+        print(f"区块 #{block_number} - 交易哈希: {tx_hash} - 交易数据: {tx_data}")
         
         # 只显示前20个交易哈希，避免输出过多
         if i >= 19 and len(type4_txs) > 30:
