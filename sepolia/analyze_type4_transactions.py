@@ -4,6 +4,37 @@
 import sqlite3
 import json
 from collections import Counter
+from eth_keys import keys
+from hexbytes import HexBytes
+from eth_utils import to_checksum_address
+import coincurve
+
+def ecrecover(r, s, y_parity):
+    """从签名参数恢复以太坊地址"""
+    try:
+        # 将r, s转换为字节
+        r_bytes = HexBytes(r) if not isinstance(r, bytes) else r
+        s_bytes = HexBytes(s) if not isinstance(s, bytes) else s
+        
+        # 创建签名
+        signature = r_bytes + s_bytes + bytes([y_parity])
+        
+        # 使用coincurve恢复公钥（这里使用零哈希作为消息）
+        null_msg_hash = b'\x00' * 32
+        public_key = coincurve.PublicKey.from_signature_and_message(
+            signature,
+            null_msg_hash,
+            hasher=None
+        )
+        
+        # 从公钥计算以太坊地址
+        public_key_bytes = public_key.format(compressed=False)[1:]
+        import hashlib
+        address = '0x' + hashlib.sha3_256(public_key_bytes).digest()[-20:].hex()
+        return to_checksum_address(address)
+    except Exception as e:
+        print(f"ecrecover错误: {e}")
+        return None
 
 def analyze_type4_transactions():
     # 连接到数据库
@@ -28,6 +59,9 @@ def analyze_type4_transactions():
     
     # 创建一个集合存储交易的from地址
     from_addresses = set()
+    
+    # 创建一个集合存储recovered author地址
+    author_addresses = set()
     
     """
     Type4交易示例
@@ -55,6 +89,14 @@ def analyze_type4_transactions():
                         else:
                             non_zero_address_count += 1
                             address_counter[address] += 1
+                    try:
+                        author = ecrecover(auth['r'], auth['s'], int(auth['yParity'], 16) if isinstance(auth['yParity'], str) else auth['yParity'])
+                        if author:
+                            author_addresses.add(author.lower())
+                        print(f"author: {author}")
+                    except Exception as e:
+                        print(f"处理签名恢复时出错: {e}, 数据: {auth}")
+                        continue
         except (json.JSONDecodeError, KeyError) as e:
             print(f"处理交易数据时出错: {e}")
             continue
@@ -64,7 +106,7 @@ def analyze_type4_transactions():
     print(f"address为0的授权数量: {zero_address_count}")
     print(f"address非0的授权数量: {non_zero_address_count}")
     
-    # 3. 若address非0，则统计address的频次，从高到低排列
+    # 3. 若address非0，则统计address的频次，从高到低排列 
     if address_counter:
         print(f"\n===== 非0地址频次统计(从高到低) =====")
         for address, count in address_counter.most_common():
@@ -75,6 +117,10 @@ def analyze_type4_transactions():
     # 4. 输出唯一from地址的数量
     print(f"\n===== 发送方(from)地址统计 =====")
     print(f"唯一发送方地址数量: {len(from_addresses)}")
+    
+    # 5. 输出唯一author地址的数量
+    print(f"\n===== 恢复的授权方(author)地址统计 =====")
+    print(f"唯一授权方地址数量: {len(author_addresses)}")
     
     # 关闭数据库连接
     conn.close()
