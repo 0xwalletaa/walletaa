@@ -8,3 +8,4 @@ entry_point/account_deployed/
 url.private
 sepolia_blocks.db
 author_tvl.db
+sepolia/author_tvl.db-journal
