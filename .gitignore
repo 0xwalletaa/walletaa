@@ -7,3 +7,4 @@ entry_point/account_deployed/
 *.csv
 url.private
 sepolia_blocks.db
+author_tvl.db
