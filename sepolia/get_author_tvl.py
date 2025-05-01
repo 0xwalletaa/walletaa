@@ -174,7 +174,7 @@ def update_author_balance(author_address):
     try:
         # 检查数据是否需要更新
         if is_data_fresh(author_address):
-            print(f"地址 {author_address} 的数据在一小时内已更新，跳过")
+            print(f"地址 {author_address} 的数据在24小时内已更新，跳过")
             return
         
         # 获取余额
