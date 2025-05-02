@@ -7,41 +7,41 @@ from collections import Counter
 from eth_keys import keys
 from hexbytes import HexBytes
 from eth_utils import to_checksum_address
-import coincurve
 
-def ecrecover(tx_hash, r, s, y_parity):
-    """从签名参数恢复以太坊地址"""
-    try:
-        # 将r, s转换为字节
-        r_bytes = HexBytes(r) if not isinstance(r, bytes) else r
-        s_bytes = HexBytes(s) if not isinstance(s, bytes) else s
-        
-        # 确保tx_hash是32字节长度
-        if isinstance(tx_hash, str):
-            tx_hash = HexBytes(tx_hash)
-        
-        # 确保tx_hash是32字节
-        if len(tx_hash) != 32:
-            tx_hash = tx_hash.rjust(32, b'\0') if len(tx_hash) < 32 else tx_hash[-32:]
-        
-        # 创建签名
-        signature = r_bytes + s_bytes + bytes([y_parity])
-        
-        # 使用coincurve恢复公钥（这里使用tx_hash作为消息）
-        public_key = coincurve.PublicKey.from_signature_and_message(
-            signature,
-            tx_hash,
-            hasher=None
-        )
-        
-        # 从公钥计算以太坊地址
-        public_key_bytes = public_key.format(compressed=False)[1:]
-        import hashlib
-        address = '0x' + hashlib.sha3_256(public_key_bytes).digest()[-20:].hex()
-        return to_checksum_address(address)
-    except Exception as e:
-        print(f"ecrecover错误: {e}")
-        return None
+
+from eth_keys import keys
+from hexbytes import HexBytes
+from eth_utils import to_checksum_address, to_int, to_bytes
+from eth_account import Account
+import rlp
+from eth_utils import keccak
+
+
+
+def ecrecover(auth):
+    chain_id = to_bytes(hexstr=auth['chainId'])
+    address_bytes = to_bytes(hexstr=auth['address'])
+    nonce = to_bytes(hexstr=auth['nonce'])
+
+    # RLP 编码 [chain_id, address, nonce]
+    encoded_data = rlp.encode([chain_id, address_bytes, nonce])
+
+    # 构造 EIP-7702 消息：0x05 || rlp(...)
+    message_bytes = b'\x05' + encoded_data
+    # 计算 Keccak-256 哈希
+    message_hash = keccak(message_bytes)
+
+    # 将签名组件转换为标准格式
+    r_bytes = HexBytes(auth['r'])
+    s_bytes = HexBytes(auth['s'])
+    # yParity (0 or 1) is used directly
+    y_parity = int(auth['yParity'], 16)
+
+    # 创建vrs元组
+    vrs = (y_parity, r_bytes, s_bytes)
+    recovered_address = Account()._recover_hash(message_hash, vrs=vrs)
+    
+    return recovered_address
 
 def analyze_type4_transactions():
     # 连接到数据库
@@ -97,12 +97,12 @@ def analyze_type4_transactions():
                             non_zero_address_count += 1
                             address_counter[address] += 1
                     try:
-                        author = ecrecover(tx_hash, auth['r'], auth['s'], int(auth['yParity'], 16) if isinstance(auth['yParity'], str) else auth['yParity'])
+                        author = ecrecover(auth)
                         if author:
                             author_addresses.add(author.lower())
-                        print(f"author: {author}")
+                        # print(f"author: {author}")
                     except Exception as e:
-                        print(f"处理签名恢复时出错: {e}, 数据: {auth}")
+                        print(f"处理签名恢复时出错: {e}, tx_hash: {tx_hash}, 数据: {auth}")
                         continue
         except (json.JSONDecodeError, KeyError) as e:
             print(f"处理交易数据时出错: {e}")
@@ -114,12 +114,12 @@ def analyze_type4_transactions():
     print(f"address非0的授权数量: {non_zero_address_count}")
     
     # 3. 若address非0，则统计address的频次，从高到低排列 
-    if address_counter:
-        print(f"\n===== 非0地址频次统计(从高到低) =====")
-        for address, count in address_counter.most_common():
-            print(f"地址: {address}, 出现次数: {count}")
-    else:
-        print("\n没有找到非0地址的授权。")
+    # if address_counter:
+    #     print(f"\n===== 非0地址频次统计(从高到低) =====")
+    #     for address, count in address_counter.most_common():
+    #         print(f"地址: {address}, 出现次数: {count}")
+    # else:
+    #     print("\n没有找到非0地址的授权。")
     
     # 4. 输出唯一from地址的数量
     print(f"\n===== 发送方(from)地址统计 =====")

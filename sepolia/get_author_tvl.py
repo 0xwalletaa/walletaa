@@ -39,7 +39,6 @@ DATA_EXPIRY = 86400  # 24小时
 thread_local = threading.local()
 
 def ecrecover(auth):
-    print(auth)
     chain_id = to_bytes(hexstr=auth['chainId'])
     address_bytes = to_bytes(hexstr=auth['address'])
     nonce = to_bytes(hexstr=auth['nonce'])
@@ -151,11 +150,6 @@ def is_data_fresh(author_address):
 def update_author_balance(author_address):
     """更新作者地址的余额信息"""
     try:
-        # 检查数据是否需要更新
-        if is_data_fresh(author_address):
-            print(f"地址 {author_address} 的数据在24小时内已更新，跳过")
-            return
-        
         # 获取余额
         balance = get_address_balance(author_address)
         
@@ -204,14 +198,19 @@ def main():
         print("未找到author地址，退出程序")
         return
     
+    unfresh_author_addresses = []
+    for address in author_addresses:
+        if not is_data_fresh(address):
+            unfresh_author_addresses.append(address)
+    
     # 使用线程池并行获取余额
-    print(f"开始更新 {len(author_addresses)} 个地址的余额数据...")
+    print(f"开始更新 {len(unfresh_author_addresses)} 个地址的余额数据...")
     success_count = 0
     error_count = 0
     
     with ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
         futures = []
-        for address in author_addresses:
+        for address in unfresh_author_addresses:
             futures.append(
                 executor.submit(update_author_balance, address)
             )
