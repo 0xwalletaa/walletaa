@@ -13,6 +13,14 @@ import coincurve
 from eth_utils import to_checksum_address
 import hashlib
 
+from eth_keys import keys
+from hexbytes import HexBytes
+from eth_utils import to_checksum_address, to_int, to_bytes
+from eth_account import Account
+import rlp
+from eth_utils import keccak
+
+
 # 连接到Sepolia测试网的节点列表
 web3s = [
     Web3(Web3.HTTPProvider("https://api.zan.top/eth-sepolia")),
@@ -30,47 +38,31 @@ DATA_EXPIRY = 86400  # 24小时
 # 创建一个线程本地存储
 thread_local = threading.local()
 
-def ecrecover(r, s, y_parity):
-    """从签名参数恢复以太坊地址"""
-    try:
-        # 将r, s转换为字节并确保长度正确
-        r_bytes = HexBytes(r) if not isinstance(r, bytes) else r
-        s_bytes = HexBytes(s) if not isinstance(s, bytes) else s
-        
-        # 确保r和s是32字节长度
-        if len(r_bytes) != 32:
-            r_bytes = r_bytes.rjust(32, b'\0') if len(r_bytes) < 32 else r_bytes[-32:]
-        if len(s_bytes) != 32:
-            s_bytes = s_bytes.rjust(32, b'\0') if len(s_bytes) < 32 else s_bytes[-32:]
-        
-        # 确保y_parity是单字节(0或1)
-        if isinstance(y_parity, int):
-            y_parity = y_parity & 1  # 确保只有最低位
-        else:
-            y_parity = 0  # 默认值
-        
-        # 创建65字节的签名 (r[32] + s[32] + v[1])
-        signature = r_bytes + s_bytes + bytes([y_parity])
-        
-        # 验证签名长度
-        if len(signature) != 65:
-            raise ValueError(f"签名长度不正确: {len(signature)}字节, 应为65字节")
-        
-        # 使用coincurve恢复公钥（这里使用零哈希作为消息）
-        null_msg_hash = b'\x00' * 32
-        public_key = coincurve.PublicKey.from_signature_and_message(
-            signature,
-            null_msg_hash,
-            hasher=None
-        )
-        
-        # 从公钥计算以太坊地址
-        public_key_bytes = public_key.format(compressed=False)[1:]
-        address = '0x' + hashlib.sha3_256(public_key_bytes).digest()[-20:].hex()
-        return to_checksum_address(address)
-    except Exception as e:
-        print(f"ecrecover错误: {e}")
-        return None
+def ecrecover(auth):
+    print(auth)
+    chain_id = to_bytes(hexstr=auth['chainId'])
+    address_bytes = to_bytes(hexstr=auth['address'])
+    nonce = to_bytes(hexstr=auth['nonce'])
+
+    # RLP 编码 [chain_id, address, nonce]
+    encoded_data = rlp.encode([chain_id, address_bytes, nonce])
+
+    # 构造 EIP-7702 消息：0x05 || rlp(...)
+    message_bytes = b'\x05' + encoded_data
+    # 计算 Keccak-256 哈希
+    message_hash = keccak(message_bytes)
+
+    # 将签名组件转换为标准格式
+    r_bytes = HexBytes(auth['r'])
+    s_bytes = HexBytes(auth['s'])
+    # yParity (0 or 1) is used directly
+    y_parity = int(auth['yParity'], 16)
+
+    # 创建vrs元组
+    vrs = (y_parity, r_bytes, s_bytes)
+    recovered_address = Account()._recover_hash(message_hash, vrs=vrs)
+    
+    return recovered_address
 
 def get_db_connection():
     """获取线程本地的数据库连接"""
@@ -110,20 +102,7 @@ def get_author_addresses():
                 if 'authorizationList' in tx_data and tx_data['authorizationList']:
                     for auth in tx_data['authorizationList']:
                         try:
-                            # 确保r和s是有效的十六进制字符串
-                            if not all(k in auth for k in ('r', 's', 'yParity')):
-                                continue
-                                
-                            # 尝试转换yParity
-                            if isinstance(auth['yParity'], str):
-                                if auth['yParity'].startswith('0x'):
-                                    y_parity = int(auth['yParity'], 16)
-                                else:
-                                    y_parity = int(auth['yParity'])
-                            else:
-                                y_parity = auth['yParity']
-                            
-                            author = ecrecover(auth['r'], auth['s'], y_parity)
+                            author = ecrecover(auth)
                             if author:
                                 author_addresses.add(author.lower())
                         except Exception as e:
