@@ -9,21 +9,28 @@ from hexbytes import HexBytes
 from eth_utils import to_checksum_address
 import coincurve
 
-def ecrecover(r, s, y_parity):
+def ecrecover(tx_hash, r, s, y_parity):
     """从签名参数恢复以太坊地址"""
     try:
         # 将r, s转换为字节
         r_bytes = HexBytes(r) if not isinstance(r, bytes) else r
         s_bytes = HexBytes(s) if not isinstance(s, bytes) else s
         
+        # 确保tx_hash是32字节长度
+        if isinstance(tx_hash, str):
+            tx_hash = HexBytes(tx_hash)
+        
+        # 确保tx_hash是32字节
+        if len(tx_hash) != 32:
+            tx_hash = tx_hash.rjust(32, b'\0') if len(tx_hash) < 32 else tx_hash[-32:]
+        
         # 创建签名
         signature = r_bytes + s_bytes + bytes([y_parity])
         
-        # 使用coincurve恢复公钥（这里使用零哈希作为消息）
-        null_msg_hash = b'\x00' * 32
+        # 使用coincurve恢复公钥（这里使用tx_hash作为消息）
         public_key = coincurve.PublicKey.from_signature_and_message(
             signature,
-            null_msg_hash,
+            tx_hash,
             hasher=None
         )
         
@@ -47,7 +54,7 @@ def analyze_type4_transactions():
     print(f"数据库中type=4交易总数: {total_type4_txs}")
     
     # 获取所有type4交易数据
-    cursor.execute("SELECT tx_data FROM type4_transactions")
+    cursor.execute("SELECT tx_hash, tx_data FROM type4_transactions")
     tx_data_list = cursor.fetchall()
     
     # 存储address为0和非0的计数
@@ -70,7 +77,7 @@ def analyze_type4_transactions():
     
     
     # 遍历所有交易数据
-    for (tx_data_str,) in tx_data_list:
+    for (tx_hash, tx_data_str) in tx_data_list:
         try:
             tx_data = json.loads(tx_data_str)
             
@@ -90,7 +97,7 @@ def analyze_type4_transactions():
                             non_zero_address_count += 1
                             address_counter[address] += 1
                     try:
-                        author = ecrecover(auth['r'], auth['s'], int(auth['yParity'], 16) if isinstance(auth['yParity'], str) else auth['yParity'])
+                        author = ecrecover(tx_hash, auth['r'], auth['s'], int(auth['yParity'], 16) if isinstance(auth['yParity'], str) else auth['yParity'])
                         if author:
                             author_addresses.add(author.lower())
                         print(f"author: {author}")
