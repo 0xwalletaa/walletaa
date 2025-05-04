@@ -73,7 +73,7 @@ def get_authorizers():
     })
 
 
-# authorizers分页查询接口
+# authorizers_with_zero分页查询接口
 @app.route('/authorizers_with_zero', methods=['GET'])
 def get_authorizers_with_zero():
     # 获取分页参数，默认第1页，每页10条
