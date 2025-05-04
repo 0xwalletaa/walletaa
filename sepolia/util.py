@@ -32,7 +32,7 @@ def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
         recovered_address = Account()._recover_hash(message_hash, vrs=vrs)
     except Exception as e:
         print(f"ecrecover error: {e}")
-        return None
+        return "error"
     else:
         return recovered_address
 
@@ -47,8 +47,8 @@ def parse_authorization(authorization):
     )
 
     ret = {
-        'authorizer_address': authorizer_address,
-        'code_address': authorization['address'],
+        'authorizer_address': authorizer_address.lower(),
+        'code_address': authorization['address'].lower(),
     }
 
     return ret
@@ -60,7 +60,8 @@ def parse_type4_tx_data(tx_data_str_):
     authorization_list = []
     for authorization in tx_data['authorizationList']:
         parsed_result = parse_authorization(authorization)
-        authorization_list.append(parsed_result)
+        if parsed_result is not None:
+            authorization_list.append(parsed_result)
         
     tx_fee = tx_data['gas'] * tx_data['gasPrice']
     
@@ -69,7 +70,7 @@ def parse_type4_tx_data(tx_data_str_):
         'block_hash': tx_data['blockHash'],
         'tx_index': tx_data['transactionIndex'],
         'tx_hash': tx_data['hash'],
-        'relayer_address': tx_data['from'],
+        'relayer_address': tx_data['from'].lower(),
         'tx_fee': tx_fee,
         'authorization_list': authorization_list,
     }
@@ -111,7 +112,7 @@ def get_all_type4_txs_with_timestamp():
         txs[i]['timestamp'] = timestamp_of_block[txs[i]['block_number']]
     return txs
 
-def get_authorizer_info(txs):
+def get_authorizer_info(txs, include_zero=False):
     balance_of= {}
 
     conn = sqlite3.connect('author_tvl.db')
@@ -120,7 +121,7 @@ def get_authorizer_info(txs):
     cursor.execute("SELECT author_address, eth_balance FROM author_balances")
     data = cursor.fetchall()
     for address, balance in data:
-        balance_of[address] = balance
+        balance_of[address] = float(balance)
     conn.close()
             
     info_of_authorizer_dict = {}
@@ -129,16 +130,19 @@ def get_authorizer_info(txs):
             authorizer_address = authorization['authorizer_address']
             if authorizer_address not in info_of_authorizer_dict:
                 info_of_authorizer_dict[authorizer_address] = {
+                    'authorizer_address': authorizer_address,
                     'eth_balance': 0,
                     'code_address': "",
                     'set_code_tx_count': 0,
                     'unset_code_tx_count': 0,
+                    'historical_code_address': [],
                 }
-                info_of_authorizer_dict[authorizer_address]['code_address'] = authorization['code_address']
                 if authorization['code_address'] == "0x0000000000000000000000000000000000000000":
                     info_of_authorizer_dict[authorizer_address]['unset_code_tx_count'] += 1
+                    info_of_authorizer_dict[authorizer_address]['historical_code_address'].append(authorization['code_address'])
                 else:
                     info_of_authorizer_dict[authorizer_address]['set_code_tx_count'] += 1
+                info_of_authorizer_dict[authorizer_address]['code_address'] = authorization['code_address']
     
     for authorizer_address in info_of_authorizer_dict:
         if authorizer_address in balance_of:
@@ -146,7 +150,10 @@ def get_authorizer_info(txs):
 
     info_of_authorizer_list = []
     for authorizer_address in info_of_authorizer_dict:
-        info_of_authorizer_list.append(info_of_authorizer_dict[authorizer_address]) 
+        if authorizer_address != "error":
+            if not include_zero and info_of_authorizer_dict[authorizer_address]['code_address'] == "0x0000000000000000000000000000000000000000":
+                continue
+            info_of_authorizer_list.append(info_of_authorizer_dict[authorizer_address]) 
     info_of_authorizer_list.sort(key=lambda x: x['eth_balance'], reverse=True)
 
     return info_of_authorizer_list

@@ -8,14 +8,17 @@ app = Flask(__name__)
 # 全局变量
 txs = util.get_all_type4_txs_with_timestamp()
 last_update_time = time.time()
-
+authorizers = util.get_authorizer_info(txs)
+authorizers_with_zero = util.get_authorizer_info(txs, include_zero=True)
 # 后台更新线程
 def update_txs():
-    global txs, last_update_time
+    global txs, last_update_time, authorizers, authorizers_with_zero
     while True:
         time.sleep(30)  # 每30秒更新一次
         try:
             txs = util.get_all_type4_txs_with_timestamp()
+            authorizers = util.get_authorizer_info(txs)
+            authorizers_with_zero = util.get_authorizer_info(txs, include_zero=True)
             last_update_time = time.time()
             print(f"已更新交易数据，共 {len(txs)} 条记录")
         except Exception as e:
@@ -26,6 +29,7 @@ def update_txs():
 @app.route('/transactions', methods=['GET'])
 def get_transactions():
     # 获取分页参数，默认第1页，每页10条
+    reversed_txs = txs[::-1]
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('page_size', 10))
     
@@ -34,7 +38,7 @@ def get_transactions():
     end_idx = start_idx + page_size
     
     # 获取当前页的交易
-    page_txs = txs[start_idx:end_idx]
+    page_txs = reversed_txs[start_idx:end_idx]
     
     # 返回结果
     return jsonify({
@@ -42,6 +46,53 @@ def get_transactions():
         'page': page,
         'page_size': page_size,
         'transactions': page_txs,
+        'last_update_time': last_update_time
+    })
+
+# authorizers分页查询接口
+@app.route('/authorizers', methods=['GET'])
+def get_authorizers():
+    # 获取分页参数，默认第1页，每页10条
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 10))
+    
+    # 计算分页
+    start_idx = (page - 1) * page_size
+    end_idx = start_idx + page_size
+    
+    # 获取当前页的授权者信息
+    page_authorizers = authorizers[start_idx:end_idx]
+    
+    # 返回结果
+    return jsonify({
+        'total': len(authorizers),
+        'page': page,
+        'page_size': page_size,
+        'authorizers': page_authorizers,
+        'last_update_time': last_update_time
+    })
+
+
+# authorizers分页查询接口
+@app.route('/authorizers_with_zero', methods=['GET'])
+def get_authorizers_with_zero():
+    # 获取分页参数，默认第1页，每页10条
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 10))
+    
+    # 计算分页
+    start_idx = (page - 1) * page_size
+    end_idx = start_idx + page_size
+    
+    # 获取当前页的授权者信息
+    page_authorizers = authorizers_with_zero[start_idx:end_idx]
+    
+    # 返回结果
+    return jsonify({
+        'total': len(authorizers_with_zero),
+        'page': page,
+        'page_size': page_size,
+        'authorizers': page_authorizers,
         'last_update_time': last_update_time
     })
 
