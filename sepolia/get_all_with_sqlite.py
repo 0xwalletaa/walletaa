@@ -11,7 +11,7 @@ import random
 # 连接到Sepolia测试网
 web3s = [
     Web3(Web3.HTTPProvider("https://api.zan.top/eth-sepolia")),
-    Web3(Web3.HTTPProvider("https://endpoints.omniatech.io/v1/eth/sepolia/public")),
+    # Web3(Web3.HTTPProvider("https://endpoints.omniatech.io/v1/eth/sepolia/public")),
     Web3(Web3.HTTPProvider("https://eth-sepolia.public.blastapi.io")),
     Web3(Web3.HTTPProvider("https://sepolia.drpc.org")),
     Web3(Web3.HTTPProvider("https://0xrpc.io/sep"))
