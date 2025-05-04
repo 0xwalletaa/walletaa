@@ -124,12 +124,12 @@ def get_authorizer_info(txs, include_zero=False):
         balance_of[address] = float(balance)
     conn.close()
             
-    info_of_authorizer_dict = {}
+    authorizer_info_dict = {}
     for tx in txs:
         for authorization in tx['authorization_list']:
             authorizer_address = authorization['authorizer_address']
-            if authorizer_address not in info_of_authorizer_dict:
-                info_of_authorizer_dict[authorizer_address] = {
+            if authorizer_address not in authorizer_info_dict:
+                authorizer_info_dict[authorizer_address] = {
                     'authorizer_address': authorizer_address,
                     'eth_balance': 0,
                     'code_address': "0x0000000000000000000000000000000000000000",
@@ -138,26 +138,26 @@ def get_authorizer_info(txs, include_zero=False):
                     'historical_code_address': [],
                 }
                 if authorization['code_address'] == "0x0000000000000000000000000000000000000000":
-                    info_of_authorizer_dict[authorizer_address]['unset_code_tx_count'] += 1
-                    if info_of_authorizer_dict[authorizer_address]['code_address'] != "0x0000000000000000000000000000000000000000":
-                        info_of_authorizer_dict[authorizer_address]['historical_code_address'].append(info_of_authorizer_dict[authorizer_address]['code_address'])
+                    authorizer_info_dict[authorizer_address]['unset_code_tx_count'] += 1
+                    if authorizer_info_dict[authorizer_address]['code_address'] != "0x0000000000000000000000000000000000000000":
+                        authorizer_info_dict[authorizer_address]['historical_code_address'].append(authorizer_info_dict[authorizer_address]['code_address'])
                 else:
-                    info_of_authorizer_dict[authorizer_address]['set_code_tx_count'] += 1
-                info_of_authorizer_dict[authorizer_address]['code_address'] = authorization['code_address']
+                    authorizer_info_dict[authorizer_address]['set_code_tx_count'] += 1
+                authorizer_info_dict[authorizer_address]['code_address'] = authorization['code_address']
     
-    for authorizer_address in info_of_authorizer_dict:
+    for authorizer_address in authorizer_info_dict:
         if authorizer_address in balance_of:
-            info_of_authorizer_dict[authorizer_address]['eth_balance'] = balance_of[authorizer_address]
+            authorizer_info_dict[authorizer_address]['eth_balance'] = balance_of[authorizer_address]
 
-    info_of_authorizer_list = []
-    for authorizer_address in info_of_authorizer_dict:
+    authorizer_info = []
+    for authorizer_address in authorizer_info_dict:
         if authorizer_address != "error":
-            if not include_zero and info_of_authorizer_dict[authorizer_address]['code_address'] == "0x0000000000000000000000000000000000000000":
+            if not include_zero and authorizer_info_dict[authorizer_address]['code_address'] == "0x0000000000000000000000000000000000000000":
                 continue
-            info_of_authorizer_list.append(info_of_authorizer_dict[authorizer_address]) 
-    info_of_authorizer_list.sort(key=lambda x: x['eth_balance'], reverse=True)
+            authorizer_info.append(authorizer_info_dict[authorizer_address]) 
+    authorizer_info.sort(key=lambda x: x['eth_balance'], reverse=True)
 
-    return info_of_authorizer_list
+    return authorizer_info
 
 
 """
