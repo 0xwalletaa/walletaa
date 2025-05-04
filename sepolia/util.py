@@ -132,14 +132,15 @@ def get_authorizer_info(txs, include_zero=False):
                 info_of_authorizer_dict[authorizer_address] = {
                     'authorizer_address': authorizer_address,
                     'eth_balance': 0,
-                    'code_address': "",
+                    'code_address': "0x0000000000000000000000000000000000000000",
                     'set_code_tx_count': 0,
                     'unset_code_tx_count': 0,
                     'historical_code_address': [],
                 }
                 if authorization['code_address'] == "0x0000000000000000000000000000000000000000":
                     info_of_authorizer_dict[authorizer_address]['unset_code_tx_count'] += 1
-                    info_of_authorizer_dict[authorizer_address]['historical_code_address'].append(authorization['code_address'])
+                    if info_of_authorizer_dict[authorizer_address]['code_address'] != "0x0000000000000000000000000000000000000000":
+                        info_of_authorizer_dict[authorizer_address]['historical_code_address'].append(info_of_authorizer_dict[authorizer_address]['code_address'])
                 else:
                     info_of_authorizer_dict[authorizer_address]['set_code_tx_count'] += 1
                 info_of_authorizer_dict[authorizer_address]['code_address'] = authorization['code_address']
