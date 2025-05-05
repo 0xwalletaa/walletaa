@@ -50,20 +50,21 @@ const Authorizers: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.authorizers.authorization_count',
-        defaultMessage: 'Auth Count',
+        id: 'pages.authorizers.set_code_tx_count',
+        defaultMessage: 'Set Code Count',
       }),
-      dataIndex: 'authorization_count',
+      dataIndex: 'set_code_tx_count',
       sorter: true,
       valueType: 'digit',
     },
     {
       title: intl.formatMessage({
-        id: 'pages.authorizers.total_gas_fee',
-        defaultMessage: 'Total Gas Fee (ETH)',
+        id: 'pages.authorizers.unset_code_tx_count',
+        defaultMessage: 'Unset Code Count',
       }),
-      dataIndex: 'total_gas_fee',
+      dataIndex: 'unset_code_tx_count',
       sorter: true,
+      valueType: 'digit',
     },
     {
       title: intl.formatMessage({
@@ -72,6 +73,27 @@ const Authorizers: React.FC = () => {
       }),
       dataIndex: 'eth_balance',
       sorter: true,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.authorizers.historical_code_address',
+        defaultMessage: 'Historical Code Address',
+      }),
+      dataIndex: 'historical_code_address',
+      render: (dom) => {
+        if (!dom || !Array.isArray(dom) || dom.length === 0) {
+          return '-';
+        }
+        return (
+          <div>
+            {(dom as string[]).map((address, index) => (
+              <Tooltip key={index} title={address}>
+                <Tag color="purple" style={{ marginBottom: '2px' }}>{`${formatAddress(address)}`}</Tag>
+              </Tooltip>
+            ))}
+          </div>
+        );
+      },
     },
   ];
 
