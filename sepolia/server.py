@@ -361,7 +361,7 @@ update_thread.start()
 
 if __name__ == '__main__':
     # 开发环境使用
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=8082, debug=False)
 else:
     # 生产环境入口点
     # 使用Gunicorn或uWSGI运行时，这里是WSGI入口点

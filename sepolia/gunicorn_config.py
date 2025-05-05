@@ -10,7 +10,7 @@ import multiprocessing
 import os
 
 # 绑定的IP和端口
-bind = "0.0.0.0:5000"
+bind = "0.0.0.0:8082"
 
 # 工作模式
 worker_class = "sync"
