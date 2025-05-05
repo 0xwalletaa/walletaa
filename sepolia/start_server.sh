@@ -1,5 +1,5 @@
 #!/bin/bash
-
+pkill gunicorn
 # 创建日志目录
 mkdir -p logs
 # 启动服务器
