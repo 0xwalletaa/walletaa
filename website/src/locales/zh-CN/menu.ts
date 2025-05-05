@@ -1,6 +1,9 @@
 export default {
   'menu.welcome': '欢迎',
   'menu.transactions': '交易',
+  'menu.authorizers': '授权者',
+  'menu.codes': '代码',
+  'menu.relayers': '中继者',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.admin': '管理页',

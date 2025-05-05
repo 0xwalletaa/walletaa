@@ -24,6 +24,24 @@ export default [
     component: './Transactions',
   },
   {
+    name: 'authorizers',
+    icon: 'team',
+    path: '/authorizers',
+    component: './Authorizers',
+  },
+  {
+    name: 'codes',
+    icon: 'code',
+    path: '/codes',
+    component: './Codes',
+  },
+  {
+    name: 'relayers',
+    icon: 'block',
+    path: '/relayers',
+    component: './Relayers',
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },
