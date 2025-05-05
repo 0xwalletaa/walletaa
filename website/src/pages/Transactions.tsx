@@ -10,7 +10,7 @@ import { Drawer, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 import { getTransactions, TransactionItem } from '@/services/api';
 
-const TableList: React.FC = () => {
+const Transactions: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<TransactionItem>();
@@ -23,7 +23,10 @@ const TableList: React.FC = () => {
 
   const columns: ProColumns<TransactionItem>[] = [
     {
-      title: '交易哈希',
+      title: intl.formatMessage({
+        id: 'pages.transactions.tx_hash',
+        defaultMessage: 'Transaction Hash',
+      }),
       dataIndex: 'tx_hash',
       render: (dom, entity) => {
         return (
@@ -41,18 +44,31 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '区块',
+      title: intl.formatMessage({
+        id: 'pages.transactions.block_number',
+        defaultMessage: 'Block Number',
+      }),
       dataIndex: 'block_number',
       sorter: true,
     },
     {
-      title: '时间戳',
+      title: intl.formatMessage({
+        id: 'pages.transactions.timestamp',
+        defaultMessage: 'Timestamp',
+      }),
       dataIndex: 'timestamp',
       valueType: 'dateTime',
       sorter: true,
+      renderText: (val: number) => {
+        // 将秒级时间戳转换为毫秒级时间戳（如果时间戳是秒级的）
+        return val * 1000;
+      },
     },
     {
-      title: '中继者地址',
+      title: intl.formatMessage({
+        id: 'pages.transactions.relayer_address',
+        defaultMessage: 'Relayer Address',
+      }),
       dataIndex: 'relayer_address',
       render: (dom) => {
         return typeof dom === 'string' && dom.length > 10
@@ -61,18 +77,26 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '交易索引',
+      title: intl.formatMessage({
+        id: 'pages.transactions.tx_index',
+        defaultMessage: 'Transaction Index',
+      }),
       dataIndex: 'tx_index',
       valueType: 'digit',
     },
     {
-      title: '交易费用 (ETH)',
+      title: intl.formatMessage({
+        id: 'pages.transactions.tx_fee',
+        defaultMessage: 'Transaction Fee (ETH)',
+      }),
       dataIndex: 'tx_fee',
-      valueType: 'money',
       sorter: true,
     },
     {
-      title: '授权者数量',
+      title: intl.formatMessage({
+        id: 'pages.transactions.authorization_list',
+        defaultMessage: 'Authorization List',
+      }),
       dataIndex: 'authorization_list',
       render: (_, record) => record.authorization_list?.length || 0,
     },
@@ -81,7 +105,10 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<TransactionItem>
-        headerTitle="交易列表"
+        headerTitle={intl.formatMessage({
+          id: 'pages.transactions.headerTitle',
+          defaultMessage: 'Transaction List',
+        })}
         actionRef={actionRef}
         rowKey="tx_hash"
         search={false}
@@ -118,7 +145,10 @@ const TableList: React.FC = () => {
           <>
             <ProDescriptions<TransactionItem>
               column={2}
-              title={`交易详情: ${currentRow.tx_hash.substring(0, 6)}...${currentRow.tx_hash.substring(currentRow.tx_hash.length - 4)}`}
+              title={intl.formatMessage({
+                id: 'pages.transactions.detailTitle',
+                defaultMessage: 'Transaction Details',
+              })}
               request={async () => ({
                 data: currentRow || {},
               })}
@@ -129,18 +159,30 @@ const TableList: React.FC = () => {
             />
             
             <div style={{ marginTop: 20 }}>
-              <h3>授权列表</h3>
+              <h3>{intl.formatMessage({
+                id: 'pages.transactions.authorizationList',
+                defaultMessage: 'Authorization List',
+              })}</h3>
               {currentRow.authorization_list && currentRow.authorization_list.length > 0 ? (
                 <ul>
                   {currentRow.authorization_list.map((auth, index) => (
                     <li key={index}>
-                      <strong>授权者地址:</strong> {auth.authorizer_address.substring(0, 6)}...{auth.authorizer_address.substring(auth.authorizer_address.length - 4)}
-                      <div><strong>代码地址:</strong> {auth.code_address.substring(0, 6)}...{auth.code_address.substring(auth.code_address.length - 4)}</div>
+                      <strong>{intl.formatMessage({
+                        id: 'pages.transactions.authorizerAddress',
+                        defaultMessage: 'Authorizer Address',
+                      })}:</strong> {auth.authorizer_address.substring(0, 6)}...{auth.authorizer_address.substring(auth.authorizer_address.length - 4)}
+                      <div><strong>{intl.formatMessage({
+                        id: 'pages.transactions.codeAddress',
+                        defaultMessage: 'Code Address',
+                      })}:</strong> {auth.code_address.substring(0, 6)}...{auth.code_address.substring(auth.code_address.length - 4)}</div>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p>无授权数据</p>
+                <p>{intl.formatMessage({
+                  id: 'pages.transactions.noAuthorizationData',
+                  defaultMessage: 'No Authorization Data',
+                })}</p>
               )}
             </div>
           </>
@@ -150,4 +192,4 @@ const TableList: React.FC = () => {
   );
 };
 
-export default TableList;
+export default Transactions;

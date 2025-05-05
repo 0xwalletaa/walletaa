@@ -1,5 +1,6 @@
 export default {
   'menu.welcome': '欢迎',
+  'menu.transactions': '交易',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.admin': '管理页',
