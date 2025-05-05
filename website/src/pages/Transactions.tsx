@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   PageContainer,
@@ -6,7 +6,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Drawer, Tag } from 'antd';
+import { Drawer, Tag, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import { getTransactions, TransactionItem } from '@/services/api';
 
@@ -21,28 +21,13 @@ const Transactions: React.FC = () => {
    * */
   const intl = useIntl();
 
+  const formatAddress = (address: string) => {
+    return typeof address === 'string' && address.length > 10
+      ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+      : address;
+  };
+
   const columns: ProColumns<TransactionItem>[] = [
-    {
-      title: intl.formatMessage({
-        id: 'pages.transactions.tx_hash',
-        defaultMessage: 'Transaction Hash',
-      }),
-      dataIndex: 'tx_hash',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {typeof dom === 'string' && dom.length > 10
-              ? `${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`
-              : dom}
-          </a>
-        );
-      },
-    },
     {
       title: intl.formatMessage({
         id: 'pages.transactions.block_number',
@@ -66,14 +51,28 @@ const Transactions: React.FC = () => {
     },
     {
       title: intl.formatMessage({
+        id: 'pages.transactions.tx_hash',
+        defaultMessage: 'Transaction Hash',
+      }),
+      dataIndex: 'tx_hash',
+      render: (dom, entity) => {
+        return (
+          <span>
+            {formatAddress(dom as string)}
+          </span>
+        );
+      },
+    },
+    {
+      title: intl.formatMessage({
         id: 'pages.transactions.relayer_address',
         defaultMessage: 'Relayer Address',
       }),
       dataIndex: 'relayer_address',
       render: (dom) => {
         return typeof dom === 'string' && dom.length > 10
-          ? `${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`
-          : dom;
+          ? <Tooltip title={dom}><Tag color="purple">{`${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`}</Tag></Tooltip>
+          : <Tag color="purple">{dom}</Tag>;
       },
     },
     {
@@ -98,7 +97,45 @@ const Transactions: React.FC = () => {
         defaultMessage: 'Authorization List',
       }),
       dataIndex: 'authorization_list',
-      render: (_, record) => record.authorization_list?.length || 0,
+      render: (_, record) => {
+        if (!record.authorization_list || record.authorization_list.length === 0) {
+          return (
+            <span>
+              {intl.formatMessage({
+                id: 'pages.transactions.noAuthorizationData',
+                defaultMessage: 'No Authorization Data',
+              })}
+            </span>
+          );
+        }
+        
+        if (record.authorization_list.length <= 3) {
+          return (
+            <div>
+              {record.authorization_list.map((auth, index) => (
+                <div key={index} style={{ marginBottom: 4 }}>
+                  <Tag color="blue">{formatAddress(auth.authorizer_address)}</Tag>
+                  <Tag color="green">{formatAddress(auth.code_address)}</Tag>
+                </div>
+              ))}
+            </div>
+          );
+        } else {
+          return (
+            <a
+              onClick={() => {
+                setCurrentRow(record);
+                setShowDetail(true);
+              }}
+            >
+              {intl.formatMessage(
+                { id: 'pages.transactions.viewMore', defaultMessage: 'View all {count} authorizations' },
+                { count: record.authorization_list.length }
+              )}
+            </a>
+          );
+        }
+      },
     },
   ];
 
@@ -143,38 +180,28 @@ const Transactions: React.FC = () => {
       >
         {currentRow?.tx_hash && (
           <>
-            <ProDescriptions<TransactionItem>
-              column={2}
-              title={intl.formatMessage({
-                id: 'pages.transactions.detailTitle',
-                defaultMessage: 'Transaction Details',
-              })}
-              request={async () => ({
-                data: currentRow || {},
-              })}
-              params={{
-                id: currentRow?.tx_hash,
-              }}
-              columns={columns as ProDescriptionsItemProps<TransactionItem>[]}
-            />
+            <h2>{intl.formatMessage({
+              id: 'pages.transactions.authorizationList',
+              defaultMessage: 'Authorization List',
+            })}</h2>
+            <p>{intl.formatMessage({
+              id: 'pages.transactions.transactionHash',
+              defaultMessage: 'Transaction Hash',
+            })}: {currentRow.tx_hash}</p>
             
             <div style={{ marginTop: 20 }}>
-              <h3>{intl.formatMessage({
-                id: 'pages.transactions.authorizationList',
-                defaultMessage: 'Authorization List',
-              })}</h3>
               {currentRow.authorization_list && currentRow.authorization_list.length > 0 ? (
-                <ul>
+                <ul style={{ padding: 0, listStyle: 'none' }}>
                   {currentRow.authorization_list.map((auth, index) => (
-                    <li key={index}>
-                      <strong>{intl.formatMessage({
+                    <li key={index} style={{ marginBottom: 12, padding: 10, border: '1px solid #f0f0f0', borderRadius: 4 }}>
+                      <div><strong>{intl.formatMessage({
                         id: 'pages.transactions.authorizerAddress',
                         defaultMessage: 'Authorizer Address',
-                      })}:</strong> {auth.authorizer_address.substring(0, 6)}...{auth.authorizer_address.substring(auth.authorizer_address.length - 4)}
+                      })}:</strong> {auth.authorizer_address}</div>
                       <div><strong>{intl.formatMessage({
                         id: 'pages.transactions.codeAddress',
                         defaultMessage: 'Code Address',
-                      })}:</strong> {auth.code_address.substring(0, 6)}...{auth.code_address.substring(auth.code_address.length - 4)}</div>
+                      })}:</strong> {auth.code_address}</div>
                     </li>
                   ))}
                 </ul>
