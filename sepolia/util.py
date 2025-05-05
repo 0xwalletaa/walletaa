@@ -63,7 +63,7 @@ def parse_type4_tx_data(tx_data_str_):
         if parsed_result is not None:
             authorization_list.append(parsed_result)
         
-    tx_fee = tx_data['gas'] * tx_data['gasPrice']
+    tx_fee = tx_data['gas'] * tx_data['gasPrice'] / 10**18
     
     ret = {
         'block_number': tx_data['blockNumber'],
@@ -183,6 +183,34 @@ def get_code_info(authorizer_info, sort_by="eth_balance"):
         code_info.sort(key=lambda x: x['authorizer_count'], reverse=True)
     
     return code_info
+
+def get_relayer_info(txs, sort_by="tx_count"):
+    relayer_info_dict = {}
+    for tx in txs:
+        relayer_address = tx['relayer_address']
+        if relayer_address not in relayer_info_dict:
+            relayer_info_dict[relayer_address] = {
+                'relayer_address': relayer_address,
+                'tx_count': 0,
+                'authorization_count': 0,
+                'tx_fee': 0,
+            }
+        relayer_info_dict[relayer_address]['tx_count'] += 1
+        relayer_info_dict[relayer_address]['tx_fee'] += tx['tx_fee']
+        relayer_info_dict[relayer_address]['authorization_count'] += len(tx['authorization_list'])
+    
+    relayer_info = []
+    for relayer_address in relayer_info_dict:
+        relayer_info.append(relayer_info_dict[relayer_address])
+        
+    if sort_by == "tx_count":
+        relayer_info.sort(key=lambda x: x['tx_count'], reverse=True)
+    elif sort_by == "authorization_count":
+        relayer_info.sort(key=lambda x: x['authorization_count'], reverse=True)
+    elif sort_by == "tx_fee":
+        relayer_info.sort(key=lambda x: x['tx_fee'], reverse=True)
+        
+    return relayer_info
 
 """
 Type4交易示例

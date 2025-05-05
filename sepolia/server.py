@@ -34,10 +34,13 @@ authorizers = []
 authorizers_with_zero = []
 codes_by_eth_balance = []
 codes_by_authorizer_count = []
+relayers_by_tx_count = []
+relayers_by_authorization_count = []
+relayers_by_tx_fee = []
 
 # 初始化数据
 def initialize_data():
-    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count
+    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee
     try:
         with data_lock:
             txs = util.get_all_type4_txs_with_timestamp()
@@ -45,6 +48,9 @@ def initialize_data():
             authorizers_with_zero = util.get_authorizer_info(txs, include_zero=True)
             codes_by_eth_balance = util.get_code_info(authorizers, sort_by="eth_balance")
             codes_by_authorizer_count = util.get_code_info(authorizers, sort_by="authorizer_count")
+            relayers_by_tx_count = util.get_relayer_info(txs, sort_by="tx_count")
+            relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
+            relayers_by_tx_fee = util.get_relayer_info(txs, sort_by="tx_fee")
             last_update_time = time.time()
         app.logger.info(f"数据初始化成功，共 {len(txs)} 条记录")
     except Exception as e:
@@ -53,7 +59,7 @@ def initialize_data():
 
 # 后台更新线程
 def update_txs():
-    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count
+    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee
     while True:
         time.sleep(30)  # 每30秒更新一次
         try:
@@ -62,6 +68,9 @@ def update_txs():
             new_authorizers_with_zero = util.get_authorizer_info(new_txs, include_zero=True)
             new_codes_by_eth_balance = util.get_code_info(new_authorizers, sort_by="eth_balance")
             new_codes_by_authorizer_count = util.get_code_info(new_authorizers, sort_by="authorizer_count")
+            new_relayers_by_tx_count = util.get_relayer_info(new_txs, sort_by="tx_count")
+            new_relayers_by_authorization_count = util.get_relayer_info(new_txs, sort_by="authorization_count")
+            new_relayers_by_tx_fee = util.get_relayer_info(new_txs, sort_by="tx_fee")
             
             with data_lock:
                 txs = new_txs
@@ -69,6 +78,9 @@ def update_txs():
                 authorizers_with_zero = new_authorizers_with_zero
                 codes_by_eth_balance = new_codes_by_eth_balance
                 codes_by_authorizer_count = new_codes_by_authorizer_count
+                relayers_by_tx_count = new_relayers_by_tx_count
+                relayers_by_authorization_count = new_relayers_by_authorization_count
+                relayers_by_tx_fee = new_relayers_by_tx_fee
                 last_update_time = time.time()
             
             app.logger.info(f"已更新交易数据，共 {len(txs)} 条记录")
@@ -237,6 +249,102 @@ def get_codes_by_authorizer_count():
         })
     except Exception as e:
         app.logger.error(f"获取以授权者数量排序的代码数据时出错: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# relayers_by_tx_count分页查询接口
+@app.route('/relayers_by_tx_count', methods=['GET'])
+def get_relayers_by_tx_count():
+    try:
+        with data_lock:
+            # 创建副本避免竞态条件
+            current_relayers_by_tx_count = relayers_by_tx_count.copy()
+            current_last_update_time = last_update_time
+        
+        # 获取分页参数，默认第1页，每页10条
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        
+        # 计算分页
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        
+        # 获取当前页的中继者信息
+        page_relayers = current_relayers_by_tx_count[start_idx:end_idx]
+        
+        # 返回结果
+        return jsonify({
+            'total': len(current_relayers_by_tx_count),
+            'page': page,
+            'page_size': page_size,
+            'relayers': page_relayers,
+            'last_update_time': current_last_update_time
+        })
+    except Exception as e:
+        app.logger.error(f"获取以交易数量排序的中继者数据时出错: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# relayers_by_authorization_count分页查询接口
+@app.route('/relayers_by_authorization_count', methods=['GET'])
+def get_relayers_by_authorization_count():
+    try:
+        with data_lock:
+            # 创建副本避免竞态条件
+            current_relayers_by_authorization_count = relayers_by_authorization_count.copy()
+            current_last_update_time = last_update_time
+        
+        # 获取分页参数，默认第1页，每页10条
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        
+        # 计算分页
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        
+        # 获取当前页的中继者信息
+        page_relayers = current_relayers_by_authorization_count[start_idx:end_idx]
+        
+        # 返回结果
+        return jsonify({
+            'total': len(current_relayers_by_authorization_count),
+            'page': page,
+            'page_size': page_size,
+            'relayers': page_relayers,
+            'last_update_time': current_last_update_time
+        })
+    except Exception as e:
+        app.logger.error(f"获取以授权数量排序的中继者数据时出错: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# relayers_by_tx_fee分页查询接口
+@app.route('/relayers_by_tx_fee', methods=['GET'])
+def get_relayers_by_tx_fee():
+    try:
+        with data_lock:
+            # 创建副本避免竞态条件
+            current_relayers_by_tx_fee = relayers_by_tx_fee.copy()
+            current_last_update_time = last_update_time
+        
+        # 获取分页参数，默认第1页，每页10条
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        
+        # 计算分页
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        
+        # 获取当前页的中继者信息
+        page_relayers = current_relayers_by_tx_fee[start_idx:end_idx]
+        
+        # 返回结果
+        return jsonify({
+            'total': len(current_relayers_by_tx_fee),
+            'page': page,
+            'page_size': page_size,
+            'relayers': page_relayers,
+            'last_update_time': current_last_update_time
+        })
+    except Exception as e:
+        app.logger.error(f"获取以交易费用排序的中继者数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # 健康检查接口
