@@ -114,8 +114,12 @@ const Transactions: React.FC = () => {
             <div>
               {record.authorization_list.map((auth, index) => (
                 <div key={index} style={{ marginBottom: 4 }}>
-                  <Tag color="blue">{formatAddress(auth.authorizer_address)}</Tag>
-                  <Tag color="green">{formatAddress(auth.code_address)}</Tag>
+                  <Tooltip title={auth.authorizer_address}>
+                    <Tag color="blue">{formatAddress(auth.authorizer_address)}</Tag>
+                  </Tooltip>
+                  <Tooltip title={auth.code_address}>
+                    <Tag color="green">{formatAddress(auth.code_address)}</Tag>
+                  </Tooltip>
                 </div>
               ))}
             </div>
@@ -197,11 +201,11 @@ const Transactions: React.FC = () => {
                       <div><strong>{intl.formatMessage({
                         id: 'pages.transactions.authorizerAddress',
                         defaultMessage: 'Authorizer Address',
-                      })}:</strong> {auth.authorizer_address}</div>
+                      })}:</strong> <Tooltip title={auth.authorizer_address}><Tag color="blue">{auth.authorizer_address}</Tag></Tooltip></div>
                       <div><strong>{intl.formatMessage({
                         id: 'pages.transactions.codeAddress',
                         defaultMessage: 'Code Address',
-                      })}:</strong> {auth.code_address}</div>
+                      })}:</strong> <Tooltip title={auth.code_address}><Tag color="green">{auth.code_address}</Tag></Tooltip></div>
                     </li>
                   ))}
                 </ul>
