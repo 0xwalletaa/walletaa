@@ -5,6 +5,7 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from flask_cors import CORS
 
 # 配置日志
 log_dir = "logs"
@@ -21,6 +22,7 @@ handler.setLevel(logging.INFO)
 
 # 配置Flask应用日志
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})  # 添加CORS支持，允许所有域名访问
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
 
