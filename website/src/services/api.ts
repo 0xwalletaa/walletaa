@@ -19,9 +19,10 @@ export interface TransactionItem {
 export interface AuthorizerItem {
   authorizer_address: string;
   code_address: string;
-  authorization_count: number;
-  total_gas_fee: number;
   eth_balance: number;
+  set_code_tx_count: number;
+  unset_code_tx_count: number;
+  historical_code_address: string[];
 }
 
 // 定义代码数据类型
