@@ -47,15 +47,6 @@ const Codes: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.codes.authorization_count',
-        defaultMessage: 'Authorization Count',
-      }),
-      dataIndex: 'authorization_count',
-      sorter: true,
-      valueType: 'digit',
-    },
-    {
-      title: intl.formatMessage({
         id: 'pages.codes.eth_balance',
         defaultMessage: 'ETH Balance',
       }),
