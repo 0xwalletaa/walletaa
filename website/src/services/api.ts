@@ -1,7 +1,7 @@
 import { request } from '@umijs/max';
 
 // 定义API基础地址
-export const BASE_URL = 'http://47.242.237.111:8082';
+export const BASE_URL = 'https://walletaa.com/api-sepolia';
 
 // 定义交易数据类型
 export interface TransactionItem {
