@@ -212,6 +212,11 @@ def get_relayer_info(txs, sort_by="tx_count"):
         
     return relayer_info
 
+def get_code_infos():
+    with open('code_info.json', 'r', encoding='utf-8') as f:
+        code_infos = json.load(f)
+    return code_infos
+
 """
 Type4交易示例
 ('ddf4aef622b21511447ee55f417ef76acaeaf8e4d8b4f587bbfa2bf9e24eee97', 8033831, '{"blockHash": "953c5893e1e7c4c9a350fe9778f6dd69965b93207d4b686017f1a1b94ce4c621", "blockNumber": 8033831, "from": "0x54c5E297819D1BF7bbF6a9d3B129b5BBfcA99171", "gas": 4918696, "gasPrice": 708846590, "maxPriorityFeePerGas": 100000000, "maxFeePerGas": 873235169, "hash": "ddf4aef622b21511447ee55f417ef76acaeaf8e4d8b4f587bbfa2bf9e24eee97", "input": "0x0000", "nonce": 68, "to": "0x0000000071727De22E5E9d8BAf0edAc6f37da032", "transactionIndex": 94, "value": 0, "type": 4, "accessList": [], "chainId": 11155111, "authorizationList": [{"chainId": "0xaa36a7", "address": "0x69007702764179f14f51cdce752f4f775d74e139", "nonce": "0x0", "yParity": "0x1", "r": "0xc6763bea75391f2e3ded5de88fc9f37dfb36b4166af73f3732ea31331ca292e0", "s": "0x58bc8fc791548d0f90eefaaa72623b54d1e5b7f0bbf94d23d95dad230e228cad"}], "v": 0, "yParity": 0, "r": "2e87f05f6b1d3352c1cff1b90a1528f002c5c9f99072fa49a7ed2d37153f19df", "s": "5a3f5f3045a41ed862e8814a7eb712c0a9c291bbb63b7527d705683bd0c0c4f1"}')

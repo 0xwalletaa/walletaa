@@ -41,10 +41,11 @@ codes_by_authorizer_count = []
 relayers_by_tx_count = []
 relayers_by_authorization_count = []
 relayers_by_tx_fee = []
+code_infos = []
 
 # 获取数据
 def get_data():
-    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee
+    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee, code_infos
     try:
         with data_lock:
             txs = util.get_all_type4_txs_with_timestamp()
@@ -55,6 +56,7 @@ def get_data():
             relayers_by_tx_count = util.get_relayer_info(txs, sort_by="tx_count")
             relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
             relayers_by_tx_fee = util.get_relayer_info(txs, sort_by="tx_fee")
+            code_infos = util.get_code_infos()
             last_update_time = time.time()
         app.logger.info(f"数据获取成功，共 {len(txs)} 条记录")
     except Exception as e:
@@ -397,16 +399,14 @@ def get_relayers_by_tx_fee():
 @app.route('/code_infos', methods=['GET'])
 def get_code_infos():
     try:
-        # 从website/public目录读取code_info.json文件
-        code_info_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'website', 'public', 'code_info.json')
-        
-        with open(code_info_path, 'r', encoding='utf-8') as f:
-            code_infos = json.load(f)
+        with data_lock: 
+            current_code_infos = code_infos.copy()
+            current_last_update_time = last_update_time
         
         return jsonify({
-            'code_infos': code_infos,
-            'total': len(code_infos),
-            'last_update_time': last_update_time
+            'code_infos': current_code_infos,
+            'total': len(current_code_infos),
+            'last_update_time': current_last_update_time
         })
     except Exception as e:
         app.logger.error(f"获取code_infos数据时出错: {str(e)}")
