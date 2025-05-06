@@ -45,7 +45,7 @@ const Relayers: React.FC = () => {
       dataIndex: 'tx_count',
       valueType: 'digit',
       sorter: true,
-      sortDirections: ['ascend', 'descend'],
+      sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'tx_count' ? 'descend' : undefined,
     },
     {
@@ -56,7 +56,7 @@ const Relayers: React.FC = () => {
       dataIndex: 'authorization_count',
       valueType: 'digit',
       sorter: true,
-      sortDirections: ['ascend', 'descend'],
+      sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'authorization_count' ? 'descend' : undefined,
     },
     {
@@ -66,7 +66,7 @@ const Relayers: React.FC = () => {
       }),
       dataIndex: 'tx_fee',
       sorter: true,
-      sortDirections: ['ascend', 'descend'],
+      sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'tx_fee' ? 'descend' : undefined,
     },
   ];
