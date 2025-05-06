@@ -6,6 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 from flask_cors import CORS
+import random
 
 # 配置日志
 log_dir = "logs"
@@ -40,7 +41,7 @@ relayers_by_tx_count = []
 relayers_by_authorization_count = []
 relayers_by_tx_fee = []
 
-# 初始化数据
+# 获取数据
 def get_data():
     global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee
     try:
@@ -54,14 +55,15 @@ def get_data():
             relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
             relayers_by_tx_fee = util.get_relayer_info(txs, sort_by="tx_fee")
             last_update_time = time.time()
-        app.logger.info(f"数据初始化成功，共 {len(txs)} 条记录")
+        app.logger.info(f"数据获取成功，共 {len(txs)} 条记录")
     except Exception as e:
-        app.logger.error(f"数据初始化失败: {str(e)}")
+        app.logger.error(f"数据获取失败: {str(e)}")
         raise
 
 # 后台更新线程
 def update_data():
     global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee
+    time.sleep(random.randint(1, 30))
     while True:
         time.sleep(30)  # 每30秒更新一次
         get_data()
@@ -87,6 +89,7 @@ def get_transactions():
         
         # 获取当前页的交易
         page_txs = reversed_txs[start_idx:end_idx]
+        print("current_last_update_time", current_last_update_time)
         
         # 返回结果
         return jsonify({
