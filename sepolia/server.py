@@ -42,10 +42,11 @@ relayers_by_tx_count = []
 relayers_by_authorization_count = []
 relayers_by_tx_fee = []
 code_infos = []
+overview = {}
 
 # 获取数据
 def get_data():
-    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee, code_infos
+    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee, code_infos, overview
     try:
         with data_lock:
             txs = util.get_all_type4_txs_with_timestamp()
@@ -57,6 +58,7 @@ def get_data():
             relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
             relayers_by_tx_fee = util.get_relayer_info(txs, sort_by="tx_fee")
             code_infos = util.get_code_infos()
+            overview = util.get_overview(txs, authorizers, codes_by_authorizer_count, relayers_by_tx_count)
             last_update_time = time.time()
         app.logger.info(f"数据获取成功，共 {len(txs)} 条记录")
     except Exception as e:
@@ -410,6 +412,22 @@ def get_code_infos():
         })
     except Exception as e:
         app.logger.error(f"获取code_infos数据时出错: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# overview查询接口
+@app.route('/overview', methods=['GET'])
+def get_overview():
+    try:
+        with data_lock:
+            current_overview = overview.copy()
+            current_last_update_time = last_update_time 
+            
+            return jsonify({
+                'overview': current_overview,
+                'last_update_time': current_last_update_time
+            })
+    except Exception as e:
+        app.logger.error(f"获取overview数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # 健康检查接口

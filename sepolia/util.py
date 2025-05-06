@@ -5,6 +5,7 @@ from eth_utils import to_bytes
 from eth_account import Account
 import rlp
 from eth_utils import keccak
+from datetime import datetime
 
 
 def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
@@ -216,6 +217,49 @@ def get_code_infos():
     with open('code_info.json', 'r', encoding='utf-8') as f:
         code_infos = json.load(f)
     return code_infos
+
+def get_overview(txs, authorizers, codes, relayers):
+    daily_tx_count = {}
+    for tx in txs:
+        tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
+        if tx_date not in daily_tx_count:
+            daily_tx_count[tx_date] = 0
+        daily_tx_count[tx_date] += 1    
+    
+    daily_cumulative_tx_count = {}
+    last_day_cumulative_tx_count = 0
+    for tx_date in sorted(daily_tx_count.keys()):
+        last_day_cumulative_tx_count += daily_tx_count[tx_date]
+        daily_cumulative_tx_count[tx_date] = last_day_cumulative_tx_count
+        
+    daily_authorizaion_count = {}
+    for tx in txs:
+        tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
+        if tx_date not in daily_authorizaion_count:
+            daily_authorizaion_count[tx_date] = 0
+        daily_authorizaion_count[tx_date] += len(tx['authorization_list'])
+    
+    daily_cumulative_authorizaion_count = {}
+    last_day_cumulative_authorizaion_count = 0
+    for tx_date in sorted(daily_authorizaion_count.keys()):
+        last_day_cumulative_authorizaion_count += daily_authorizaion_count[tx_date]
+        daily_cumulative_authorizaion_count[tx_date] = last_day_cumulative_authorizaion_count
+    
+    top10_codes = codes[:10]
+    top10_relayers = relayers[:10]
+    
+    return {
+        'tx_count': len(txs),
+        'authorizer_count': len(authorizers),
+        'code_count': len(codes),
+        'relayer_count': len(relayers),
+        'daily_tx_count': daily_tx_count,
+        'daily_cumulative_tx_count': daily_cumulative_tx_count,
+        'daily_authorizaion_count': daily_authorizaion_count,
+        'daily_cumulative_authorizaion_count': daily_cumulative_authorizaion_count,
+        'top10_codes': top10_codes,
+        'top10_relayers': top10_relayers,
+    }
 
 """
 Type4交易示例
