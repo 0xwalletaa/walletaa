@@ -64,6 +64,17 @@ export async function getAuthorizers(params: {
   });
 }
 
+// 获取包含零代码地址的授权者列表接口
+export async function getAuthorizersWithZero(params: {
+  page?: number;
+  page_size?: number;
+}) {
+  return request('http://47.242.237.111:8082/authorizers_with_zero', {
+    method: 'GET',
+    params,
+  });
+}
+
 // 获取代码列表接口（按ETH余额排序）
 export async function getCodesByEthBalance(params: {
   page?: number;
