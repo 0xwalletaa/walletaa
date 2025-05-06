@@ -122,9 +122,6 @@ const Authorizers: React.FC = () => {
           };
         }}
         columns={columns}
-        pagination={{
-          pageSize: 10,
-        }}
       />
     </PageContainer>
   );
