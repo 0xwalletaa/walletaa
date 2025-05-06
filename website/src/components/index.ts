@@ -6,6 +6,6 @@
  * 布局组件
  */
 import Footer from './Footer';
-import { Question, SelectLang } from './RightContent';
+import { SelectLang } from './RightContent';
 
-export { Footer, Question, SelectLang };
+export { Footer, SelectLang };
