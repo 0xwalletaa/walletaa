@@ -8,6 +8,11 @@ Gunicorn配置文件
 
 import multiprocessing
 import os
+import sys
+import threading
+
+# 添加项目路径到sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # 绑定的IP和端口
 bind = "0.0.0.0:8082"
@@ -17,7 +22,7 @@ worker_class = "sync"
 
 # 并发工作进程数，通常设置为 (2 x $num_cores) + 1
 # 也可以根据内存需求适当调整
-workers = multiprocessing.cpu_count() * 2 + 1
+workers = 4 #  multiprocessing.cpu_count() * 2 + 1
 
 # 每个工作进程的线程数
 threads = 2
@@ -59,4 +64,17 @@ def on_starting(server):
     server.log.info("Gunicorn服务器正在启动...")
 
 def on_exit(server):
-    server.log.info("Gunicorn服务器正在关闭...") 
+    server.log.info("Gunicorn服务器正在关闭...")
+
+# worker进程的钩子函数
+def post_fork(server, worker):
+    """
+    每个worker进程启动后的钩子函数，确保每个worker都启动自己的更新线程
+    """
+    server.log.info(f"Worker {worker.pid} 正在启动更新线程...")
+    from server import update_data
+    
+    # 在每个worker进程中启动独立的更新线程
+    worker_update_thread = threading.Thread(target=update_data, daemon=True)
+    worker_update_thread.start()
+    server.log.info(f"Worker {worker.pid} 更新线程已启动") 
