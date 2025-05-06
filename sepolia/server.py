@@ -126,9 +126,9 @@ def get_authorizers():
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
-            sorted_authorizers = current_authorizers
-        else:
             sorted_authorizers = current_authorizers[::-1]
+        else:
+            sorted_authorizers = current_authorizers
         
         # 计算分页
         start_idx = (page - 1) * page_size
@@ -167,9 +167,9 @@ def get_authorizers_with_zero():
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
-            sorted_authorizers = current_authorizers_with_zero
-        else:
             sorted_authorizers = current_authorizers_with_zero[::-1]
+        else:
+            sorted_authorizers = current_authorizers_with_zero
         
         # 计算分页
         start_idx = (page - 1) * page_size

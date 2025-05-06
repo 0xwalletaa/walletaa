@@ -4,12 +4,13 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Tag, Tooltip } from 'antd';
-import React, { useRef } from 'react';
-import { getAuthorizers, AuthorizerItem } from '@/services/api';
+import { Tag, Tooltip, Switch, Space } from 'antd';
+import React, { useRef, useState } from 'react';
+import { getAuthorizers, getAuthorizersWithZero, AuthorizerItem } from '@/services/api';
 
 const Authorizers: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const [includeZero, setIncludeZero] = useState<boolean>(false);
 
   /**
    * @en-US International configuration
@@ -101,13 +102,34 @@ const Authorizers: React.FC = () => {
           id: 'pages.authorizers.headerTitle',
           defaultMessage: 'Authorizer List',
         })}
+        toolBarRender={() => [
+          <Space key="switch">
+            <Switch 
+              checked={includeZero} 
+              onChange={(checked) => {
+                setIncludeZero(checked);
+                if (actionRef.current) {
+                  actionRef.current.reload();
+                }
+              }} 
+            />
+            <span style={{ fontWeight: 300 }}>{intl.formatMessage({
+              id: 'pages.authorizers.includeZero',
+              defaultMessage: 'Include Canceled',
+            })}</span>
+          </Space>
+        ]}
         actionRef={actionRef}
         rowKey="authorizer_address"
         search={false}
         request={async (params) => {
           // 将ProTable的params转换为后端API所需的格式
           const { current, pageSize, ...rest } = params;
-          const msg = await getAuthorizers({
+          
+          // 根据开关状态选择API
+          const fetchFunction = includeZero ? getAuthorizersWithZero : getAuthorizers;
+          
+          const msg = await fetchFunction({
             page: current,
             page_size: pageSize,
             ...rest,
