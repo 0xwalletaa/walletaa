@@ -5,6 +5,7 @@ import { Card, Col, Row, Table, Tooltip } from 'antd';
 import { Area, Column } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
+import { getOverview, Overview } from '@/services/api';
 
 // 定义ChartCard组件的属性类型
 interface ChartCardProps {
@@ -21,29 +22,6 @@ interface ChartCardProps {
 interface FieldProps {
   label: string;
   value: string | number;
-}
-
-// 定义Overview类型
-interface Overview {
-  tx_count: number;
-  authorizer_count: number;
-  code_count: number;
-  relayer_count: number;
-  daily_tx_count: Record<string, number>;
-  daily_cumulative_tx_count: Record<string, number>;
-  daily_authorizaion_count: Record<string, number>;
-  daily_cumulative_authorizaion_count: Record<string, number>;
-  top10_codes: Array<{
-    code_address: string;
-    authorizer_count: number;
-    eth_balance: number;
-  }>;
-  top10_relayers: Array<{
-    relayer_address: string;
-    tx_count: number;
-    authorization_count: number;
-    tx_fee: number;
-  }>;
 }
 
 // 定义图表数据类型
@@ -124,8 +102,7 @@ const Welcome: React.FC = () => {
   const [overview, setOverview] = useState<Overview | null>(null);
 
   useEffect(() => {
-    fetch('https://walletaa.com/api-sepolia/overview')
-      .then(response => response.json())
+    getOverview()
       .then(data => {
         setOverview(data.overview);
         setLoading(false);
