@@ -54,7 +54,6 @@ const Authorizers: React.FC = () => {
         defaultMessage: 'Set Code Count',
       }),
       dataIndex: 'set_code_tx_count',
-      sorter: true,
       valueType: 'digit',
     },
     {
@@ -63,7 +62,6 @@ const Authorizers: React.FC = () => {
         defaultMessage: 'Unset Code Count',
       }),
       dataIndex: 'unset_code_tx_count',
-      sorter: true,
       valueType: 'digit',
     },
     {
@@ -72,7 +70,6 @@ const Authorizers: React.FC = () => {
         defaultMessage: 'ETH Balance',
       }),
       dataIndex: 'eth_balance',
-      sorter: true,
     },
     {
       title: intl.formatMessage({

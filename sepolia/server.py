@@ -41,7 +41,7 @@ relayers_by_authorization_count = []
 relayers_by_tx_fee = []
 
 # 初始化数据
-def initialize_data():
+def get_data():
     global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee
     try:
         with data_lock:
@@ -60,34 +60,11 @@ def initialize_data():
         raise
 
 # 后台更新线程
-def update_txs():
+def update_data():
     global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee
     while True:
         time.sleep(30)  # 每30秒更新一次
-        try:
-            new_txs = util.get_all_type4_txs_with_timestamp()
-            new_authorizers = util.get_authorizer_info(new_txs)
-            new_authorizers_with_zero = util.get_authorizer_info(new_txs, include_zero=True)
-            new_codes_by_eth_balance = util.get_code_info(new_authorizers, sort_by="eth_balance")
-            new_codes_by_authorizer_count = util.get_code_info(new_authorizers, sort_by="authorizer_count")
-            new_relayers_by_tx_count = util.get_relayer_info(new_txs, sort_by="tx_count")
-            new_relayers_by_authorization_count = util.get_relayer_info(new_txs, sort_by="authorization_count")
-            new_relayers_by_tx_fee = util.get_relayer_info(new_txs, sort_by="tx_fee")
-            
-            with data_lock:
-                txs = new_txs
-                authorizers = new_authorizers
-                authorizers_with_zero = new_authorizers_with_zero
-                codes_by_eth_balance = new_codes_by_eth_balance
-                codes_by_authorizer_count = new_codes_by_authorizer_count
-                relayers_by_tx_count = new_relayers_by_tx_count
-                relayers_by_authorization_count = new_relayers_by_authorization_count
-                relayers_by_tx_fee = new_relayers_by_tx_fee
-                last_update_time = time.time()
-            
-            app.logger.info(f"已更新交易数据，共 {len(txs)} 条记录")
-        except Exception as e:
-            app.logger.error(f"更新交易数据时出错: {str(e)}")
+        get_data()
 
 
 # 分页查询接口
@@ -355,10 +332,10 @@ def health_check():
     return jsonify({'status': 'ok', 'last_update_time': last_update_time})
 
 # 初始化数据
-initialize_data()
+get_data()
     
 # 启动后台更新线程
-update_thread = threading.Thread(target=update_txs, daemon=True)
+update_thread = threading.Thread(target=update_data, daemon=True)
 update_thread.start()
 
 if __name__ == '__main__':

@@ -42,7 +42,6 @@ const Codes: React.FC = () => {
         defaultMessage: 'Authorizer Count',
       }),
       dataIndex: 'authorizer_count',
-      sorter: true,
       valueType: 'digit',
     },
     {
@@ -51,7 +50,6 @@ const Codes: React.FC = () => {
         defaultMessage: 'ETH Balance',
       }),
       dataIndex: 'eth_balance',
-      sorter: true,
     },
   ];
 

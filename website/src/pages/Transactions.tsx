@@ -34,7 +34,6 @@ const Transactions: React.FC = () => {
         defaultMessage: 'Block Number',
       }),
       dataIndex: 'block_number',
-      sorter: true,
     },
     {
       title: intl.formatMessage({
@@ -43,7 +42,6 @@ const Transactions: React.FC = () => {
       }),
       dataIndex: 'timestamp',
       valueType: 'dateTime',
-      sorter: true,
       renderText: (val: number) => {
         // 将秒级时间戳转换为毫秒级时间戳（如果时间戳是秒级的）
         return val * 1000;
@@ -77,19 +75,10 @@ const Transactions: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.transactions.tx_index',
-        defaultMessage: 'Transaction Index',
-      }),
-      dataIndex: 'tx_index',
-      valueType: 'digit',
-    },
-    {
-      title: intl.formatMessage({
         id: 'pages.transactions.tx_fee',
         defaultMessage: 'Transaction Fee (ETH)',
       }),
       dataIndex: 'tx_fee',
-      sorter: true,
     },
     {
       title: intl.formatMessage({

@@ -42,7 +42,6 @@ const Relayers: React.FC = () => {
         defaultMessage: 'Transaction Count',
       }),
       dataIndex: 'tx_count',
-      sorter: true,
       valueType: 'digit',
     },
     {
@@ -51,7 +50,6 @@ const Relayers: React.FC = () => {
         defaultMessage: 'Authorization Count',
       }),
       dataIndex: 'authorization_count',
-      sorter: true,
       valueType: 'digit',
     },
     {
@@ -60,7 +58,6 @@ const Relayers: React.FC = () => {
         defaultMessage: 'Transaction Fee (ETH)',
       }),
       dataIndex: 'tx_fee',
-      sorter: true,
     },
   ];
 
