@@ -1,7 +1,7 @@
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useRequest } from '@umijs/max';
-import { Card, Col, Row, Table, Tooltip } from 'antd';
+import { Card, Col, Row, Table, Tooltip, Tag } from 'antd';
 import { Area, Column } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
@@ -113,6 +113,13 @@ const Welcome: React.FC = () => {
       });
   }, []);
 
+  // 格式化地址显示
+  const formatAddress = (address: string) => {
+    return typeof address === 'string' && address.length > 10
+      ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+      : address;
+  };
+
   // 准备图表数据
   const getDailyTxCountData = (): ChartDataItem[] => {
     if (!overview || !overview.daily_tx_count) return [];
@@ -125,6 +132,22 @@ const Welcome: React.FC = () => {
   const getDailyAuthCountData = (): ChartDataItem[] => {
     if (!overview || !overview.daily_authorizaion_count) return [];
     return Object.entries(overview.daily_authorizaion_count).map(([date, count]) => ({
+      x: date,
+      y: count,
+    }));
+  };
+
+  const getDailyCodeCountData = (): ChartDataItem[] => {
+    if (!overview || !overview.daily_code_count) return [];
+    return Object.entries(overview.daily_code_count).map(([date, count]) => ({
+      x: date,
+      y: count,
+    }));
+  };
+
+  const getDailyRelayerCountData = (): ChartDataItem[] => {
+    if (!overview || !overview.daily_relayer_count) return [];
+    return Object.entries(overview.daily_relayer_count).map(([date, count]) => ({
       x: date,
       y: count,
     }));
@@ -157,19 +180,23 @@ const Welcome: React.FC = () => {
       title: '代码地址',
       dataIndex: 'code_address',
       key: 'code_address',
-      render: (text: string) => <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">{text}</a>,
+      render: (text: string) => (
+        <Tooltip title={text}>
+          <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
+            <Tag color="blue">{formatAddress(text)}</Tag>
+          </a>
+        </Tooltip>
+      ),
     },
     {
       title: '授权者数量',
       dataIndex: 'authorizer_count',
       key: 'authorizer_count',
-      sorter: (a: any, b: any) => a.authorizer_count - b.authorizer_count,
     },
     {
       title: 'ETH余额',
       dataIndex: 'eth_balance',
       key: 'eth_balance',
-      sorter: (a: any, b: any) => a.eth_balance - b.eth_balance,
       render: (text: number) => numeral(text).format('0,0.0000'),
     },
   ];
@@ -185,25 +212,28 @@ const Welcome: React.FC = () => {
       title: '中继者地址',
       dataIndex: 'relayer_address',
       key: 'relayer_address',
-      render: (text: string) => <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">{text}</a>,
+      render: (text: string) => (
+        <Tooltip title={text}>
+          <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
+            <Tag color="purple">{formatAddress(text)}</Tag>
+          </a>
+        </Tooltip>
+      ),
     },
     {
       title: '交易数量',
       dataIndex: 'tx_count',
       key: 'tx_count',
-      sorter: (a: any, b: any) => a.tx_count - b.tx_count,
     },
     {
       title: '授权数量',
       dataIndex: 'authorization_count',
       key: 'authorization_count',
-      sorter: (a: any, b: any) => a.authorization_count - b.authorization_count,
     },
     {
       title: '交易费用(ETH)',
       dataIndex: 'tx_fee',
       key: 'tx_fee',
-      sorter: (a: any, b: any) => a.tx_fee - b.tx_fee,
       render: (text: number) => numeral(text).format('0,0.0000'),
     },
   ];
@@ -220,19 +250,14 @@ const Welcome: React.FC = () => {
             footer={<Field label="总交易数" value={overview ? numeral(overview.tx_count).format('0,0') : 0} />}
             contentHeight={46}
           >
-            <Area
+            <Column
               xField="x"
               yField="y"
-              shapeField="smooth"
-              height={46}
-              axis={false}
-              style={{
-                fill: 'linear-gradient(-90deg, white 0%, #975FE4 100%)',
-                fillOpacity: 0.6,
-                width: '100%',
-              }}
               padding={-20}
-              data={getCumulativeTxData()}
+              axis={false}
+              height={46}
+              data={getDailyTxCountData()}
+              scale={{ x: { paddingInner: 0.4 } }}
             />
           </ChartCard>
         </Col>
@@ -246,19 +271,14 @@ const Welcome: React.FC = () => {
             footer={<Field label="总授权者数" value={overview ? numeral(overview.authorizer_count).format('0,0') : 0} />}
             contentHeight={46}
           >
-            <Area
+            <Column
               xField="x"
               yField="y"
-              shapeField="smooth"
-              height={46}
-              axis={false}
-              style={{
-                fill: 'linear-gradient(-90deg, white 0%, #975FE4 100%)',
-                fillOpacity: 0.6,
-                width: '100%',
-              }}
               padding={-20}
-              data={getCumulativeAuthData()}
+              axis={false}
+              height={46}
+              data={getDailyAuthCountData()}
+              scale={{ x: { paddingInner: 0.4 } }}
             />
           </ChartCard>
         </Col>
@@ -278,7 +298,7 @@ const Welcome: React.FC = () => {
               padding={-20}
               axis={false}
               height={46}
-              data={[]}
+              data={getDailyCodeCountData()}
               scale={{ x: { paddingInner: 0.4 } }}
             />
           </ChartCard>
@@ -299,7 +319,7 @@ const Welcome: React.FC = () => {
               padding={-20}
               axis={false}
               height={46}
-              data={[]}
+              data={getDailyRelayerCountData()}
               scale={{ x: { paddingInner: 0.4 } }}
             />
           </ChartCard>
@@ -316,12 +336,13 @@ const Welcome: React.FC = () => {
           <Row gutter={24}>
             <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
               <div style={{ position: 'relative' }}>
-                <h4 style={{ marginBottom: 20 }}>每日交易量</h4>
-                <Column
-                  height={400}
-                  data={getDailyTxCountData()}
+                <h4 style={{ marginBottom: 20 }}>累计交易量</h4>
+                <Area
+                  height={200}
+                  data={getCumulativeTxData()}
                   xField="x"
                   yField="y"
+                  shapeField="smooth"
                   paddingBottom={12}
                   axis={{
                     x: {
@@ -333,11 +354,8 @@ const Welcome: React.FC = () => {
                       gridStroke: '#ccc',
                     },
                   }}
-                  scale={{
-                    x: { paddingInner: 0.4 },
-                  }}
                   tooltip={{
-                    name: '交易数量',
+                    name: '累计交易数量',
                     channel: 'y',
                   }}
                 />
@@ -345,12 +363,13 @@ const Welcome: React.FC = () => {
             </Col>
             <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
               <div style={{ position: 'relative' }}>
-                <h4 style={{ marginBottom: 20 }}>每日授权量</h4>
-                <Column
-                  height={400}
-                  data={getDailyAuthCountData()}
+                <h4 style={{ marginBottom: 20 }}>累计授权量</h4>
+                <Area
+                  height={200}
+                  data={getCumulativeAuthData()}
                   xField="x"
                   yField="y"
+                  shapeField="smooth"
                   paddingBottom={12}
                   axis={{
                     x: {
@@ -362,11 +381,8 @@ const Welcome: React.FC = () => {
                       gridStroke: '#ccc',
                     },
                   }}
-                  scale={{
-                    x: { paddingInner: 0.4 },
-                  }}
                   tooltip={{
-                    name: '授权数量',
+                    name: '累计授权数量',
                     channel: 'y',
                   }}
                 />
