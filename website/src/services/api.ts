@@ -73,6 +73,29 @@ export interface CodeInfoItem {
   [key: string]: any; // 允许其他可能的属性
 }
 
+// 定义Overview数据类型
+export interface Overview {
+  tx_count: number;
+  authorizer_count: number;
+  code_count: number;
+  relayer_count: number;
+  daily_tx_count: Record<string, number>;
+  daily_cumulative_tx_count: Record<string, number>;
+  daily_authorizaion_count: Record<string, number>;
+  daily_cumulative_authorizaion_count: Record<string, number>;
+  top10_codes: Array<{
+    code_address: string;
+    authorizer_count: number;
+    eth_balance: number;
+  }>;
+  top10_relayers: Array<{
+    relayer_address: string;
+    tx_count: number;
+    authorization_count: number;
+    tx_fee: number;
+  }>;
+}
+
 // 获取交易列表接口
 export async function getTransactions(params: {
   page?: number;
@@ -179,6 +202,13 @@ export async function getRelayersByTxFee(params: {
 // 获取完整的code_infos数据
 export async function getCodeInfos() {
   return request(`${BASE_URL}/code_infos`, {
+    method: 'GET',
+  });
+}
+
+// 获取overview数据
+export async function getOverview() {
+  return request(`${BASE_URL}/overview`, {
     method: 'GET',
   });
 } 
