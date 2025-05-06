@@ -109,7 +109,7 @@ const Codes: React.FC = () => {
       dataIndex: 'authorizer_count',
       valueType: 'digit',
       sorter: true,
-      sortDirections: ['ascend', 'descend'],
+      sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'authorizer_count' ? 'descend' : undefined,
     },
     {
@@ -119,7 +119,7 @@ const Codes: React.FC = () => {
       }),
       dataIndex: 'eth_balance',
       sorter: true,
-      sortDirections: ['ascend', 'descend'],
+      sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'eth_balance' ? 'descend' : undefined,
     },
     {
