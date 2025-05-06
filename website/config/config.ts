@@ -85,7 +85,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: 'Wallet AA',
+  title: 'WalletAA',
   layout: {
     locale: true,
     ...defaultSettings,
