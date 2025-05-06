@@ -1,5 +1,8 @@
 import { request } from '@umijs/max';
 
+// 定义API基础地址
+export const BASE_URL = 'http://47.242.237.111:8082';
+
 // 定义交易数据类型
 export interface TransactionItem {
   tx_hash: string;
@@ -47,7 +50,7 @@ export async function getTransactions(params: {
   page_size?: number;
   order?: string;
 }) {
-  return request('http://47.242.237.111:8082/transactions', {
+  return request(`${BASE_URL}/transactions`, {
     method: 'GET',
     params,
   });
@@ -58,7 +61,7 @@ export async function getAuthorizers(params: {
   page?: number;
   page_size?: number;
 }) {
-  return request('http://47.242.237.111:8082/authorizers', {
+  return request(`${BASE_URL}/authorizers`, {
     method: 'GET',
     params,
   });
@@ -69,7 +72,7 @@ export async function getAuthorizersWithZero(params: {
   page?: number;
   page_size?: number;
 }) {
-  return request('http://47.242.237.111:8082/authorizers_with_zero', {
+  return request(`${BASE_URL}/authorizers_with_zero`, {
     method: 'GET',
     params,
   });
@@ -81,7 +84,7 @@ export async function getCodesByEthBalance(params: {
   page_size?: number;
   order?: string;
 }) {
-  return request('http://47.242.237.111:8082/codes_by_eth_balance', {
+  return request(`${BASE_URL}/codes_by_eth_balance`, {
     method: 'GET',
     params,
   });
@@ -93,7 +96,7 @@ export async function getCodesByAuthorizerCount(params: {
   page_size?: number;
   order?: string;
 }) {
-  return request('http://47.242.237.111:8082/codes_by_authorizer_count', {
+  return request(`${BASE_URL}/codes_by_authorizer_count`, {
     method: 'GET',
     params,
   });
@@ -114,7 +117,7 @@ export async function getRelayersByTxCount(params: {
   page_size?: number;
   order?: string;
 }) {
-  return request('http://47.242.237.111:8082/relayers_by_tx_count', {
+  return request(`${BASE_URL}/relayers_by_tx_count`, {
     method: 'GET',
     params,
   });
@@ -126,7 +129,7 @@ export async function getRelayersByAuthorizationCount(params: {
   page_size?: number;
   order?: string;
 }) {
-  return request('http://47.242.237.111:8082/relayers_by_authorization_count', {
+  return request(`${BASE_URL}/relayers_by_authorization_count`, {
     method: 'GET',
     params,
   });
@@ -138,7 +141,7 @@ export async function getRelayersByTxFee(params: {
   page_size?: number;
   order?: string;
 }) {
-  return request('http://47.242.237.111:8082/relayers_by_tx_fee', {
+  return request(`${BASE_URL}/relayers_by_tx_fee`, {
     method: 'GET',
     params,
   });
