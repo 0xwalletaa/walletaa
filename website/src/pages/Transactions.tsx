@@ -168,9 +168,6 @@ const Transactions: React.FC = () => {
           };
         }}
         columns={columns}
-        pagination={{
-          pageSize: 10,
-        }}
       />
 
       <Drawer
