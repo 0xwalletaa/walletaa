@@ -5,11 +5,12 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Tag, Tooltip } from 'antd';
-import React, { useRef } from 'react';
-import { getCodes, CodeItem } from '@/services/api';
+import React, { useRef, useState } from 'react';
+import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem } from '@/services/api';
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const [sortApi, setSortApi] = useState<'eth_balance' | 'authorizer_count'>('eth_balance');
 
   /**
    * @en-US International configuration
@@ -43,6 +44,9 @@ const Codes: React.FC = () => {
       }),
       dataIndex: 'authorizer_count',
       valueType: 'digit',
+      sorter: true,
+      sortDirections: ['ascend', 'descend'],
+      defaultSortOrder: sortApi === 'authorizer_count' ? 'descend' : undefined,
     },
     {
       title: intl.formatMessage({
@@ -50,27 +54,77 @@ const Codes: React.FC = () => {
         defaultMessage: 'ETH Balance',
       }),
       dataIndex: 'eth_balance',
+      sorter: true,
+      sortDirections: ['ascend', 'descend'],
+      defaultSortOrder: sortApi === 'eth_balance' ? 'descend' : undefined,
     },
   ];
+
+  // 动态设置表格标题
+  const getHeaderTitle = () => {
+    if (sortApi === 'eth_balance') {
+      return intl.formatMessage({
+        id: 'pages.codes.headerTitleEthBalance',
+        defaultMessage: 'Code List (By ETH Balance)',
+      });
+    } else {
+      return intl.formatMessage({
+        id: 'pages.codes.headerTitleAuthorizerCount',
+        defaultMessage: 'Code List (By Authorizer Count)',
+      });
+    }
+  };
 
   return (
     <PageContainer>
       <ProTable<CodeItem>
-        headerTitle={intl.formatMessage({
-          id: 'pages.codes.headerTitle',
-          defaultMessage: 'Code List (By ETH Balance)',
-        })}
+        headerTitle={getHeaderTitle()}
         actionRef={actionRef}
         rowKey="code_address"
         search={false}
-        request={async (params) => {
+        request={async (params, sort) => {
           // 将ProTable的params转换为后端API所需的格式
           const { current, pageSize, ...rest } = params;
-          const msg = await getCodes({
-            page: current,
-            page_size: pageSize,
-            ...rest,
-          });
+
+          // 处理排序参数
+          let orderParam = 'desc'; // 默认倒序
+          let selectedApi = sortApi;
+
+          if (sort && Object.keys(sort).length > 0) {
+            // 获取排序字段和顺序
+            const sortField = Object.keys(sort)[0];
+            const sortOrder = sort[sortField] === 'ascend' ? 'desc' : 'asc';
+            
+            // 根据排序字段选择API
+            if (sortField === 'eth_balance') {
+              selectedApi = 'eth_balance';
+              setSortApi('eth_balance');
+            } else if (sortField === 'authorizer_count') {
+              selectedApi = 'authorizer_count';
+              setSortApi('authorizer_count');
+            }
+            
+            orderParam = sortOrder;
+          }
+
+          // 根据选择的API调用不同的接口
+          let msg;
+          if (selectedApi === 'eth_balance') {
+            msg = await getCodesByEthBalance({
+              page: current,
+              page_size: pageSize,
+              order: orderParam,
+              ...rest,
+            });
+          } else {
+            msg = await getCodesByAuthorizerCount({
+              page: current,
+              page_size: pageSize,
+              order: orderParam,
+              ...rest,
+            });
+          }
+
           return {
             data: msg.codes || [],
             success: true,

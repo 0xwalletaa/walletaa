@@ -34,6 +34,9 @@ const Transactions: React.FC = () => {
         defaultMessage: 'Block Number',
       }),
       dataIndex: 'block_number',
+      sorter: true,
+      sortDirections: ['ascend', 'descend'],
+      defaultSortOrder: 'descend',
     },
     {
       title: intl.formatMessage({
@@ -42,6 +45,8 @@ const Transactions: React.FC = () => {
       }),
       dataIndex: 'timestamp',
       valueType: 'dateTime',
+      sorter: true,
+      sortDirections: ['ascend', 'descend'],
       renderText: (val: number) => {
         // 将秒级时间戳转换为毫秒级时间戳（如果时间戳是秒级的）
         return val * 1000;
@@ -142,12 +147,23 @@ const Transactions: React.FC = () => {
         actionRef={actionRef}
         rowKey="tx_hash"
         search={false}
-        request={async (params) => {
+        request={async (params, sort) => {
           // 将ProTable的params转换为后端API所需的格式
           const { current, pageSize, ...rest } = params;
+          
+          // 处理排序参数
+          let orderParam = 'desc'; // 默认倒序
+          if (sort && Object.keys(sort).length > 0) {
+            // 获取第一个排序字段
+            const sortField = Object.keys(sort)[0];
+            const sortOrder = sort[sortField] === 'ascend' ? 'asc' : 'desc';
+            orderParam = sortOrder;
+          }
+          
           const msg = await getTransactions({
             page: current,
             page_size: pageSize,
+            order: orderParam,
             ...rest,
           });
           return {

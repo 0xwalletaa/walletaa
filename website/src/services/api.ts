@@ -45,6 +45,7 @@ export interface RelayerItem {
 export async function getTransactions(params: {
   page?: number;
   page_size?: number;
+  order?: string;
 }) {
   return request('http://47.242.237.111:8082/transactions', {
     method: 'GET',
@@ -64,9 +65,10 @@ export async function getAuthorizers(params: {
 }
 
 // 获取代码列表接口（按ETH余额排序）
-export async function getCodes(params: {
+export async function getCodesByEthBalance(params: {
   page?: number;
   page_size?: number;
+  order?: string;
 }) {
   return request('http://47.242.237.111:8082/codes_by_eth_balance', {
     method: 'GET',
@@ -74,12 +76,58 @@ export async function getCodes(params: {
   });
 }
 
-// 获取中继者列表接口（按交易数量排序）
-export async function getRelayers(params: {
+// 获取代码列表接口（按授权者数量排序）
+export async function getCodesByAuthorizerCount(params: {
   page?: number;
   page_size?: number;
+  order?: string;
+}) {
+  return request('http://47.242.237.111:8082/codes_by_authorizer_count', {
+    method: 'GET',
+    params,
+  });
+}
+
+// 兼容旧的调用方式
+export async function getCodes(params: {
+  page?: number;
+  page_size?: number;
+  order?: string;
+}) {
+  return getCodesByEthBalance(params);
+}
+
+// 获取中继者列表接口（按交易数量排序）
+export async function getRelayersByTxCount(params: {
+  page?: number;
+  page_size?: number;
+  order?: string;
 }) {
   return request('http://47.242.237.111:8082/relayers_by_tx_count', {
+    method: 'GET',
+    params,
+  });
+}
+
+// 获取中继者列表接口（按授权数量排序）
+export async function getRelayersByAuthorizationCount(params: {
+  page?: number;
+  page_size?: number;
+  order?: string;
+}) {
+  return request('http://47.242.237.111:8082/relayers_by_authorization_count', {
+    method: 'GET',
+    params,
+  });
+}
+
+// 获取中继者列表接口（按交易费用排序）
+export async function getRelayersByTxFee(params: {
+  page?: number;
+  page_size?: number;
+  order?: string;
+}) {
+  return request('http://47.242.237.111:8082/relayers_by_tx_fee', {
     method: 'GET',
     params,
   });

@@ -79,16 +79,22 @@ def get_transactions():
             current_last_update_time = last_update_time
         
         # 获取分页参数，默认第1页，每页10条
-        reversed_txs = current_txs[::-1]
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_txs = current_txs
+        else:
+            sorted_txs = current_txs[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的交易
-        page_txs = reversed_txs[start_idx:end_idx]
+        page_txs = sorted_txs[start_idx:end_idx]
         print("current_last_update_time", current_last_update_time)
         
         # 返回结果
@@ -96,6 +102,7 @@ def get_transactions():
             'total': len(current_txs),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'transactions': page_txs,
             'last_update_time': current_last_update_time
         })
@@ -115,19 +122,27 @@ def get_authorizers():
         # 获取分页参数，默认第1页，每页10条
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_authorizers = current_authorizers
+        else:
+            sorted_authorizers = current_authorizers[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的授权者信息
-        page_authorizers = current_authorizers[start_idx:end_idx]
+        page_authorizers = sorted_authorizers[start_idx:end_idx]
         
         # 返回结果
         return jsonify({
             'total': len(current_authorizers),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'authorizers': page_authorizers,
             'last_update_time': current_last_update_time
         })
@@ -148,19 +163,27 @@ def get_authorizers_with_zero():
         # 获取分页参数，默认第1页，每页10条
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_authorizers = current_authorizers_with_zero
+        else:
+            sorted_authorizers = current_authorizers_with_zero[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的授权者信息
-        page_authorizers = current_authorizers_with_zero[start_idx:end_idx]
+        page_authorizers = sorted_authorizers[start_idx:end_idx]
         
         # 返回结果
         return jsonify({
             'total': len(current_authorizers_with_zero),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'authorizers': page_authorizers,
             'last_update_time': current_last_update_time
         })
@@ -180,19 +203,27 @@ def get_codes_by_eth_balance():
         # 获取分页参数，默认第1页，每页10条
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_codes = current_codes_by_eth_balance
+        else:
+            sorted_codes = current_codes_by_eth_balance[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的代码信息
-        page_codes = current_codes_by_eth_balance[start_idx:end_idx]
+        page_codes = sorted_codes[start_idx:end_idx]
         
         # 返回结果
         return jsonify({
             'total': len(current_codes_by_eth_balance),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'codes': page_codes,
             'last_update_time': current_last_update_time
         })
@@ -213,19 +244,27 @@ def get_codes_by_authorizer_count():
         # 获取分页参数，默认第1页，每页10条
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_codes = current_codes_by_authorizer_count
+        else:
+            sorted_codes = current_codes_by_authorizer_count[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的代码信息
-        page_codes = current_codes_by_authorizer_count[start_idx:end_idx]
+        page_codes = sorted_codes[start_idx:end_idx]
         
         # 返回结果
         return jsonify({
             'total': len(current_codes_by_authorizer_count),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'codes': page_codes,
             'last_update_time': current_last_update_time
         })
@@ -245,19 +284,27 @@ def get_relayers_by_tx_count():
         # 获取分页参数，默认第1页，每页10条
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_relayers = current_relayers_by_tx_count
+        else:
+            sorted_relayers = current_relayers_by_tx_count[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的中继者信息
-        page_relayers = current_relayers_by_tx_count[start_idx:end_idx]
+        page_relayers = sorted_relayers[start_idx:end_idx]
         
         # 返回结果
         return jsonify({
             'total': len(current_relayers_by_tx_count),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'relayers': page_relayers,
             'last_update_time': current_last_update_time
         })
@@ -277,19 +324,27 @@ def get_relayers_by_authorization_count():
         # 获取分页参数，默认第1页，每页10条
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_relayers = current_relayers_by_authorization_count
+        else:
+            sorted_relayers = current_relayers_by_authorization_count[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的中继者信息
-        page_relayers = current_relayers_by_authorization_count[start_idx:end_idx]
+        page_relayers = sorted_relayers[start_idx:end_idx]
         
         # 返回结果
         return jsonify({
             'total': len(current_relayers_by_authorization_count),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'relayers': page_relayers,
             'last_update_time': current_last_update_time
         })
@@ -309,19 +364,27 @@ def get_relayers_by_tx_fee():
         # 获取分页参数，默认第1页，每页10条
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        
+        # 根据排序参数决定数据顺序
+        if order.lower() == 'asc':
+            sorted_relayers = current_relayers_by_tx_fee
+        else:
+            sorted_relayers = current_relayers_by_tx_fee[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         
         # 获取当前页的中继者信息
-        page_relayers = current_relayers_by_tx_fee[start_idx:end_idx]
+        page_relayers = sorted_relayers[start_idx:end_idx]
         
         # 返回结果
         return jsonify({
             'total': len(current_relayers_by_tx_fee),
             'page': page,
             'page_size': page_size,
+            'order': order,
             'relayers': page_relayers,
             'last_update_time': current_last_update_time
         })
