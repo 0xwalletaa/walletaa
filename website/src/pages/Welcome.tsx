@@ -1,6 +1,6 @@
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { useRequest } from '@umijs/max';
+import { useIntl } from '@umijs/max';
 import { Card, Col, Row, Table, Tooltip, Tag } from 'antd';
 import { Area, Column } from '@ant-design/plots';
 import numeral from 'numeral';
@@ -32,6 +32,7 @@ interface ChartDataItem {
 
 // 引入ChartCard和Field组件
 const ChartCard: React.FC<ChartCardProps> = ({ loading, title, total, contentHeight = 46, footer, children, bordered = true }) => {
+  const intl = useIntl();
   return (
     <Card
       loading={loading}
@@ -50,7 +51,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ loading, title, total, contentHei
             }}
           >
             <div>{title}</div>
-            <Tooltip title="数据说明">
+            <Tooltip title={intl.formatMessage({ id: 'pages.welcome.dataDescription' })}>
               <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
             </Tooltip>
           </div>
@@ -98,6 +99,7 @@ const topColResponsiveProps = {
 };
 
 const Welcome: React.FC = () => {
+  const intl = useIntl();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<Overview | null>(null);
 
@@ -169,85 +171,15 @@ const Welcome: React.FC = () => {
     }));
   };
 
-  const codeRankColumns = [
-    {
-      title: '排名',
-      dataIndex: 'index',
-      key: 'index',
-      render: (_: any, __: any, index: number) => index + 1,
-    },
-    {
-      title: '代码地址',
-      dataIndex: 'code_address',
-      key: 'code_address',
-      render: (text: string) => (
-        <Tooltip title={text}>
-          <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
-            <Tag color="blue">{formatAddress(text)}</Tag>
-          </a>
-        </Tooltip>
-      ),
-    },
-    {
-      title: '授权者数量',
-      dataIndex: 'authorizer_count',
-      key: 'authorizer_count',
-    },
-    {
-      title: 'ETH余额',
-      dataIndex: 'eth_balance',
-      key: 'eth_balance',
-      render: (text: number) => numeral(text).format('0,0.0000'),
-    },
-  ];
-
-  const relayerRankColumns = [
-    {
-      title: '排名',
-      dataIndex: 'index',
-      key: 'index',
-      render: (_: any, __: any, index: number) => index + 1,
-    },
-    {
-      title: '中继者地址',
-      dataIndex: 'relayer_address',
-      key: 'relayer_address',
-      render: (text: string) => (
-        <Tooltip title={text}>
-          <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
-            <Tag color="purple">{formatAddress(text)}</Tag>
-          </a>
-        </Tooltip>
-      ),
-    },
-    {
-      title: '交易数量',
-      dataIndex: 'tx_count',
-      key: 'tx_count',
-    },
-    {
-      title: '授权数量',
-      dataIndex: 'authorization_count',
-      key: 'authorization_count',
-    },
-    {
-      title: '交易费用(ETH)',
-      dataIndex: 'tx_fee',
-      key: 'tx_fee',
-      render: (text: number) => numeral(text).format('0,0.0000'),
-    },
-  ];
-
   return (
     <PageContainer>
       <Row gutter={24}>
         <Col {...topColResponsiveProps}>
           <ChartCard
             bordered={false}
-            title="交易数量"
+            title={intl.formatMessage({ id: 'pages.welcome.transactions' })}
             loading={loading}
             total={overview ? numeral(overview.tx_count).format('0,0') : 0}
-            footer={<Field label="总交易数" value={overview ? numeral(overview.tx_count).format('0,0') : 0} />}
             contentHeight={46}
           >
             <Column
@@ -266,9 +198,8 @@ const Welcome: React.FC = () => {
           <ChartCard
             bordered={false}
             loading={loading}
-            title="授权者数量"
+            title={intl.formatMessage({ id: 'pages.welcome.authorizers' })}
             total={overview ? numeral(overview.authorizer_count).format('0,0') : 0}
-            footer={<Field label="总授权者数" value={overview ? numeral(overview.authorizer_count).format('0,0') : 0} />}
             contentHeight={46}
           >
             <Column
@@ -287,9 +218,8 @@ const Welcome: React.FC = () => {
           <ChartCard
             bordered={false}
             loading={loading}
-            title="代码数量"
+            title={intl.formatMessage({ id: 'pages.welcome.codes' })}
             total={overview ? numeral(overview.code_count).format('0,0') : 0}
-            footer={<Field label="总代码数" value={overview ? numeral(overview.code_count).format('0,0') : 0} />}
             contentHeight={46}
           >
             <Column
@@ -308,9 +238,8 @@ const Welcome: React.FC = () => {
           <ChartCard
             loading={loading}
             bordered={false}
-            title="中继者数量"
+            title={intl.formatMessage({ id: 'pages.welcome.relayers' })}
             total={overview ? numeral(overview.relayer_count).format('0,0') : 0}
-            footer={<Field label="总中继者数" value={overview ? numeral(overview.relayer_count).format('0,0') : 0} />}
             contentHeight={46}
           >
             <Column
@@ -336,7 +265,7 @@ const Welcome: React.FC = () => {
           <Row gutter={24}>
             <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
               <div style={{ position: 'relative' }}>
-                <h4 style={{ marginBottom: 20 }}>累计交易量</h4>
+                <h4 style={{ marginBottom: 20 }}>{intl.formatMessage({ id: 'pages.welcome.cumulativeTxs' })}</h4>
                 <Area
                   height={200}
                   data={getCumulativeTxData()}
@@ -355,7 +284,7 @@ const Welcome: React.FC = () => {
                     },
                   }}
                   tooltip={{
-                    name: '累计交易数量',
+                    name: intl.formatMessage({ id: 'pages.welcome.cumulativeTxs' }),
                     channel: 'y',
                   }}
                 />
@@ -363,7 +292,7 @@ const Welcome: React.FC = () => {
             </Col>
             <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
               <div style={{ position: 'relative' }}>
-                <h4 style={{ marginBottom: 20 }}>累计授权量</h4>
+                <h4 style={{ marginBottom: 20 }}>{intl.formatMessage({ id: 'pages.welcome.cumulativeAuths' })}</h4>
                 <Area
                   height={200}
                   data={getCumulativeAuthData()}
@@ -382,7 +311,7 @@ const Welcome: React.FC = () => {
                     },
                   }}
                   tooltip={{
-                    name: '累计授权数量',
+                    name: intl.formatMessage({ id: 'pages.welcome.cumulativeAuths' }),
                     channel: 'y',
                   }}
                 />
@@ -396,7 +325,7 @@ const Welcome: React.FC = () => {
         <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
           <Card
             bordered={false}
-            title="代码排行榜"
+            title={intl.formatMessage({ id: 'pages.welcome.codeRanking' })}
             loading={loading}
             style={{ height: '100%' }}
             bodyStyle={{ padding: '0 24px 24px 24px' }}
@@ -404,7 +333,37 @@ const Welcome: React.FC = () => {
             <Table
               rowKey="code_address"
               size="small"
-              columns={codeRankColumns}
+              columns={[
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.ranking' }),
+                  dataIndex: 'index',
+                  key: 'index',
+                  render: (_: any, __: any, index: number) => index + 1,
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.codeAddress' }),
+                  dataIndex: 'code_address',
+                  key: 'code_address',
+                  render: (text: string) => (
+                    <Tooltip title={text}>
+                      <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
+                        <Tag color="blue">{formatAddress(text)}</Tag>
+                      </a>
+                    </Tooltip>
+                  ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.authorizerCount' }),
+                  dataIndex: 'authorizer_count',
+                  key: 'authorizer_count',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.ethBalance' }),
+                  dataIndex: 'eth_balance',
+                  key: 'eth_balance',
+                  render: (text: number) => numeral(text).format('0,0.0000'),
+                },
+              ]}
               dataSource={overview ? overview.top10_codes : []}
               pagination={false}
             />
@@ -413,7 +372,7 @@ const Welcome: React.FC = () => {
         <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
           <Card
             bordered={false}
-            title="中继者排行榜"
+            title={intl.formatMessage({ id: 'pages.welcome.relayerRanking' })}
             loading={loading}
             style={{ height: '100%' }}
             bodyStyle={{ padding: '0 24px 24px 24px' }}
@@ -421,7 +380,42 @@ const Welcome: React.FC = () => {
             <Table
               rowKey="relayer_address"
               size="small"
-              columns={relayerRankColumns}
+              columns={[
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.ranking' }),
+                  dataIndex: 'index',
+                  key: 'index',
+                  render: (_: any, __: any, index: number) => index + 1,
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.relayerAddress' }),
+                  dataIndex: 'relayer_address',
+                  key: 'relayer_address',
+                  render: (text: string) => (
+                    <Tooltip title={text}>
+                      <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
+                        <Tag color="purple">{formatAddress(text)}</Tag>
+                      </a>
+                    </Tooltip>
+                  ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.txCount' }),
+                  dataIndex: 'tx_count',
+                  key: 'tx_count',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.authCount' }),
+                  dataIndex: 'authorization_count',
+                  key: 'authorization_count',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.txFee' }),
+                  dataIndex: 'tx_fee',
+                  key: 'tx_fee',
+                  render: (text: number) => numeral(text).format('0,0.0000'),
+                },
+              ]}
               dataSource={overview ? overview.top10_relayers : []}
               pagination={false}
             />
