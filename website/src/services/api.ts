@@ -83,6 +83,8 @@ export interface Overview {
   daily_cumulative_tx_count: Record<string, number>;
   daily_authorizaion_count: Record<string, number>;
   daily_cumulative_authorizaion_count: Record<string, number>;
+  daily_code_count: Record<string, number>;
+  daily_relayer_count: Record<string, number>;
   top10_codes: Array<{
     code_address: string;
     authorizer_count: number;

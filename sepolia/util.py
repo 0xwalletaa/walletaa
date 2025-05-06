@@ -239,6 +239,28 @@ def get_overview(txs, authorizers, codes, relayers):
             daily_authorizaion_count[tx_date] = 0
         daily_authorizaion_count[tx_date] += len(tx['authorization_list'])
     
+    daily_code_set = {}
+    for tx in txs:
+        tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
+        if tx_date not in daily_code_set:
+            daily_code_set[tx_date] = set()
+        for authorization in tx['authorization_list']:
+            daily_code_set[tx_date].add(authorization['code_address'])
+    daily_code_count = {}
+    for tx_date in daily_code_set:
+        daily_code_count[tx_date] = len(daily_code_set[tx_date])
+    
+    
+    daily_relayer_set = {}
+    for tx in txs:
+        tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
+        if tx_date not in daily_relayer_set:
+            daily_relayer_set[tx_date] = set()
+        daily_relayer_set[tx_date].add(tx['relayer_address'])
+    daily_relayer_count = {}
+    for tx_date in daily_relayer_set:
+        daily_relayer_count[tx_date] = len(daily_relayer_set[tx_date])
+    
     daily_cumulative_authorizaion_count = {}
     last_day_cumulative_authorizaion_count = 0
     for tx_date in sorted(daily_authorizaion_count.keys()):
@@ -257,6 +279,8 @@ def get_overview(txs, authorizers, codes, relayers):
         'daily_cumulative_tx_count': daily_cumulative_tx_count,
         'daily_authorizaion_count': daily_authorizaion_count,
         'daily_cumulative_authorizaion_count': daily_cumulative_authorizaion_count,
+        'daily_code_count': daily_code_count,
+        'daily_relayer_count': daily_relayer_count,
         'top10_codes': top10_codes,
         'top10_relayers': top10_relayers,
     }
