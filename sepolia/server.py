@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 import os
 from flask_cors import CORS
 import random
+import json
 
 # 配置日志
 log_dir = "logs"
@@ -390,6 +391,25 @@ def get_relayers_by_tx_fee():
         })
     except Exception as e:
         app.logger.error(f"获取以交易费用排序的中继者数据时出错: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 添加新的接口，返回完整的code_info.json内容
+@app.route('/code_infos', methods=['GET'])
+def get_code_infos():
+    try:
+        # 从website/public目录读取code_info.json文件
+        code_info_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'website', 'public', 'code_info.json')
+        
+        with open(code_info_path, 'r', encoding='utf-8') as f:
+            code_infos = json.load(f)
+        
+        return jsonify({
+            'code_infos': code_infos,
+            'total': len(code_infos),
+            'last_update_time': last_update_time
+        })
+    except Exception as e:
+        app.logger.error(f"获取code_infos数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # 健康检查接口

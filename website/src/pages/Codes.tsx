@@ -6,7 +6,7 @@ import {
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography } from 'antd';
 import React, { useRef, useState, useEffect } from 'react';
-import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem } from '@/services/api';
+import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, getCodeInfos, CodeInfoItem } from '@/services/api';
 
 // 定义代码详情类型
 interface CodeInfo {
@@ -51,15 +51,14 @@ const Codes: React.FC = () => {
   const intl = useIntl();
   const { Text, Link } = Typography;
 
-  // 加载代码详情信息
+  // 加载代码详情信息 - 使用API接口替代本地fetch
   useEffect(() => {
-    fetch('/code_info.json')
-      .then(response => response.json())
-      .then(data => {
-        setCodeInfos(data);
+    getCodeInfos()
+      .then(response => {
+        setCodeInfos(response.code_infos);
       })
       .catch(error => {
-        console.error('加载code_info.json失败:', error);
+        console.error('加载code_infos失败:', error);
       });
   }, []);
 

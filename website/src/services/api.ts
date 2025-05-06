@@ -44,6 +44,35 @@ export interface RelayerItem {
   tx_fee: number;
 }
 
+// 定义代码信息详情类型
+export interface CodeInfoItem {
+  address: string;
+  name: string;
+  provider: string;
+  code: string;
+  repo: string;
+  contractAccountStandard: string | boolean;
+  verificationMethod: string;
+  batchCall: string | boolean;
+  executor: string | boolean;
+  receiveETH: string | boolean;
+  receiveNFT: string | boolean;
+  recovery: string | boolean;
+  sessionKey: string | boolean;
+  storage: string;
+  nativeETHApprovalAndTransfer: string | boolean;
+  hooks: string | boolean;
+  signature: string;
+  txInitiationMethod: string;
+  feePaymentMethod: string;
+  upgradable: string | boolean;
+  modularContractAccount: string | boolean;
+  moduleRegistry: string | boolean;
+  isContractAddress: boolean;
+  production: string | boolean;
+  [key: string]: any; // 允许其他可能的属性
+}
+
 // 获取交易列表接口
 export async function getTransactions(params: {
   page?: number;
@@ -144,5 +173,12 @@ export async function getRelayersByTxFee(params: {
   return request(`${BASE_URL}/relayers_by_tx_fee`, {
     method: 'GET',
     params,
+  });
+}
+
+// 获取完整的code_infos数据
+export async function getCodeInfos() {
+  return request(`${BASE_URL}/code_infos`, {
+    method: 'GET',
   });
 } 
