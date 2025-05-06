@@ -16,3 +16,4 @@ sepolia/logs
 *node_modules/
 *.umi/
 *.husky/
+temp/
