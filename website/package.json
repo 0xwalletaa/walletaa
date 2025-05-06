@@ -35,14 +35,19 @@
     "test:update": "npm run jest -- -u",
     "tsc": "tsc --noEmit"
   },
-  "browserslist": ["defaults"],
+  "browserslist": [
+    "defaults"
+  ],
   "dependencies": {
     "@ant-design/icons": "^4.8.3",
+    "@ant-design/plots": "^2.3.3",
     "@ant-design/pro-components": "^2.7.19",
+    "@types/numeral": "^2.0.5",
     "antd": "^5.21.2",
     "antd-style": "^3.7.0",
     "classnames": "^2.5.1",
     "dayjs": "^1.11.13",
+    "numeral": "^2.0.6",
     "querystring": "^0.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -78,5 +83,7 @@
     "umi-presets-pro": "^2.0.3",
     "umi-serve": "^1.9.11"
   },
-  "engines": { "node": ">=12.0.0" }
+  "engines": {
+    "node": ">=12.0.0"
+  }
 }
