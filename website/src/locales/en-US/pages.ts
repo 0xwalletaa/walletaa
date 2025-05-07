@@ -146,4 +146,5 @@ export default {
   'pages.welcome.authCount': 'Authorization Count',
   'pages.welcome.txFee': 'Transaction Fee (ETH)',
   'pages.welcome.dataDescription': 'Data Description',
+  'pages.welcome.eip7702Title': 'Welcome to the World of EIP-7702',
 };

@@ -174,7 +174,7 @@ const Welcome: React.FC = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer title={intl.formatMessage({ id: 'pages.welcome.eip7702Title' })}>
       <Row gutter={24}>
         <Col {...topColResponsiveProps}>
           <ChartCard
