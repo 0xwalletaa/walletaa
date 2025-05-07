@@ -73,22 +73,10 @@ const Relayers: React.FC = () => {
 
   // 动态设置表格标题
   const getHeaderTitle = () => {
-    if (sortApi === 'tx_count') {
-      return intl.formatMessage({
-        id: 'pages.relayers.headerTitleTxCount',
-        defaultMessage: 'Relayer List (By TX Count)',
-      });
-    } else if (sortApi === 'authorization_count') {
-      return intl.formatMessage({
-        id: 'pages.relayers.headerTitleAuthCount',
-        defaultMessage: 'Relayer List (By Authorization Count)',
-      });
-    } else {
-      return intl.formatMessage({
-        id: 'pages.relayers.headerTitleTxFee',
-        defaultMessage: 'Relayer List (By TX Fee)',
-      });
-    }
+    return intl.formatMessage({
+      id: 'pages.relayers.headerTitle',
+      defaultMessage: 'Relayer List',
+    });
   };
 
   return (
