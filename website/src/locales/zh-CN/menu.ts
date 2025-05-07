@@ -1,5 +1,5 @@
 export default {
-  'menu.welcome': '欢迎来到EIP-7702的世界',
+  'menu.welcome': '欢迎',
   'menu.transactions': '交易',
   'menu.authorizers': '授权者',
   'menu.codes': '代码',
