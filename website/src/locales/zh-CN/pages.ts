@@ -143,4 +143,5 @@ export default {
   'pages.welcome.authCount': '授权数量',
   'pages.welcome.txFee': '交易费用(ETH)',
   'pages.welcome.dataDescription': '数据说明',
+  'pages.welcome.eip7702Title': '欢迎来到EIP-7702的世界',
 };
