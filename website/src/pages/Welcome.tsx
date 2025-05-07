@@ -6,6 +6,7 @@ import { Area, Column } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
 import { getOverview, Overview } from '@/services/api';
+import { getChainConfig } from '@/services/config';
 
 // 定义ChartCard组件的属性类型
 interface ChartCardProps {
@@ -102,6 +103,7 @@ const Welcome: React.FC = () => {
   const intl = useIntl();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<Overview | null>(null);
+  const chainConfig = getChainConfig();
 
   useEffect(() => {
     getOverview()
@@ -346,7 +348,7 @@ const Welcome: React.FC = () => {
                   key: 'code_address',
                   render: (text: string) => (
                     <Tooltip title={text}>
-                      <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
+                      <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer">
                         <Tag color="blue">{formatAddress(text)}</Tag>
                       </a>
                     </Tooltip>
@@ -393,7 +395,7 @@ const Welcome: React.FC = () => {
                   key: 'relayer_address',
                   render: (text: string) => (
                     <Tooltip title={text}>
-                      <a href={`https://sepolia.etherscan.io/address/${text}`} target="_blank" rel="noopener noreferrer">
+                      <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer">
                         <Tag color="purple">{formatAddress(text)}</Tag>
                       </a>
                     </Tooltip>

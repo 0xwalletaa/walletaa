@@ -1,12 +1,13 @@
-import { Footer, SelectLang } from '@/components';
+import { Footer, SelectLang, ChainSelect } from '@/components';
 import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
-import { history } from '@umijs/max';
+import { history, Link } from '@umijs/max';
 import React from 'react';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
+import { getCurrentChain, DEFAULT_CHAIN } from './services/config';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -42,7 +43,7 @@ export async function getInitialState(): Promise<{
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => [<SelectLang key="SelectLang" />],
+    actionsRender: () => [<ChainSelect key="ChainSelect" />, <SelectLang key="SelectLang" />],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: initialState?.currentUser?.name,
@@ -96,6 +97,22 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
           )}
         </>
       );
+    },
+    // 保持URL中的chain参数，当chain为默认值时不添加参数
+    menuItemRender: (menuItemProps, defaultDom) => {
+      if (menuItemProps.isUrl || !menuItemProps.path) {
+        return defaultDom;
+      }
+      const currentChain = getCurrentChain();
+      
+      // 如果是默认链，不添加参数
+      if (currentChain === DEFAULT_CHAIN) {
+        return <Link to={menuItemProps.path}>{defaultDom}</Link>;
+      }
+      
+      // 非默认链，添加参数
+      const path = `${menuItemProps.path}${menuItemProps.path.includes('?') ? '&' : '?'}chain=${currentChain}`;
+      return <Link to={path}>{defaultDom}</Link>;
     },
     ...initialState?.settings,
   };

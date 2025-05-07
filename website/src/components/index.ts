@@ -7,5 +7,7 @@
  */
 import Footer from './Footer';
 import { SelectLang } from './RightContent';
+import ChainLink from './ChainLink';
+import ChainSelect from './ChainSelect';
 
-export { Footer, SelectLang };
+export { Footer, SelectLang, ChainLink, ChainSelect };
