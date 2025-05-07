@@ -5,8 +5,10 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography } from 'antd';
+import { LinkOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, getCodeInfos, CodeInfoItem } from '@/services/api';
+import { getChainConfig } from '@/services/config';
 
 // 定义代码详情类型
 interface CodeInfo {
@@ -43,6 +45,7 @@ const Codes: React.FC = () => {
   const [codeInfos, setCodeInfos] = useState<CodeInfo[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentCode, setCurrentCode] = useState<CodeInfo | null>(null);
+  const { EXPLORER_URL } = getChainConfig();
 
   /**
    * @en-US International configuration
@@ -96,7 +99,16 @@ const Codes: React.FC = () => {
       dataIndex: 'code_address',
       render: (dom) => {
         return typeof dom === 'string' && dom.length > 10
-          ? <Tooltip title={dom}><Tag color="green">{`${formatAddress(dom as string)}`}</Tag></Tooltip>
+          ? <Tooltip title={
+              <span>
+                {dom}
+                <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                  <LinkOutlined />
+                </a>
+              </span>
+            }>
+              <Tag color="green">{`${formatAddress(dom as string)}`}</Tag>
+            </Tooltip>
           : <Tag color="green">{dom}</Tag>;
       },
     },
@@ -193,6 +205,9 @@ const Codes: React.FC = () => {
           span={2}
         >
           {code.address}
+          <a href={`${EXPLORER_URL}/address/${code.address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8 }}>
+            <LinkOutlined />
+          </a>
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({

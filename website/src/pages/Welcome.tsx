@@ -1,4 +1,4 @@
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Card, Col, Row, Table, Tooltip, Tag } from 'antd';
@@ -347,10 +347,15 @@ const Welcome: React.FC = () => {
                   dataIndex: 'code_address',
                   key: 'code_address',
                   render: (text: string) => (
-                    <Tooltip title={text}>
-                      <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer">
-                        <Tag color="blue">{formatAddress(text)}</Tag>
-                      </a>
+                    <Tooltip title={
+                      <span>
+                        {text}
+                        <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                          <LinkOutlined />
+                        </a>
+                      </span>
+                    }>
+                      <Tag color="blue">{formatAddress(text)}</Tag>
                     </Tooltip>
                   ),
                 },
@@ -394,10 +399,15 @@ const Welcome: React.FC = () => {
                   dataIndex: 'relayer_address',
                   key: 'relayer_address',
                   render: (text: string) => (
-                    <Tooltip title={text}>
-                      <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer">
-                        <Tag color="purple">{formatAddress(text)}</Tag>
-                      </a>
+                    <Tooltip title={
+                      <span>
+                        {text}
+                        <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                          <LinkOutlined />
+                        </a>
+                      </span>
+                    }>
+                      <Tag color="purple">{formatAddress(text)}</Tag>
                     </Tooltip>
                   ),
                 },

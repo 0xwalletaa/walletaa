@@ -5,12 +5,15 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Tag, Tooltip } from 'antd';
+import { LinkOutlined } from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
 import { getRelayersByTxCount, getRelayersByAuthorizationCount, getRelayersByTxFee, RelayerItem } from '@/services/api';
+import { getChainConfig } from '@/services/config';
 
 const Relayers: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [sortApi, setSortApi] = useState<'tx_count' | 'authorization_count' | 'tx_fee'>('tx_count');
+  const { EXPLORER_URL } = getChainConfig();
 
   /**
    * @en-US International configuration
@@ -33,7 +36,16 @@ const Relayers: React.FC = () => {
       dataIndex: 'relayer_address',
       render: (dom) => {
         return typeof dom === 'string' && dom.length > 10
-          ? <Tooltip title={dom}><Tag color="purple">{`${formatAddress(dom as string)}`}</Tag></Tooltip>
+          ? <Tooltip title={
+              <span>
+                {dom}
+                <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                  <LinkOutlined />
+                </a>
+              </span>
+            }>
+              <Tag color="purple">{`${formatAddress(dom as string)}`}</Tag>
+            </Tooltip>
           : <Tag color="purple">{dom}</Tag>;
       },
     },

@@ -5,12 +5,15 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Tag, Tooltip, Switch, Space } from 'antd';
+import { LinkOutlined } from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
 import { getAuthorizers, getAuthorizersWithZero, AuthorizerItem } from '@/services/api';
+import { getChainConfig } from '@/services/config';
 
 const Authorizers: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [includeZero, setIncludeZero] = useState<boolean>(false);
+  const { EXPLORER_URL } = getChainConfig();
 
   /**
    * @en-US International configuration
@@ -33,7 +36,16 @@ const Authorizers: React.FC = () => {
       dataIndex: 'authorizer_address',
       render: (dom) => {
         return typeof dom === 'string' && dom.length > 10
-          ? <Tooltip title={dom}><Tag color="blue">{`${formatAddress(dom as string)}`}</Tag></Tooltip>
+          ? <Tooltip title={
+              <span>
+                {dom}
+                <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                  <LinkOutlined />
+                </a>
+              </span>
+            }>
+              <Tag color="blue">{`${formatAddress(dom as string)}`}</Tag>
+            </Tooltip>
           : <Tag color="blue">{dom}</Tag>;
       },
     },
@@ -45,7 +57,16 @@ const Authorizers: React.FC = () => {
       dataIndex: 'code_address',
       render: (dom) => {
         return typeof dom === 'string' && dom.length > 10
-          ? <Tooltip title={dom}><Tag color="green">{`${formatAddress(dom as string)}`}</Tag></Tooltip>
+          ? <Tooltip title={
+              <span>
+                {dom}
+                <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                  <LinkOutlined />
+                </a>
+              </span>
+            }>
+              <Tag color="green">{`${formatAddress(dom as string)}`}</Tag>
+            </Tooltip>
           : <Tag color="green">{dom}</Tag>;
       },
     },
@@ -85,7 +106,14 @@ const Authorizers: React.FC = () => {
         return (
           <div>
             {(dom as string[]).map((address, index) => (
-              <Tooltip key={index} title={address}>
+              <Tooltip key={index} title={
+                <span>
+                  {address}
+                  <a href={`${EXPLORER_URL}/address/${address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                    <LinkOutlined />
+                  </a>
+                </span>
+              }>
                 <Tag color="purple" style={{ marginBottom: '2px' }}>{`${formatAddress(address)}`}</Tag>
               </Tooltip>
             ))}
