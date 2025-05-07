@@ -2,7 +2,7 @@
 export type ChainType = 'mainnet' | 'sepolia';
 
 // 默认链
-export const DEFAULT_CHAIN: ChainType = 'sepolia';
+export const DEFAULT_CHAIN: ChainType = 'mainnet';
 
 // 链配置接口
 interface ChainConfig {
