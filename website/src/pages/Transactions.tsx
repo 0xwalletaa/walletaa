@@ -1,4 +1,4 @@
-import { PlusOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { PlusOutlined, ArrowRightOutlined, LinkOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   PageContainer,
@@ -9,6 +9,7 @@ import { FormattedMessage, useIntl } from '@umijs/max';
 import { Drawer, Tag, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import { getTransactions, TransactionItem } from '@/services/api';
+import { getChainConfig } from '@/services/config';
 
 const Transactions: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
@@ -20,6 +21,7 @@ const Transactions: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
+  const { EXPLORER_URL } = getChainConfig();
 
   const formatAddress = (address: string) => {
     return typeof address === 'string' && address.length > 10
@@ -59,9 +61,22 @@ const Transactions: React.FC = () => {
       }),
       dataIndex: 'tx_hash',
       render: (dom) => {
-        return typeof dom === 'string' && dom.length > 10
-          ? <Tooltip title={dom}><Tag color="orange">{`${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`}</Tag></Tooltip>
-          : <Tag color="orange">{dom}</Tag>;
+        if (typeof dom === 'string' && dom.length > 10) {
+          const formattedHash = `${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`;
+          return (
+            <Tooltip title={
+              <span>
+                {dom}
+                <a href={`${EXPLORER_URL}/tx/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                  <LinkOutlined />
+                </a>
+              </span>
+            }>
+              <Tag color="orange">{formattedHash}</Tag>
+            </Tooltip>
+          );
+        }
+        return <Tag color="orange">{dom}</Tag>;
       },
     },
     {
@@ -71,9 +86,22 @@ const Transactions: React.FC = () => {
       }),
       dataIndex: 'relayer_address',
       render: (dom) => {
-        return typeof dom === 'string' && dom.length > 10
-          ? <Tooltip title={dom}><Tag color="purple">{`${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`}</Tag></Tooltip>
-          : <Tag color="purple">{dom}</Tag>;
+        if (typeof dom === 'string' && dom.length > 10) {
+          const formattedAddress = `${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`;
+          return (
+            <Tooltip title={
+              <span>
+                {dom}
+                <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                  <LinkOutlined />
+                </a>
+              </span>
+            }>
+              <Tag color="purple">{formattedAddress}</Tag>
+            </Tooltip>
+          );
+        }
+        return <Tag color="purple">{dom}</Tag>;
       },
     },
     {
@@ -108,10 +136,24 @@ const Transactions: React.FC = () => {
             <div>
               {record.authorization_list.map((auth, index) => (
                 <div key={index} style={{ marginBottom: 4 }}>
-                  <Tooltip title={auth.authorizer_address}>
+                  <Tooltip title={
+                    <span>
+                      {auth.authorizer_address}
+                      <a href={`${EXPLORER_URL}/address/${auth.authorizer_address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                        <LinkOutlined />
+                      </a>
+                    </span>
+                  }>
                     <Tag color="blue">{formatAddress(auth.authorizer_address)}</Tag>
                   </Tooltip>
-                  <Tooltip title={auth.code_address}>
+                  <Tooltip title={
+                    <span>
+                      {auth.code_address}
+                      <a href={`${EXPLORER_URL}/address/${auth.code_address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                        <LinkOutlined />
+                      </a>
+                    </span>
+                  }>
                     <Tag color="green">{formatAddress(auth.code_address)}</Tag>
                   </Tooltip>
                 </div>
@@ -190,24 +232,60 @@ const Transactions: React.FC = () => {
               id: 'pages.transactions.authorizationList',
               defaultMessage: 'Authorization List',
             })}</h2>
-            <p>{intl.formatMessage({
-              id: 'pages.transactions.transactionHash',
-              defaultMessage: 'Transaction Hash',
-            })}: {currentRow.tx_hash}</p>
+            <p>
+              {intl.formatMessage({
+                id: 'pages.transactions.transactionHash',
+                defaultMessage: 'Transaction Hash',
+              })}: 
+              <Tooltip title={
+                <span>
+                  {currentRow.tx_hash}
+                  <a href={`${EXPLORER_URL}/tx/${currentRow.tx_hash}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                    <LinkOutlined />
+                  </a>
+                </span>
+              }>
+                <span style={{ marginLeft: 5 }}>{currentRow.tx_hash}</span>
+              </Tooltip>
+            </p>
             
             <div style={{ marginTop: 20 }}>
               {currentRow.authorization_list && currentRow.authorization_list.length > 0 ? (
                 <ul style={{ padding: 0, listStyle: 'none' }}>
                   {currentRow.authorization_list.map((auth, index) => (
                     <li key={index} style={{ marginBottom: 12, padding: 10, border: '1px solid #f0f0f0', borderRadius: 4 }}>
-                      <div><strong>{intl.formatMessage({
-                        id: 'pages.transactions.authorizerAddress',
-                        defaultMessage: 'Authorizer Address',
-                      })}:</strong> <Tooltip title={auth.authorizer_address}><Tag color="blue">{auth.authorizer_address}</Tag></Tooltip></div>
-                      <div><strong>{intl.formatMessage({
-                        id: 'pages.transactions.codeAddress',
-                        defaultMessage: 'Code Address',
-                      })}:</strong> <Tooltip title={auth.code_address}><Tag color="green">{auth.code_address}</Tag></Tooltip></div>
+                      <div>
+                        <strong>{intl.formatMessage({
+                          id: 'pages.transactions.authorizerAddress',
+                          defaultMessage: 'Authorizer Address',
+                        })}:</strong> 
+                        <Tooltip title={
+                          <span>
+                            {auth.authorizer_address}
+                            <a href={`${EXPLORER_URL}/address/${auth.authorizer_address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                              <LinkOutlined />
+                            </a>
+                          </span>
+                        }>
+                          <Tag color="blue">{auth.authorizer_address}</Tag>
+                        </Tooltip>
+                      </div>
+                      <div>
+                        <strong>{intl.formatMessage({
+                          id: 'pages.transactions.codeAddress',
+                          defaultMessage: 'Code Address',
+                        })}:</strong> 
+                        <Tooltip title={
+                          <span>
+                            {auth.code_address}
+                            <a href={`${EXPLORER_URL}/address/${auth.code_address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                              <LinkOutlined />
+                            </a>
+                          </span>
+                        }>
+                          <Tag color="green">{auth.code_address}</Tag>
+                        </Tooltip>
+                      </div>
                     </li>
                   ))}
                 </ul>
