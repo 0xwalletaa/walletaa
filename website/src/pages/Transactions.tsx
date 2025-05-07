@@ -6,7 +6,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Drawer, Tag, Tooltip } from 'antd';
+import { Modal, Tag, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import { getTransactions, TransactionItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
@@ -217,48 +217,43 @@ const Transactions: React.FC = () => {
         columns={columns}
       />
 
-      <Drawer
-        width={600}
+      <Modal
+        title={intl.formatMessage({
+          id: 'pages.transactions.authorizationList',
+          defaultMessage: 'Authorization List',
+        })}
         open={showDetail}
-        onClose={() => {
+        onCancel={() => {
           setCurrentRow(undefined);
           setShowDetail(false);
         }}
-        closable={false}
+        footer={null}
+        width={800}
       >
-        {currentRow?.tx_hash && (
-          <>
-            <h2>{intl.formatMessage({
-              id: 'pages.transactions.authorizationList',
-              defaultMessage: 'Authorization List',
-            })}</h2>
-            <p>
-              {intl.formatMessage({
-                id: 'pages.transactions.transactionHash',
-                defaultMessage: 'Transaction Hash',
-              })}: 
-              <Tooltip title={
-                <span>
-                  {currentRow.tx_hash}
-                  <a href={`${EXPLORER_URL}/tx/${currentRow.tx_hash}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
-                    <LinkOutlined />
-                  </a>
-                </span>
-              }>
-                <span style={{ marginLeft: 5 }}>{currentRow.tx_hash}</span>
-              </Tooltip>
-            </p>
-            
-            <div style={{ marginTop: 20 }}>
-              {currentRow.authorization_list && currentRow.authorization_list.length > 0 ? (
-                <ul style={{ padding: 0, listStyle: 'none' }}>
+        {currentRow?.authorization_list && (
+          <div style={{ marginTop: 20 }}>
+            {currentRow.authorization_list && currentRow.authorization_list.length > 0 ? (
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #f0f0f0' }}>
+                      {intl.formatMessage({
+                        id: 'pages.transactions.authorizerAddress',
+                        defaultMessage: 'Authorizer Address',
+                      })}
+                    </th>
+                    <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #f0f0f0' }}>
+                      {intl.formatMessage({
+                        id: 'pages.transactions.codeAddress',
+                        defaultMessage: 'Code Address',
+                      })}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
                   {currentRow.authorization_list.map((auth, index) => (
-                    <li key={index} style={{ marginBottom: 12, padding: 10, border: '1px solid #f0f0f0', borderRadius: 4 }}>
-                      <div>
-                        <strong>{intl.formatMessage({
-                          id: 'pages.transactions.authorizerAddress',
-                          defaultMessage: 'Authorizer Address',
-                        })}:</strong> 
+                    <tr key={index} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                      <td style={{ padding: '8px' }}>
                         <Tooltip title={
                           <span>
                             {auth.authorizer_address}
@@ -267,14 +262,10 @@ const Transactions: React.FC = () => {
                             </a>
                           </span>
                         }>
-                          <Tag color="blue">{auth.authorizer_address}</Tag>
+                          <Tag color="blue">{formatAddress(auth.authorizer_address)}</Tag>
                         </Tooltip>
-                      </div>
-                      <div>
-                        <strong>{intl.formatMessage({
-                          id: 'pages.transactions.codeAddress',
-                          defaultMessage: 'Code Address',
-                        })}:</strong> 
+                      </td>
+                      <td style={{ padding: '8px' }}>
                         <Tooltip title={
                           <span>
                             {auth.code_address}
@@ -283,22 +274,22 @@ const Transactions: React.FC = () => {
                             </a>
                           </span>
                         }>
-                          <Tag color="green">{auth.code_address}</Tag>
+                          <Tag color="green">{formatAddress(auth.code_address)}</Tag>
                         </Tooltip>
-                      </div>
-                    </li>
+                      </td>
+                    </tr>
                   ))}
-                </ul>
-              ) : (
-                <p>{intl.formatMessage({
-                  id: 'pages.transactions.noAuthorizationData',
-                  defaultMessage: 'No Authorization Data',
-                })}</p>
-              )}
-            </div>
-          </>
+                </tbody>
+              </table>
+            ) : (
+              <p>{intl.formatMessage({
+                id: 'pages.transactions.noAuthorizationData',
+                defaultMessage: 'No Authorization Data',
+              })}</p>
+            )}
+          </div>
         )}
-      </Drawer>
+      </Modal>
     </PageContainer>
   );
 };
