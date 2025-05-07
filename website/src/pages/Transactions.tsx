@@ -58,12 +58,10 @@ const Transactions: React.FC = () => {
         defaultMessage: 'Transaction Hash',
       }),
       dataIndex: 'tx_hash',
-      render: (dom, entity) => {
-        return (
-          <span>
-            {formatAddress(dom as string)}
-          </span>
-        );
+      render: (dom) => {
+        return typeof dom === 'string' && dom.length > 10
+          ? <Tooltip title={dom}><Tag color="orange">{`${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`}</Tag></Tooltip>
+          : <Tag color="orange">{dom}</Tag>;
       },
     },
     {
