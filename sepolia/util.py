@@ -70,7 +70,7 @@ def parse_type4_tx_data(tx_data_str_):
         'block_number': tx_data['blockNumber'],
         'block_hash': tx_data['blockHash'],
         'tx_index': tx_data['transactionIndex'],
-        'tx_hash': tx_data['hash'],
+        'tx_hash': '0x' + tx_data['hash'],
         'relayer_address': tx_data['from'].lower(),
         'tx_fee': tx_fee,
         'authorization_list': authorization_list,
