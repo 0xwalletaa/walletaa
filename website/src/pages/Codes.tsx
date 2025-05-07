@@ -146,17 +146,10 @@ const Codes: React.FC = () => {
 
   // 动态设置表格标题
   const getHeaderTitle = () => {
-    if (sortApi === 'eth_balance') {
-      return intl.formatMessage({
-        id: 'pages.codes.headerTitleEthBalance',
-        defaultMessage: 'Code List (By ETH Balance)',
-      });
-    } else {
-      return intl.formatMessage({
-        id: 'pages.codes.headerTitleAuthorizerCount',
-        defaultMessage: 'Code List (By Authorizer Count)',
-      });
-    }
+    return intl.formatMessage({
+      id: 'pages.codes.headerTitle',
+      defaultMessage: 'Code List',
+    });
   };
 
   // 渲染代码详情内容
