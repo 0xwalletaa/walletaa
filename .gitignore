@@ -13,6 +13,8 @@ sepolia/miaomi.txt
 example/
 *.pyc
 sepolia/logs
+mainnet/logs
+mainnet_blocks.db
 *node_modules/
 *.umi/
 *.husky/
