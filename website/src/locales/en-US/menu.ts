@@ -1,5 +1,5 @@
 export default {
-  'menu': 'Welcome to world with EIP-7702',
+  'menu.welcome': 'Welcome',
   'menu.transactions': 'Transactions',
   'menu.authorizers': 'Authorizers',
   'menu.codes': 'Codes',
