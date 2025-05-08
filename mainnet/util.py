@@ -218,7 +218,7 @@ def get_code_infos():
         code_infos = json.load(f)
     return code_infos
 
-def get_overview(txs, authorizers, codes, relayers):
+def get_overview(txs, authorizers, codes, relayers, code_infos):
     daily_tx_count = {}
     for tx in txs:
         tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
@@ -283,6 +283,7 @@ def get_overview(txs, authorizers, codes, relayers):
         'daily_relayer_count': daily_relayer_count,
         'top10_codes': top10_codes,
         'top10_relayers': top10_relayers,
+        'code_infos': code_infos,
     }
 
 """
