@@ -191,7 +191,7 @@ const Codes: React.FC = () => {
     };
 
     const renderLink = (url: string) => {
-      if (!url || url === '' || url === 'x') return '-';
+      if (!url || url === '' || url === 'closed-source') return '-';
       return <Link href={url} target="_blank">{url}</Link>;
     };
 
