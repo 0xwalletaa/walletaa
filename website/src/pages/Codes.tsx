@@ -191,7 +191,7 @@ const Codes: React.FC = () => {
     };
 
     const renderLink = (url: string) => {
-      if (!url || url === '' || url === '闭源') return '-';
+      if (!url || url === '' || url === 'x') return '-';
       return <Link href={url} target="_blank">{url}</Link>;
     };
 
