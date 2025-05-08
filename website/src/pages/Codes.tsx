@@ -87,7 +87,7 @@ const Codes: React.FC = () => {
     const codeInfo = codeInfos.find(item => 
       item.address.toLowerCase() === codeAddress.toLowerCase()
     );
-    return codeInfo && codeInfo.code !== '闭源';
+    return codeInfo;
   };
 
   const columns: ProColumns<CodeItem>[] = [
