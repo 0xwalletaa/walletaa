@@ -23,7 +23,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": ""
   },
   {
     "address": "0xa65eaa25c97783600134354c6ccf62686be12386",
@@ -49,7 +49,7 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": false
+    "audit": false
   },
   {
     "address": "0xa9526ba55F7cABa1A6eB1cb4d555F29022ebFeed",
@@ -75,7 +75,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": ""
   },
   {
     "address": "0xe264dccc54e4b6906c0d1fee11d4326c06d33c80",
@@ -101,7 +101,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": ""
   },
   {
     "address": "0x8a0a91114ce5be2df367d08f729ba2aae2eb4262",
@@ -127,7 +127,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": false,
-    "production": ""
+    "audit": ""
   },
   {
     "address": "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
@@ -156,7 +156,7 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": "❓"
+    "audit": ""
   },
   {
     "address": "0x000000004f43c49e93c970e84001853a70923b03",
@@ -188,7 +188,7 @@
     "modularContractAccount": "ERC-7579",
     "moduleRegistry": "ERC-7484",
     "isContractAddress": true,
-    "production": true
+    "audit": true
   },
   {
     "address": "0x227380efd3392ec33cf148ade5e0a89d33121814",
@@ -217,7 +217,7 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": "❓"
+    "audit": ""
   },
   {
     "address": "0xfde60f1fe9e8d425272b98bee16acc795f2b83b9",
@@ -243,7 +243,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": ""
   },
   {
     "address": "0xb0a7d836421c41fc2f87bf349a296090a48bd544",
@@ -269,7 +269,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": ""
   },
   {
     "address": "0xb65dd26d7e0726a27cb39c6f9f22c03345ec3b1a",
@@ -295,7 +295,7 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": false
+    "audit": false
   },
   {
     "address": "0xb2cb3e92969828c2207367d9f4331a701b9464e6",
@@ -324,7 +324,7 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": "❓"
+    "audit": ""
   },
   {
     "address": "0x5291d8e0a0cdf6b803174e5a6895459eb31aad3f",
@@ -350,7 +350,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": ""
   },
   {
     "address": "0x5826683b26d1fbc55bf44c2b3b20e288dda9df58",
@@ -376,6 +376,6 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": ""
   }
-] 
+]
