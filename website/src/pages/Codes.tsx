@@ -87,7 +87,7 @@ const Codes: React.FC = () => {
     const codeInfo = codeInfos.find(item => 
       item.address.toLowerCase() === codeAddress.toLowerCase()
     );
-    return codeInfo && codeInfo.code !== '闭源';
+    return codeInfo;
   };
 
   const columns: ProColumns<CodeItem>[] = [
@@ -191,7 +191,7 @@ const Codes: React.FC = () => {
     };
 
     const renderLink = (url: string) => {
-      if (!url || url === '' || url === '闭源') return '-';
+      if (!url || url === '' || url === 'closed-source') return '-';
       return <Link href={url} target="_blank">{url}</Link>;
     };
 
