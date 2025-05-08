@@ -57,7 +57,7 @@ def get_data():
         new_relayers_by_authorization_count = util.get_relayer_info(new_txs, sort_by="authorization_count")
         new_relayers_by_tx_fee = util.get_relayer_info(new_txs, sort_by="tx_fee")
         new_code_infos = util.get_code_infos()
-        new_overview = util.get_overview(new_txs, new_authorizers, new_codes_by_authorizer_count, new_relayers_by_tx_count)
+        new_overview = util.get_overview(new_txs, new_authorizers, new_codes_by_authorizer_count, new_relayers_by_tx_count, new_code_infos)
         with data_lock:
             txs = new_txs
             authorizers = new_authorizers
