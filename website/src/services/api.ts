@@ -100,6 +100,7 @@ export interface Overview {
     authorization_count: number;
     tx_fee: number;
   }>;
+  code_infos?: CodeInfoItem[];
 }
 
 // 获取交易列表接口
