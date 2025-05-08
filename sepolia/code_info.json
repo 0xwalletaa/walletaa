@@ -3,7 +3,7 @@
     "address": "0x976d1885a5d42ccfe5327a06c8d6b6d519fde365",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -23,7 +23,8 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0xa65eaa25c97783600134354c6ccf62686be12386",
@@ -49,13 +50,14 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": false
+    "audit": false,
+    "usage": ""
   },
   {
     "address": "0xa9526ba55F7cABa1A6eB1cb4d555F29022ebFeed",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -75,13 +77,14 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0xe264dccc54e4b6906c0d1fee11d4326c06d33c80",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -101,13 +104,14 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0x8a0a91114ce5be2df367d08f729ba2aae2eb4262",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -127,7 +131,8 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": false,
-    "production": ""
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
@@ -156,7 +161,8 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": "❓"
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0x000000004f43c49e93c970e84001853a70923b03",
@@ -188,7 +194,8 @@
     "modularContractAccount": "ERC-7579",
     "moduleRegistry": "ERC-7484",
     "isContractAddress": true,
-    "production": true
+    "audit": true,
+    "usage": ""
   },
   {
     "address": "0x227380efd3392ec33cf148ade5e0a89d33121814",
@@ -217,13 +224,14 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": "❓"
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0xfde60f1fe9e8d425272b98bee16acc795f2b83b9",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -243,13 +251,14 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0xb0a7d836421c41fc2f87bf349a296090a48bd544",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -269,7 +278,8 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0xb65dd26d7e0726a27cb39c6f9f22c03345ec3b1a",
@@ -295,7 +305,8 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": false
+    "audit": false,
+    "usage": ""
   },
   {
     "address": "0xb2cb3e92969828c2207367d9f4331a701b9464e6",
@@ -324,13 +335,14 @@
     "modularContractAccount": false,
     "moduleRegistry": false,
     "isContractAddress": true,
-    "production": "❓"
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0x5291d8e0a0cdf6b803174e5a6895459eb31aad3f",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -350,13 +362,14 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": "",
+    "usage": ""
   },
   {
     "address": "0x5826683b26d1fbc55bf44c2b3b20e288dda9df58",
     "name": "",
     "provider": "",
-    "code": "闭源",
+    "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "",
     "verificationMethod": "",
@@ -376,6 +389,7 @@
     "modularContractAccount": "",
     "moduleRegistry": "",
     "isContractAddress": true,
-    "production": ""
+    "audit": "",
+    "usage": ""
   }
-] 
+]
