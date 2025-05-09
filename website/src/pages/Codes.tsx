@@ -195,6 +195,42 @@ const Codes: React.FC = () => {
       return <Link href={url} target="_blank">{url}</Link>;
     };
 
+    // 用于渲染带有Extra信息的字段
+    const renderWithExtra = (value: boolean | string, extraValue?: string) => {
+      // 如果值是类似 "true (ERC-7821)" 这样的格式，需要先提取布尔值部分
+      let baseValue = value;
+      if (typeof value === 'string') {
+        if (value.toLowerCase().startsWith('true')) {
+          baseValue = true;
+        } else if (value.toLowerCase().startsWith('false')) {
+          baseValue = false;
+        }
+      }
+      
+      // 显示基本值（是/否标签）
+      const renderedBaseValue = renderBooleanOrText(baseValue);
+      
+      // 如果有额外信息，则在下面显示
+      if (!extraValue) {
+        // 如果原始值是字符串且包含括号，提取括号内的额外信息
+        if (typeof value === 'string') {
+          const match = value.match(/\((.*?)\)/);
+          if (match && match[1]) {
+            extraValue = match[1];
+          }
+        }
+      }
+      
+      if (!extraValue) return renderedBaseValue;
+      
+      return (
+        <Space direction="vertical" size={0}>
+          {renderedBaseValue}
+          {extraValue && <Text type="secondary" style={{ fontSize: '12px' }}>{extraValue}</Text>}
+        </Space>
+      );
+    };
+
     return (
       <Descriptions bordered column={2}>
         <Descriptions.Item 

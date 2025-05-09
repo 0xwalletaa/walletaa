@@ -58,22 +58,31 @@ export interface CodeInfoItem {
   contractAccountStandard: string | boolean;
   verificationMethod: string;
   batchCall: string | boolean;
+  batchCallExtra?: string;
   executor: string | boolean;
+  executorExtra?: string;
   receiveETH: string | boolean;
   receiveNFT: string | boolean;
   recovery: string | boolean;
+  recoveryExtra?: string;
   sessionKey: string | boolean;
+  sessionKeyExtra?: string;
   storage: string;
   nativeETHApprovalAndTransfer: string | boolean;
+  nativeETHApprovalAndTransferExtra?: string;
   hooks: string | boolean;
+  hooksExtra?: string;
   signature: string;
   txInitiationMethod: string;
   feePaymentMethod: string;
   upgradable: string | boolean;
+  upgradableExtra?: string;
   modularContractAccount: string | boolean;
   moduleRegistry: string | boolean;
   isContractAddress: boolean;
   production: string | boolean;
+  audit: string | boolean;
+  usage: string;
   [key: string]: any; // 允许其他可能的属性
 }
 

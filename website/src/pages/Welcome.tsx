@@ -41,22 +41,31 @@ interface CodeInfo {
   contractAccountStandard: string | boolean;
   verificationMethod: string;
   batchCall: string | boolean;
+  batchCallExtra?: string;
   executor: string | boolean;
+  executorExtra?: string;
   receiveETH: string | boolean;
   receiveNFT: string | boolean;
   recovery: string | boolean;
+  recoveryExtra?: string;
   sessionKey: string | boolean;
+  sessionKeyExtra?: string;
   storage: string;
   nativeETHApprovalAndTransfer: string | boolean;
+  nativeETHApprovalAndTransferExtra?: string;
   hooks: string | boolean;
+  hooksExtra?: string;
   signature: string;
   txInitiationMethod: string;
   feePaymentMethod: string;
   upgradable: string | boolean;
+  upgradableExtra?: string;
   modularContractAccount: string | boolean;
   moduleRegistry: string | boolean;
   isContractAddress: boolean;
   production: string | boolean;
+  audit: string | boolean;
+  usage: string;
   [key: string]: any; // 索引签名，允许其他可能的属性
 }
 
@@ -258,6 +267,42 @@ const Welcome: React.FC = () => {
       return <Link href={url} target="_blank">{url}</Link>;
     };
 
+    // 用于渲染带有Extra信息的字段
+    const renderWithExtra = (value: boolean | string, extraValue?: string) => {
+      // 如果值是类似 "true (ERC-7821)" 这样的格式，需要先提取布尔值部分
+      let baseValue = value;
+      if (typeof value === 'string') {
+        if (value.toLowerCase().startsWith('true')) {
+          baseValue = true;
+        } else if (value.toLowerCase().startsWith('false')) {
+          baseValue = false;
+        }
+      }
+      
+      // 显示基本值（是/否标签）
+      const renderedBaseValue = renderBooleanOrText(baseValue);
+      
+      // 如果有额外信息，则在下面显示
+      if (!extraValue) {
+        // 如果原始值是字符串且包含括号，提取括号内的额外信息
+        if (typeof value === 'string') {
+          const match = value.match(/\((.*?)\)/);
+          if (match && match[1]) {
+            extraValue = match[1];
+          }
+        }
+      }
+      
+      if (!extraValue) return renderedBaseValue;
+      
+      return (
+        <Space direction="vertical" size={0}>
+          {renderedBaseValue}
+          {extraValue && <Text type="secondary" style={{ fontSize: '12px' }}>{extraValue}</Text>}
+        </Space>
+      );
+    };
+
     return (
       <Descriptions bordered column={2}>
         <Descriptions.Item 
@@ -327,7 +372,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Batch Call',
           })}
         >
-          {renderBooleanOrText(code.batchCall)}
+          {renderWithExtra(code.batchCall, code.batchCallExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -335,7 +380,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Executor',
           })}
         >
-          {renderBooleanOrText(code.executor)}
+          {renderWithExtra(code.executor, code.executorExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -359,7 +404,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Recovery',
           })}
         >
-          {renderBooleanOrText(code.recovery)}
+          {renderWithExtra(code.recovery, code.recoveryExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -367,7 +412,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Session Key',
           })}
         >
-          {renderBooleanOrText(code.sessionKey)}
+          {renderWithExtra(code.sessionKey, code.sessionKeyExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -383,7 +428,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Native ETH Approval & Transfer',
           })}
         >
-          {renderBooleanOrText(code.nativeETHApprovalAndTransfer)}
+          {renderWithExtra(code.nativeETHApprovalAndTransfer, code.nativeETHApprovalAndTransferExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -391,7 +436,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Hooks',
           })}
         >
-          {renderBooleanOrText(code.hooks)}
+          {renderWithExtra(code.hooks, code.hooksExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -423,7 +468,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Upgradable',
           })}
         >
-          {renderBooleanOrText(code.upgradable)}
+          {renderWithExtra(code.upgradable, code.upgradableExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -456,6 +501,22 @@ const Welcome: React.FC = () => {
           })}
         >
           {renderBooleanOrText(code.production)}
+        </Descriptions.Item>
+        <Descriptions.Item 
+          label={intl.formatMessage({
+            id: 'pages.codes.audit',
+            defaultMessage: 'Audit',
+          })}
+        >
+          {renderBooleanOrText(code.audit)}
+        </Descriptions.Item>
+        <Descriptions.Item 
+          label={intl.formatMessage({
+            id: 'pages.codes.usage',
+            defaultMessage: 'Usage',
+          })}
+        >
+          {code.usage || '-'}
         </Descriptions.Item>
       </Descriptions>
     );
