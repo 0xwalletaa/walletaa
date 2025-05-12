@@ -19,3 +19,4 @@ mainnet_blocks.db
 *.umi/
 *.husky/
 temp/
+*.db
