@@ -32,6 +32,8 @@ export interface AuthorizerItem {
   set_code_tx_count: number;
   unset_code_tx_count: number;
   historical_code_address: string[];
+  last_nonce: number;
+  last_chain_id: number;
 }
 
 // 定义代码数据类型

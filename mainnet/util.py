@@ -135,6 +135,8 @@ def get_authorizer_info(txs, include_zero=False):
                 authorizer_info_dict[authorizer_address] = {
                     'authorizer_address': authorizer_address,
                     'eth_balance': 0,
+                    'last_nonce': authorization['nonce'],
+                    'last_chain_id': authorization['chain_id'],
                     'code_address': "0x0000000000000000000000000000000000000000",
                     'set_code_tx_count': 0,
                     'unset_code_tx_count': 0,

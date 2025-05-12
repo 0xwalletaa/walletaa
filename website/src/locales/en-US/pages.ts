@@ -151,4 +151,8 @@ export default {
   'pages.transactions.newEOATag': 'NewEOA',
   'pages.transactions.crossAuth': 'Cross-chain Authentication with chainId=0',
   'pages.transactions.crossAuthTag': 'CrossAuth',
+  'pages.authorizers.newEOA': 'New Account with last_nonce=0',
+  'pages.authorizers.newEOATag': 'NewEOA',
+  'pages.authorizers.crossAuth': 'Cross-chain Authentication with last_chain_id=0',
+  'pages.authorizers.crossAuthTag': 'CrossAuth',
 };

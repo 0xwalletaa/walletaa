@@ -150,4 +150,8 @@ export default {
   'pages.transactions.newEOATag': '新地址',
   'pages.transactions.crossAuth': '跨链授权，chainId=0',
   'pages.transactions.crossAuthTag': '跨链授权',
+  'pages.authorizers.newEOA': '新账户，last_nonce=0',
+  'pages.authorizers.newEOATag': '新地址',
+  'pages.authorizers.crossAuth': '跨链授权，last_chain_id=0',
+  'pages.authorizers.crossAuthTag': '跨链授权',
 };
