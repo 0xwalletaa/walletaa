@@ -4,24 +4,27 @@
 import json
 import sqlite3
 import time
+import threading
 from web3 import Web3
 from collections import Counter
 from hexbytes import HexBytes
 import random
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 
 # 添加命令行参数解析
 parser = argparse.ArgumentParser(description='处理区块链交易数据')
 parser.add_argument('--name', help='区块链网络名称')
 parser.add_argument('--endpoints', nargs='+',  help='Web3 端点列表')
 parser.add_argument('--start_block', type=int, help='起始区块号')
-
+parser.add_argument('--num_threads', type=int, default=4, help='并行线程数')
 
 args = parser.parse_args()
 
 NAME = args.name
 WEB3_ENPOINTS = args.endpoints
 START_BLOCK = args.start_block
+NUM_THREADS = args.num_threads
 
 block_db_path = f'{NAME}_block.db'
 
@@ -29,6 +32,8 @@ web3s = [
     Web3(Web3.HTTPProvider(endpoint)) for endpoint in WEB3_ENPOINTS
 ]
 
+# 创建一个线程本地存储
+thread_local = threading.local()
 
 if NAME == 'bsc':
     from web3.middleware import ExtraDataToPOAMiddleware
@@ -51,6 +56,12 @@ def serialize_web3_tx(tx_dict):
         else:
             result[key] = value
     return result
+
+# 获取线程本地的数据库连接
+def get_db_connection():
+    if not hasattr(thread_local, "db_connection"):
+        thread_local.db_connection = sqlite3.connect(block_db_path)
+    return thread_local.db_connection
 
 # 初始化数据库
 def init_db():
@@ -95,7 +106,8 @@ def is_block_exists(conn, block_number):
     return cursor.fetchone() is not None
 
 # 处理并存储区块信息
-def process_block(conn, block_number):
+def process_block(block_number):
+    conn = get_db_connection()
     try:
         # 获取完整区块信息
         block = random.choice(web3s).eth.get_block(block_number, full_transactions=True)
@@ -137,8 +149,17 @@ def process_block(conn, block_number):
         conn.rollback()
         return False
 
+def process_block_with_retry(block_number):
+    # 重试机制
+    max_retries = 3
+    for retry in range(max_retries):
+        if process_block(block_number):
+            return True
+        else:
+            print(f"重试处理区块 #{block_number}，第 {retry+1}/{max_retries} 次尝试")
+    return False
+
 def main():
-    
     # 初始化数据库
     conn = init_db()
     
@@ -155,20 +176,34 @@ def main():
         print(f"需要处理的区块数: {len(blocks_needed)}")
         time.sleep(1)
         
-        # 从最新区块倒序遍历到起始区块
-        for block_number in blocks_needed:
-            # 检查区块是否已存在于数据库中
-            if is_block_exists(conn, block_number):
-                print(f"区块 #{block_number} 已存在于数据库中，跳过")
-                continue
+        # 使用线程池并行处理区块
+        print(f"开始使用 {NUM_THREADS} 个线程并行处理区块...")
+        success_count = 0
+        error_count = 0
+        
+        with ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
+            futures = []
+            for block_number in blocks_needed:
+                futures.append(
+                    executor.submit(process_block_with_retry, block_number)
+                )
             
-            # 重试机制
-            max_retries = 3
-            for retry in range(max_retries):
-                if process_block(conn, block_number):
-                    break
-                else:
-                    print(f"重试处理区块 #{block_number}，第 {retry+1}/{max_retries} 次尝试")
+            # 等待所有任务完成
+            for future in futures:
+                try:
+                    result = future.result()
+                    if result:
+                        success_count += 1
+                    else:
+                        error_count += 1
+                    
+                    if (success_count + error_count) % 10 == 0:
+                        print(f"已处理 {success_count + error_count} 个区块, 成功: {success_count}, 失败: {error_count}")
+                except Exception as e:
+                    print(f"处理区块时出错: {e}")
+                    error_count += 1
+        
+        print(f"\n处理完成! 成功: {success_count}, 失败: {error_count}")
     
     finally:
         conn.close()
