@@ -1,0 +1,1 @@
+python3 get_block.py --name bsc --endpoints https://api.zan.top/bsc-mainnet https://endpoints.omniatech.io/v1/bsc/mainnet/public https://bsc-mainnet.public.blastapi.io https://bsc.drpc.org https://bsc-dataseed4.bnbchain.org --start_block 49530000
