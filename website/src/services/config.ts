@@ -8,6 +8,7 @@ export const DEFAULT_CHAIN: ChainType = 'mainnet';
 interface ChainConfig {
   BASE_URL: string;
   EXPLORER_URL: string;
+  CHAIN_ID: number;
 }
 
 // 各链的配置
@@ -15,10 +16,12 @@ export const CHAIN_CONFIGS: Record<ChainType, ChainConfig> = {
   mainnet: {
     BASE_URL: '/api-mainnet',
     EXPLORER_URL: 'https://etherscan.io',
+    CHAIN_ID: 1,
   },
   sepolia: {
     BASE_URL: '/api-sepolia',
     EXPLORER_URL: 'https://sepolia.etherscan.io',
+    CHAIN_ID: 11155111,
   },
 };
 
