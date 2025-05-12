@@ -19,6 +19,8 @@ export interface TransactionItem {
   authorization_list: Array<{
     authorizer_address: string;
     code_address: string;
+    nonce: number;
+    chain_id: number;
   }>;
 }
 
