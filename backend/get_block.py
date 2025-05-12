@@ -30,6 +30,11 @@ web3s = [
 ]
 
 
+if NAME == 'bsc':
+    from web3.middleware import ExtraDataToPOAMiddleware
+    for i in range(len(web3s)):
+        web3s[i].middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+
 # 辅助函数：处理HexBytes对象的JSON序列化
 def serialize_web3_tx(tx_dict):
     result = {}
