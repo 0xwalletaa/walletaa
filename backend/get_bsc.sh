@@ -12,4 +12,5 @@ https://rpc-bsc.48.club \
 https://rpc.therpc.io/bsc \
 https://bsc.rpc.blxrbdn.com \
 https://bsc.blockrazor.xyz \
---start_block 49530000
+--num_threads 10 \
+--start_block 47600000
