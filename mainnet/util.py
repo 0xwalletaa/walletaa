@@ -50,6 +50,8 @@ def parse_authorization(authorization):
     ret = {
         'authorizer_address': authorizer_address.lower(),
         'code_address': authorization['address'].lower(),
+        'chain_id': int(authorization['chainId'], 16),
+        'nonce': int(authorization['nonce'], 16),
     }
 
     return ret
