@@ -203,9 +203,6 @@ def main():
     success_count = 0
     error_count = 0
     
-    if len(unfresh_author_addresses) < 10:
-        NUM_THREADS = 1
-    
     with ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
         futures = []
         for address in unfresh_author_addresses:
