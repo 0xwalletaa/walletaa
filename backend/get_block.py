@@ -177,10 +177,7 @@ def main():
                 
         print(f"需要处理的区块数: {len(blocks_needed)}")
         time.sleep(1)
-        
-        if (len(blocks_needed) < 10):
-            NUM_THREADS = 1
-        
+
         # 使用线程池并行处理区块
         print(f"开始使用 {NUM_THREADS} 个线程并行处理区块...")
         success_count = 0
