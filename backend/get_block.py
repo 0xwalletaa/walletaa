@@ -172,6 +172,8 @@ def main():
         for block_number in range(START_BLOCK, latest_block):
             if not is_block_exists(conn, block_number):
                 blocks_needed.append(block_number)
+                if len(blocks_needed) > 10000:
+                    break
                 
         print(f"需要处理的区块数: {len(blocks_needed)}")
         time.sleep(1)
