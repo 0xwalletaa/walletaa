@@ -20,3 +20,4 @@ mainnet_blocks.db
 *.husky/
 temp/
 *.db
+logs_*

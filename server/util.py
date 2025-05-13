@@ -7,7 +7,7 @@ import rlp
 from eth_utils import keccak
 from datetime import datetime
 
-NAME = "mainnet"
+NAME = ""
 
 def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
     try:
