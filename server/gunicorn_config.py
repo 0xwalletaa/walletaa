@@ -27,7 +27,7 @@ worker_class = "sync"
 
 # 并发工作进程数，通常设置为 (2 x $num_cores) + 1
 # 也可以根据内存需求适当调整
-workers = 4 #  multiprocessing.cpu_count() * 2 + 1
+workers = 2 #  multiprocessing.cpu_count() * 2 + 1
 
 # 每个工作进程的线程数
 threads = 2

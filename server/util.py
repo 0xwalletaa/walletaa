@@ -10,14 +10,7 @@ from datetime import datetime
 NAME = ""
 
 def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
-    try:
-        if type(chain_id_) == int:
-            chain_id_ = hex(chain_id_)
-        if type(nonce_) == int:
-            nonce_ = hex(nonce_)
-        if type(y_parity_) == int:
-            y_parity_ = hex(y_parity_)
-            
+    try:            
         chain_id = to_bytes(hexstr=chain_id_)
         address_bytes = to_bytes(hexstr=address_)
         nonce = to_bytes(hexstr=nonce_)
@@ -46,6 +39,13 @@ def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
         return recovered_address
 
 def parse_authorization(authorization):
+    if type(authorization['chainId']) == int:
+        authorization['chainId'] = hex(authorization['chainId'])
+    if type(authorization['nonce']) == int:
+        authorization['nonce'] = hex(authorization['nonce'])
+    if type(authorization['yParity']) == int:
+        authorization['yParity'] = hex(authorization['yParity'])
+        
     authorizer_address = ecrecover(
         authorization['chainId'],
         authorization['address'],

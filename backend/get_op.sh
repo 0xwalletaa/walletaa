@@ -28,5 +28,5 @@ https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
 --num_threads 10
-sleep 30
+sleep 60
 done
