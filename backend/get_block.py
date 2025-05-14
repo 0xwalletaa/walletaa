@@ -130,7 +130,7 @@ def process_block(block_number):
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO blocks (block_number, tx_count, type4_tx_count, timestamp) VALUES (?, ?, ?, ?)",
-            (block_number, len(transactions), type4_count, int(time.time()))
+            (block_number, len(transactions), type4_count, block.timestamp)
         )
         
         # 存储type=4的交易
