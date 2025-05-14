@@ -34,5 +34,5 @@ https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
 --num_threads 10
-sleep 30
+sleep 60
 done

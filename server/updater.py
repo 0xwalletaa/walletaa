@@ -50,7 +50,7 @@ while True:
         print("--------------------------------")
         
     
-    for NAME in ["mainnet", "sepolia"]:
+    for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
         start_time = time.time()
         loaded_data = pickle.load(open(f'/dev/shm/{NAME}_data.pkl', 'rb'))
         end_time = time.time()
