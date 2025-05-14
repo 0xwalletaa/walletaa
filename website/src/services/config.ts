@@ -1,5 +1,5 @@
 // 定义支持的链类型
-export type ChainType = 'mainnet' | 'sepolia';
+export type ChainType = 'mainnet' | 'sepolia' | 'op' | 'base' | 'bsc';
 
 // 默认链
 export const DEFAULT_CHAIN: ChainType = 'mainnet';
@@ -22,6 +22,21 @@ export const CHAIN_CONFIGS: Record<ChainType, ChainConfig> = {
     BASE_URL: '/api-sepolia',
     EXPLORER_URL: 'https://sepolia.etherscan.io',
     CHAIN_ID: 11155111,
+  },
+  op: {
+    BASE_URL: '/api-op',
+    EXPLORER_URL: 'https://optimistic.etherscan.io',
+    CHAIN_ID: 10,
+  },
+  base: {
+    BASE_URL: '/api-base',
+    EXPLORER_URL: 'https://basescan.org',
+    CHAIN_ID: 8453,
+  },
+  bsc: {
+    BASE_URL: '/api-bsc',
+    EXPLORER_URL: 'https://bscscan.com',
+    CHAIN_ID: 56,
   },
 };
 
