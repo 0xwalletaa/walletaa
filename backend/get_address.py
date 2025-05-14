@@ -50,6 +50,13 @@ address_db_path = f'{NAME}_address.db'
 thread_local = threading.local()
 
 def ecrecover(auth):
+    if type(auth['chainId']) == int:
+        auth['chainId'] = hex(auth['chainId'])
+    if type(auth['nonce']) == int:
+        auth['nonce'] = hex(auth['nonce'])
+    if type(auth['yParity']) == int:
+        auth['yParity'] = hex(auth['yParity'])
+        
     chain_id = to_bytes(hexstr=auth['chainId'])
     address_bytes = to_bytes(hexstr=auth['address'])
     nonce = to_bytes(hexstr=auth['nonce'])
