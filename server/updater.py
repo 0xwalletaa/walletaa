@@ -11,7 +11,7 @@ import json
 import pickle
 
 while True:
-    for NAME in ["mainnet", "sepolia"]:
+    for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
         util.NAME = NAME
 
         start_time = time.time()
@@ -57,4 +57,4 @@ while True:
         print(f"{NAME} 加载时间: {end_time - start_time} 秒")
         print("--------------------------------")
 
-    time.sleep(10)
+    time.sleep(30)

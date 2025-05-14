@@ -1,4 +1,4 @@
 #!/bin/bash
-export NAME="sepolia"
-export PORT=9002
+export NAME="bsc"
+export PORT=9003
 gunicorn -c gunicorn_config.py server:app
