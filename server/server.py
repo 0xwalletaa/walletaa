@@ -8,6 +8,7 @@ import os
 from flask_cors import CORS
 import random
 import json
+import pickle
 
 NAME = os.environ.get("NAME")
 
@@ -52,28 +53,19 @@ overview = {}
 def get_data():
     global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_tx_fee, code_infos, overview
     try:
-        new_txs = util.get_all_type4_txs_with_timestamp()
-        new_authorizers = util.get_authorizer_info(new_txs)
-        new_authorizers_with_zero = util.get_authorizer_info(new_txs, include_zero=True)
-        new_codes_by_eth_balance = util.get_code_info(new_authorizers, sort_by="eth_balance")
-        new_codes_by_authorizer_count = util.get_code_info(new_authorizers, sort_by="authorizer_count")
-        new_relayers_by_tx_count = util.get_relayer_info(new_txs, sort_by="tx_count")
-        new_relayers_by_authorization_count = util.get_relayer_info(new_txs, sort_by="authorization_count")
-        new_relayers_by_tx_fee = util.get_relayer_info(new_txs, sort_by="tx_fee")
-        new_code_infos = util.get_code_infos()
-        new_overview = util.get_overview(new_txs, new_authorizers, new_codes_by_authorizer_count, new_relayers_by_tx_count, new_code_infos)
+        loaded_data = pickle.load(open(f'/dev/shm/{NAME}_data.pkl', 'rb'))
         with data_lock:
-            txs = new_txs
-            authorizers = new_authorizers
-            authorizers_with_zero = new_authorizers_with_zero
-            codes_by_eth_balance = new_codes_by_eth_balance
-            codes_by_authorizer_count = new_codes_by_authorizer_count
-            relayers_by_tx_count = new_relayers_by_tx_count
-            relayers_by_authorization_count = new_relayers_by_authorization_count
-            relayers_by_tx_fee = new_relayers_by_tx_fee
-            code_infos = new_code_infos
-            overview = new_overview
-            last_update_time = time.time()
+            txs = loaded_data['txs']
+            authorizers = loaded_data['authorizers']
+            authorizers_with_zero = loaded_data['authorizers_with_zero']
+            codes_by_eth_balance = loaded_data['codes_by_eth_balance']
+            codes_by_authorizer_count = loaded_data['codes_by_authorizer_count']
+            relayers_by_tx_count = loaded_data['relayers_by_tx_count']
+            relayers_by_authorization_count = loaded_data['relayers_by_authorization_count']
+            relayers_by_tx_fee = loaded_data['relayers_by_tx_fee']
+            code_infos = loaded_data['code_infos']
+            overview = loaded_data['overview']
+            last_update_time = loaded_data['last_update_time']
         app.logger.info(f"{NAME}数据获取成功，共 {len(txs)} 条记录")
     except Exception as e:
         app.logger.error(f"数据获取失败: {str(e)}")
