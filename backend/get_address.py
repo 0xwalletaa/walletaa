@@ -194,7 +194,10 @@ def main():
     get_db_connection()
     
     # 获取所有author地址
+    time_start = time.time()
     author_addresses = get_author_addresses()
+    time_end = time.time()  
+    print(f"获取到 {len(author_addresses)} 个author地址，用时 {time_end - time_start} 秒")
     
     if not author_addresses:
         print("未找到author地址，退出程序")

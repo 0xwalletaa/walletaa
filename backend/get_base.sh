@@ -6,7 +6,6 @@ https://base-mainnet.public.blastapi.io \
 https://base-pokt.nodies.app \
 https://base.drpc.org \
 https://base.meowrpc.com \
-https://rpc.therpc.io/base \
 https://1rpc.io/base \
 https://endpoints.omniatech.io/v1/base/mainnet/public \
 https://base.blockpi.network/v1/rpc/public \
@@ -18,5 +17,22 @@ https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
 --num_threads 10 \
 --start_block 30000000
-sleep 1
+python3 get_address.py --name base --endpoints \
+https://base.llamarpc.com \
+https://base.api.onfinality.io/public \
+https://base-mainnet.public.blastapi.io \
+https://base-pokt.nodies.app \
+https://base.drpc.org \
+https://base.meowrpc.com \
+https://1rpc.io/base \
+https://endpoints.omniatech.io/v1/base/mainnet/public \
+https://base.blockpi.network/v1/rpc/public \
+https://0xrpc.io/base \
+https://mainnet.base.org \
+https://api.zan.top/base-mainnet \
+https://base.gateway.tenderly.co \
+https://base.rpc.subquery.network/public \
+https://base.gateway.tenderly.co \
+--num_threads 10
+sleep 30
 done

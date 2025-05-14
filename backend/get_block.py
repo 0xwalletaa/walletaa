@@ -29,7 +29,7 @@ NUM_THREADS = args.num_threads
 block_db_path = f'{NAME}_block.db'
 
 web3s = [
-    Web3(Web3.HTTPProvider(endpoint)) for endpoint in WEB3_ENPOINTS
+    Web3(Web3.HTTPProvider(endpoint, request_kwargs={'timeout': 10})) for endpoint in WEB3_ENPOINTS
 ]
 
 # 创建一个线程本地存储
