@@ -42,6 +42,7 @@ export interface CodeItem {
   authorizer_count: number;
   authorization_count: number;
   eth_balance: number;
+  tags?: string[]; // 添加标签字段
 }
 
 // 定义中继者数据类型

@@ -36,8 +36,22 @@ interface CodeInfo {
   moduleRegistry: string | boolean;
   isContractAddress: boolean;
   production: string | boolean;
+  tags?: string[]; // 添加标签字段
   [key: string]: any; // 索引签名，允许其他可能的属性
 }
+
+// 标签颜色映射
+const tagColorMap: Record<string, string> = {
+  'ERC-4337': 'blue',
+  'ERC-7579 (Moduler)': 'purple',
+  'ERC-7821 (Batch)': 'green',
+  'ERC-7914': 'orange',
+  'ERC-1271': 'cyan',
+  'ERC-721 Reciver': 'magenta',
+  'ERC-1155 Reciver': 'magenta',
+  'ERC-1967': 'red',
+  'Proxy': 'gold',
+};
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -132,6 +146,22 @@ const Codes: React.FC = () => {
       sorter: true,
       sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'eth_balance' ? 'descend' : undefined,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.codes.tags',
+        defaultMessage: 'Tags',
+      }),
+      dataIndex: 'tags',
+      render: (_, record) => (
+        <Space wrap>
+          {record.tags && record.tags.map((tag: string) => (
+            <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+              {tag}
+            </Tag>
+          ))}
+        </Space>
+      ),
     },
     {
       title: intl.formatMessage({
@@ -429,6 +459,21 @@ const Codes: React.FC = () => {
           })}
         >
           {renderBooleanOrText(code.production)}
+        </Descriptions.Item>
+        <Descriptions.Item 
+          label={intl.formatMessage({
+            id: 'pages.codes.tags',
+            defaultMessage: 'Tags',
+          })}
+          span={2}
+        >
+          <Space wrap>
+            {code.tags && code.tags.map((tag: string) => (
+              <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+                {tag}
+              </Tag>
+            ))}
+          </Space>
         </Descriptions.Item>
       </Descriptions>
     );
