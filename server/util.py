@@ -297,3 +297,31 @@ def get_overview(txs, authorizers, codes, relayers, code_infos):
         'top10_relayers': top10_relayers,
         'code_infos': code_infos,
     }
+
+from pyevmasm import instruction_tables, disassemble_hex, disassemble_all, assemble_hex
+
+def parse_functions(code):
+    disassembled = disassemble_hex(code)
+    arr = disassembled.split("\n")
+    # print(arr)
+    functions = []
+    for i in range(len(arr)):
+        if arr[i].startswith("PUSH4"):
+            if arr[i+1] == "EQ":
+                if arr[i+2].startswith("PUSH2"):
+                    if arr[i+3] == "JUMPI":
+                        functions.append(arr[i][6:])
+    return functions
+
+def get_code_function_info():
+    conn = sqlite3.connect(f'../backend/{NAME}_code.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT code_address, code FROM codes")
+    rows = cursor.fetchall()
+    
+    # 遍历所有数据
+    for (code_address, code) in rows:
+        functions = parse_functions(code)
+        print(code_address, functions)
+        functions.append(functions)
+    conn.close()
