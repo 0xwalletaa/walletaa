@@ -6,6 +6,7 @@ from eth_account import Account
 import rlp
 from eth_utils import keccak
 from datetime import datetime
+from pyevmasm import disassemble_hex
 
 NAME = ""
 
@@ -173,7 +174,7 @@ def get_authorizer_info(txs, include_zero=False):
     return authorizer_info
 
 
-def get_code_info(authorizer_info, sort_by="eth_balance"):
+def get_code_info(authorizer_info, code_function_info, sort_by="eth_balance"):
     code_info_dict = {}
     for authorizer in authorizer_info:
         code_address = authorizer['code_address']
@@ -182,7 +183,10 @@ def get_code_info(authorizer_info, sort_by="eth_balance"):
                 'code_address': code_address,
                 'authorizer_count': 0,
                 'eth_balance': 0,
+                'tags': [],
             }
+            if code_address in code_function_info:
+                code_info_dict[code_address]['tags'] = code_function_info[code_address]
         code_info_dict[code_address]['authorizer_count'] += 1
         code_info_dict[code_address]['eth_balance'] += authorizer['eth_balance']
     
@@ -298,7 +302,6 @@ def get_overview(txs, authorizers, codes, relayers, code_infos):
         'code_infos': code_infos,
     }
 
-from pyevmasm import instruction_tables, disassemble_hex, disassemble_all, assemble_hex
 
 def parse_functions(code):
     disassembled = disassemble_hex(code)
@@ -313,15 +316,39 @@ def parse_functions(code):
                         functions.append(arr[i][6:])
     return functions
 
+
+TAG_INFO = json.load(open('tag_info.json'))
+FUNCTION_TO_TAG = {}
+for tag in TAG_INFO:
+    for function in tag['functions']:
+        function = "0x"+keccak(function.encode()).hex()[:8]
+        FUNCTION_TO_TAG[function] = tag['tag']
+        print(function, tag['tag'])
+
+
 def get_code_function_info():
     conn = sqlite3.connect(f'../backend/{NAME}_code.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT code_address, code FROM codes")
+    cursor.execute("SELECT code_address, code FROM codes") # WHERE code_address = '0x0c338ca25585035142a9a0a1eeeba267256f281f'")
     rows = cursor.fetchall()
     
+    ret = {}
     # 遍历所有数据
     for (code_address, code) in rows:
         functions = parse_functions(code)
-        print(code_address, functions)
-        functions.append(functions)
+        tags = []
+        for function in functions:
+            if function in FUNCTION_TO_TAG:
+                tags.append(FUNCTION_TO_TAG[function])
+        if len(tags) > 0:
+            ret[code_address] = tags
+        
     conn.close()
+    return ret
+
+# import time
+# NAME = "mainnet"
+# start_time = time.time()
+# print(get_code_function_info())
+# end_time = time.time()
+# print(f"Time taken: {end_time - start_time} seconds")
