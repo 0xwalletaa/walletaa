@@ -128,6 +128,23 @@ const Codes: React.FC = () => {
     },
     {
       title: intl.formatMessage({
+        id: 'pages.codes.provider',
+        defaultMessage: 'Provider',
+      }),
+      dataIndex: 'code_address',
+      render: (codeAddress) => {
+        if (typeof codeAddress !== 'string') return null;
+        
+        const codeInfo = codeInfos.find(item => 
+          item.address.toLowerCase() === codeAddress.toLowerCase()
+        );
+        return codeInfo && codeInfo.provider ? (
+          <Tag color="volcano">{codeInfo.provider}</Tag>
+        ) : null;
+      },
+    },
+    {
+      title: intl.formatMessage({
         id: 'pages.codes.authorizer_count',
         defaultMessage: 'Authorizer Count',
       }),
