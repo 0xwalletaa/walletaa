@@ -310,9 +310,9 @@ def parse_functions(code):
     functions = []
     for i in range(len(arr)):
         if arr[i].startswith("PUSH4"):
-            if arr[i+1] == "EQ":
-                if arr[i+2].startswith("PUSH2"):
-                    if arr[i+3] == "JUMPI":
+            if i+1 < len(arr) and arr[i+1] == "EQ":
+                if i+2 < len(arr) and arr[i+2].startswith("PUSH2"):
+                    if i+3 < len(arr) and arr[i+3] == "JUMPI":
                         functions.append(arr[i][6:])
     return functions
 
@@ -341,7 +341,7 @@ def get_code_function_info():
             if function in FUNCTION_TO_TAG:
                 tags.append(FUNCTION_TO_TAG[function])
         if len(tags) > 0:
-            ret[code_address] = tags
+            ret[code_address.lower()] = tags
         
     conn.close()
     return ret
