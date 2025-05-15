@@ -47,8 +47,8 @@ const tagColorMap: Record<string, string> = {
   'ERC-7821 (Batch)': 'green',
   'ERC-7914': 'orange',
   'ERC-1271': 'cyan',
-  'ERC-721 Reciver': 'magenta',
-  'ERC-1155 Reciver': 'magenta',
+  'ERC-721 Receiver': 'magenta',
+  'ERC-1155 Receiver': 'magenta',
   'ERC-1967': 'red',
   'Proxy': 'gold',
 };

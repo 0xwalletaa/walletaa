@@ -30,13 +30,13 @@
     ]
   },
   {
-    "tag": "ERC-721 Reciver",
+    "tag": "ERC-721 Receiver",
     "functions": [
         "onERC721Received(address,address,uint256,bytes)"
     ]
   },
   {
-    "tag": "ERC-1155 Reciver",
+    "tag": "ERC-1155 Receiver",
     "functions": [
         "onERC1155Received(address,address,uint256,uint256,bytes)"
     ]
