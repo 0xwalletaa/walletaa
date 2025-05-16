@@ -135,6 +135,16 @@ export default defineConfig({
   headScripts: [
     // 解决首次加载时白屏的问题
     { src: join(PUBLIC_PATH, 'scripts/loading.js'), async: true },
+    // 谷歌统计代码
+    { src: 'https://www.googletagmanager.com/gtag/js?id=G-JTBX2XG0GZ', async: true },
+    {
+      content: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JTBX2XG0GZ');
+      `,
+    },
   ],
   //================ pro 插件配置 =================
   presets: ['umi-presets-pro'],

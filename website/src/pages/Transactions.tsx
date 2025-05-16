@@ -156,6 +156,40 @@ const Transactions: React.FC = () => {
                   }>
                     <Tag color="green">{formatAddress(auth.code_address)}</Tag>
                   </Tooltip>
+                  {auth.nonce === 0 && (
+                    <Tooltip title={
+                      <span>
+                        {intl.formatMessage({
+                          id: 'pages.transactions.newEOA',
+                          defaultMessage: 'New Account with nonce=0',
+                        })}
+                      </span>
+                    }>
+                      <Tag color="red">
+                        {intl.formatMessage({
+                          id: 'pages.transactions.newEOATag',
+                          defaultMessage: 'NewEOA',
+                        })}
+                      </Tag>
+                    </Tooltip>
+                  )}
+                  {auth.chain_id === 0 && (
+                    <Tooltip title={
+                      <span>
+                        {intl.formatMessage({
+                          id: 'pages.transactions.crossAuth',
+                          defaultMessage: 'Cross-chain Authentication with chainId=0',
+                        })}
+                      </span>
+                    }>
+                      <Tag color="red">
+                        {intl.formatMessage({
+                          id: 'pages.transactions.crossAuthTag',
+                          defaultMessage: 'CrossAuth',
+                        })}
+                      </Tag>
+                    </Tooltip>
+                  )}
                 </div>
               ))}
             </div>
@@ -264,6 +298,40 @@ const Transactions: React.FC = () => {
                         }>
                           <Tag color="blue">{formatAddress(auth.authorizer_address)}</Tag>
                         </Tooltip>
+                        {auth.nonce === 0 && (
+                          <Tooltip title={
+                            <span>
+                              {intl.formatMessage({
+                                id: 'pages.transactions.newEOA',
+                                defaultMessage: 'New Account with nonce=0',
+                              })}
+                            </span>
+                          }>
+                            <Tag color="red">
+                              {intl.formatMessage({
+                                id: 'pages.transactions.newEOATag',
+                                defaultMessage: 'NewEOA',
+                              })}
+                            </Tag>
+                          </Tooltip>
+                        )}
+                        {auth.chain_id === 0 && (
+                          <Tooltip title={
+                            <span>
+                              {intl.formatMessage({
+                                id: 'pages.transactions.crossAuth',
+                                defaultMessage: 'Cross-chain Authentication with chainId=0',
+                              })}
+                            </span>
+                          }>
+                            <Tag color="red">
+                              {intl.formatMessage({
+                                id: 'pages.transactions.crossAuthTag',
+                                defaultMessage: 'CrossAuth',
+                              })}
+                            </Tag>
+                          </Tooltip>
+                        )}
                       </td>
                       <td style={{ padding: '8px' }}>
                         <Tooltip title={

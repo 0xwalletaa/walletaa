@@ -34,18 +34,56 @@ const Authorizers: React.FC = () => {
         defaultMessage: 'Authorizer Address',
       }),
       dataIndex: 'authorizer_address',
-      render: (dom) => {
+      render: (dom, record) => {
         return typeof dom === 'string' && dom.length > 10
-          ? <Tooltip title={
-              <span>
-                {dom}
-                <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
-                  <LinkOutlined />
-                </a>
-              </span>
-            }>
-              <Tag color="blue">{`${formatAddress(dom as string)}`}</Tag>
-            </Tooltip>
+          ? (
+            <div>
+              <Tooltip title={
+                <span>
+                  {dom}
+                  <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                    <LinkOutlined />
+                  </a>
+                </span>
+              }>
+                <Tag color="blue">{`${formatAddress(dom as string)}`}</Tag>
+              </Tooltip>
+              {record.last_nonce === 0 && (
+                <Tooltip title={
+                  <span>
+                    {intl.formatMessage({
+                      id: 'pages.authorizers.newEOA',
+                      defaultMessage: 'New Account with last_nonce=0',
+                    })}
+                  </span>
+                }>
+                  <Tag color="red">
+                    {intl.formatMessage({
+                      id: 'pages.authorizers.newEOATag',
+                      defaultMessage: 'NewEOA',
+                    })}
+                  </Tag>
+                </Tooltip>
+              )}
+              {record.last_chain_id === 0 && (
+                <Tooltip title={
+                  <span>
+                    {intl.formatMessage({
+                      id: 'pages.authorizers.crossAuth',
+                      defaultMessage: 'Cross-chain Authentication with last_chain_id=0',
+                    })}
+                  </span>
+                }>
+                  <Tag color="red">
+                    {intl.formatMessage({
+                      id: 'pages.authorizers.crossAuthTag',
+                      defaultMessage: 'CrossAuth',
+                    })}
+                  </Tag>
+                </Tooltip>
+              )}
+            </div>
+          )
           : <Tag color="blue">{dom}</Tag>;
       },
     },

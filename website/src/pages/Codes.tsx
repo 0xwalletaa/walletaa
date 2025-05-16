@@ -36,8 +36,22 @@ interface CodeInfo {
   moduleRegistry: string | boolean;
   isContractAddress: boolean;
   production: string | boolean;
+  tags?: string[]; // 添加标签字段
   [key: string]: any; // 索引签名，允许其他可能的属性
 }
+
+// 标签颜色映射
+const tagColorMap: Record<string, string> = {
+  'ERC-4337': 'blue',
+  'ERC-7579 (Moduler)': 'purple',
+  'ERC-7821 (Batch)': 'green',
+  'ERC-7914': 'orange',
+  'ERC-1271': 'cyan',
+  'ERC-721 Receiver': 'magenta',
+  'ERC-1155 Receiver': 'magenta',
+  'ERC-1967': 'red',
+  'Proxy': 'gold',
+};
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -114,6 +128,23 @@ const Codes: React.FC = () => {
     },
     {
       title: intl.formatMessage({
+        id: 'pages.codes.provider',
+        defaultMessage: 'Provider',
+      }),
+      dataIndex: 'code_address',
+      render: (codeAddress) => {
+        if (typeof codeAddress !== 'string') return null;
+        
+        const codeInfo = codeInfos.find(item => 
+          item.address.toLowerCase() === codeAddress.toLowerCase()
+        );
+        return codeInfo && codeInfo.provider ? (
+          <Tag color="volcano">{codeInfo.provider}</Tag>
+        ) : null;
+      },
+    },
+    {
+      title: intl.formatMessage({
         id: 'pages.codes.authorizer_count',
         defaultMessage: 'Authorizer Count',
       }),
@@ -132,6 +163,22 @@ const Codes: React.FC = () => {
       sorter: true,
       sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'eth_balance' ? 'descend' : undefined,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.codes.tags',
+        defaultMessage: 'Tags',
+      }),
+      dataIndex: 'tags',
+      render: (_, record) => (
+        <Space wrap>
+          {record.tags && record.tags.map((tag: string) => (
+            <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+              {tag}
+            </Tag>
+          ))}
+        </Space>
+      ),
     },
     {
       title: intl.formatMessage({
@@ -193,6 +240,42 @@ const Codes: React.FC = () => {
     const renderLink = (url: string) => {
       if (!url || url === '' || url === 'closed-source') return '-';
       return <Link href={url} target="_blank">{url}</Link>;
+    };
+
+    // 用于渲染带有Extra信息的字段
+    const renderWithExtra = (value: boolean | string, extraValue?: string) => {
+      // 如果值是类似 "true (ERC-7821)" 这样的格式，需要先提取布尔值部分
+      let baseValue = value;
+      if (typeof value === 'string') {
+        if (value.toLowerCase().startsWith('true')) {
+          baseValue = true;
+        } else if (value.toLowerCase().startsWith('false')) {
+          baseValue = false;
+        }
+      }
+      
+      // 显示基本值（是/否标签）
+      const renderedBaseValue = renderBooleanOrText(baseValue);
+      
+      // 如果有额外信息，则在下面显示
+      if (!extraValue) {
+        // 如果原始值是字符串且包含括号，提取括号内的额外信息
+        if (typeof value === 'string') {
+          const match = value.match(/\((.*?)\)/);
+          if (match && match[1]) {
+            extraValue = match[1];
+          }
+        }
+      }
+      
+      if (!extraValue) return renderedBaseValue;
+      
+      return (
+        <Space direction="vertical" size={0}>
+          {renderedBaseValue}
+          {extraValue && <Text type="secondary" style={{ fontSize: '12px' }}>{extraValue}</Text>}
+        </Space>
+      );
     };
 
     return (
@@ -393,6 +476,21 @@ const Codes: React.FC = () => {
           })}
         >
           {renderBooleanOrText(code.production)}
+        </Descriptions.Item>
+        <Descriptions.Item 
+          label={intl.formatMessage({
+            id: 'pages.codes.tags',
+            defaultMessage: 'Tags',
+          })}
+          span={2}
+        >
+          <Space wrap>
+            {code.tags && code.tags.map((tag: string) => (
+              <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+                {tag}
+              </Tag>
+            ))}
+          </Space>
         </Descriptions.Item>
       </Descriptions>
     );

@@ -1,0 +1,57 @@
+[
+  {
+    "tag": "ERC-4337",
+    "functions": [
+        "validateUserOp((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes),bytes32,uint256)"
+    ]
+  },
+  {
+    "tag": "ERC-7579 (Moduler)",
+    "functions": [
+        "installModule(uint256,address,bytes)"
+    ]
+  },
+  {
+    "tag": "ERC-7821 (Batch)",
+    "functions": [
+        "execute(bytes32,bytes)"
+    ]
+  },
+  {
+    "tag": "ERC-7914",
+    "functions": [
+        "transferFromNative(address,address,uint256)"
+    ]
+  },
+  {
+    "tag": "ERC-1271",
+    "functions": [
+        "isValidSignature(bytes32,bytes)"
+    ]
+  },
+  {
+    "tag": "ERC-721 Receiver",
+    "functions": [
+        "onERC721Received(address,address,uint256,bytes)"
+    ]
+  },
+  {
+    "tag": "ERC-1155 Receiver",
+    "functions": [
+        "onERC1155Received(address,address,uint256,uint256,bytes)"
+    ]
+  },
+  {
+    "tag": "ERC-1967",
+    "functions": [
+        "upgradeToAndCall(address,bytes)"
+    ]
+  },
+  {
+    "tag": "Proxy",
+    "functions": [
+        "getImplementation()"
+    ]
+  }
+]
+
