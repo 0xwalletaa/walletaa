@@ -6,10 +6,12 @@ from eth_account import Account
 import rlp
 from eth_utils import keccak
 from datetime import datetime
+from pyevmasm import disassemble_hex
 
+NAME = ""
 
 def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
-    try:
+    try:            
         chain_id = to_bytes(hexstr=chain_id_)
         address_bytes = to_bytes(hexstr=address_)
         nonce = to_bytes(hexstr=nonce_)
@@ -38,6 +40,13 @@ def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
         return recovered_address
 
 def parse_authorization(authorization):
+    if type(authorization['chainId']) == int:
+        authorization['chainId'] = hex(authorization['chainId'])
+    if type(authorization['nonce']) == int:
+        authorization['nonce'] = hex(authorization['nonce'])
+    if type(authorization['yParity']) == int:
+        authorization['yParity'] = hex(authorization['yParity'])
+        
     authorizer_address = ecrecover(
         authorization['chainId'],
         authorization['address'],
@@ -80,7 +89,7 @@ def parse_type4_tx_data(tx_data_str_):
     return ret
 
 def get_all_type4_txs():
-    conn = sqlite3.connect('mainnet_blocks.db')
+    conn = sqlite3.connect(f'../backend/{NAME}_block.db')
     cursor = conn.cursor()
     # 获取所有type4交易数据
     cursor.execute("SELECT tx_hash, tx_data FROM type4_transactions")
@@ -98,7 +107,7 @@ def get_all_type4_txs():
 
 def get_timestamp_of_block():
     timestamp_of_block = {}
-    conn = sqlite3.connect('mainnet_blocks.db')
+    conn = sqlite3.connect(f'../backend/{NAME}_block.db')
     cursor = conn.cursor()
     cursor.execute("SELECT block_number, timestamp  FROM blocks")
     rows = cursor.fetchall()
@@ -118,7 +127,7 @@ def get_all_type4_txs_with_timestamp():
 def get_authorizer_info(txs, include_zero=False):
     balance_of= {}
 
-    conn = sqlite3.connect('author_tvl.db')
+    conn = sqlite3.connect(f'../backend/{NAME}_address.db')
     cursor = conn.cursor()
     # 查询所有地址和余额
     cursor.execute("SELECT author_address, eth_balance FROM author_balances")
@@ -165,7 +174,7 @@ def get_authorizer_info(txs, include_zero=False):
     return authorizer_info
 
 
-def get_code_info(authorizer_info, sort_by="eth_balance"):
+def get_code_info(authorizer_info, code_function_info, sort_by="eth_balance"):
     code_info_dict = {}
     for authorizer in authorizer_info:
         code_address = authorizer['code_address']
@@ -174,7 +183,10 @@ def get_code_info(authorizer_info, sort_by="eth_balance"):
                 'code_address': code_address,
                 'authorizer_count': 0,
                 'eth_balance': 0,
+                'tags': [],
             }
+            if code_address in code_function_info:
+                code_info_dict[code_address]['tags'] = code_function_info[code_address]
         code_info_dict[code_address]['authorizer_count'] += 1
         code_info_dict[code_address]['eth_balance'] += authorizer['eth_balance']
     
@@ -290,7 +302,53 @@ def get_overview(txs, authorizers, codes, relayers, code_infos):
         'code_infos': code_infos,
     }
 
-"""
-Type4交易示例
-('ddf4aef622b21511447ee55f417ef76acaeaf8e4d8b4f587bbfa2bf9e24eee97', 8033831, '{"blockHash": "953c5893e1e7c4c9a350fe9778f6dd69965b93207d4b686017f1a1b94ce4c621", "blockNumber": 8033831, "from": "0x54c5E297819D1BF7bbF6a9d3B129b5BBfcA99171", "gas": 4918696, "gasPrice": 708846590, "maxPriorityFeePerGas": 100000000, "maxFeePerGas": 873235169, "hash": "ddf4aef622b21511447ee55f417ef76acaeaf8e4d8b4f587bbfa2bf9e24eee97", "input": "0x0000", "nonce": 68, "to": "0x0000000071727De22E5E9d8BAf0edAc6f37da032", "transactionIndex": 94, "value": 0, "type": 4, "accessList": [], "chainId": 11155111, "authorizationList": [{"chainId": "0xaa36a7", "address": "0x69007702764179f14f51cdce752f4f775d74e139", "nonce": "0x0", "yParity": "0x1", "r": "0xc6763bea75391f2e3ded5de88fc9f37dfb36b4166af73f3732ea31331ca292e0", "s": "0x58bc8fc791548d0f90eefaaa72623b54d1e5b7f0bbf94d23d95dad230e228cad"}], "v": 0, "yParity": 0, "r": "2e87f05f6b1d3352c1cff1b90a1528f002c5c9f99072fa49a7ed2d37153f19df", "s": "5a3f5f3045a41ed862e8814a7eb712c0a9c291bbb63b7527d705683bd0c0c4f1"}')
-"""
+
+def parse_functions(code):
+    disassembled = disassemble_hex(code)
+    arr = disassembled.split("\n")
+    # print(arr)
+    functions = []
+    for i in range(len(arr)):
+        if arr[i].startswith("PUSH4"):
+            if i+1 < len(arr) and arr[i+1] == "EQ":
+                if i+2 < len(arr) and arr[i+2].startswith("PUSH2"):
+                    if i+3 < len(arr) and arr[i+3] == "JUMPI":
+                        functions.append(arr[i][6:])
+    return functions
+
+
+TAG_INFO = json.load(open('tag_info.json'))
+FUNCTION_TO_TAG = {}
+for tag in TAG_INFO:
+    for function in tag['functions']:
+        function = "0x"+keccak(function.encode()).hex()[:8]
+        FUNCTION_TO_TAG[function] = tag['tag']
+        print(function, tag['tag'])
+
+
+def get_code_function_info():
+    conn = sqlite3.connect(f'../backend/{NAME}_code.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT code_address, code FROM codes") # WHERE code_address = '0x0c338ca25585035142a9a0a1eeeba267256f281f'")
+    rows = cursor.fetchall()
+    
+    ret = {}
+    # 遍历所有数据
+    for (code_address, code) in rows:
+        functions = parse_functions(code)
+        tags = []
+        for function in functions:
+            if function in FUNCTION_TO_TAG:
+                tags.append(FUNCTION_TO_TAG[function])
+        if len(tags) > 0:
+            ret[code_address.lower()] = tags
+        
+    conn.close()
+    return ret
+
+# import time
+# NAME = "mainnet"
+# start_time = time.time()
+# print(get_code_function_info())
+# end_time = time.time()
+# print(f"Time taken: {end_time - start_time} seconds")

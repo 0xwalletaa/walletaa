@@ -37,7 +37,10 @@ const ChainSelect: React.FC = () => {
       onChange={handleChange}
       options={[
         { value: 'mainnet', label: intl.formatMessage({ id: 'component.chainSelect.mainnet', defaultMessage: 'Mainnet' }) },
+        { value: 'base', label: intl.formatMessage({ id: 'component.chainSelect.base', defaultMessage: 'Base' }) },
+        { value: 'op', label: intl.formatMessage({ id: 'component.chainSelect.op', defaultMessage: 'Optimism' }) },
         { value: 'sepolia', label: intl.formatMessage({ id: 'component.chainSelect.sepolia', defaultMessage: 'Sepolia' }) },
+        { value: 'bsc', label: intl.formatMessage({ id: 'component.chainSelect.bsc', defaultMessage: 'BSC' }) },
       ]}
       style={{ marginRight: 12, width: 120 }}
     />

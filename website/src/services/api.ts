@@ -19,6 +19,8 @@ export interface TransactionItem {
   authorization_list: Array<{
     authorizer_address: string;
     code_address: string;
+    nonce: number;
+    chain_id: number;
   }>;
 }
 
@@ -30,6 +32,8 @@ export interface AuthorizerItem {
   set_code_tx_count: number;
   unset_code_tx_count: number;
   historical_code_address: string[];
+  last_nonce: number;
+  last_chain_id: number;
 }
 
 // 定义代码数据类型
@@ -38,6 +42,7 @@ export interface CodeItem {
   authorizer_count: number;
   authorization_count: number;
   eth_balance: number;
+  tags?: string[]; // 添加标签字段
 }
 
 // 定义中继者数据类型
@@ -58,22 +63,31 @@ export interface CodeInfoItem {
   contractAccountStandard: string | boolean;
   verificationMethod: string;
   batchCall: string | boolean;
+  batchCallExtra?: string;
   executor: string | boolean;
+  executorExtra?: string;
   receiveETH: string | boolean;
   receiveNFT: string | boolean;
   recovery: string | boolean;
+  recoveryExtra?: string;
   sessionKey: string | boolean;
+  sessionKeyExtra?: string;
   storage: string;
   nativeETHApprovalAndTransfer: string | boolean;
+  nativeETHApprovalAndTransferExtra?: string;
   hooks: string | boolean;
+  hooksExtra?: string;
   signature: string;
   txInitiationMethod: string;
   feePaymentMethod: string;
   upgradable: string | boolean;
+  upgradableExtra?: string;
   modularContractAccount: string | boolean;
   moduleRegistry: string | boolean;
   isContractAddress: boolean;
   production: string | boolean;
+  audit: string | boolean;
+  usage: string;
   [key: string]: any; // 允许其他可能的属性
 }
 
@@ -93,6 +107,8 @@ export interface Overview {
     code_address: string;
     authorizer_count: number;
     eth_balance: number;
+    provider?: string;
+    tags?: string[];
   }>;
   top10_relayers: Array<{
     relayer_address: string;
@@ -100,6 +116,7 @@ export interface Overview {
     authorization_count: number;
     tx_fee: number;
   }>;
+  code_infos?: CodeInfoItem[];
 }
 
 // 获取交易列表接口

@@ -50,6 +50,8 @@ def parse_authorization(authorization):
     ret = {
         'authorizer_address': authorizer_address.lower(),
         'code_address': authorization['address'].lower(),
+        'chain_id': int(authorization['chainId'], 16),
+        'nonce': int(authorization['nonce'], 16),
     }
 
     return ret
@@ -133,6 +135,8 @@ def get_authorizer_info(txs, include_zero=False):
                 authorizer_info_dict[authorizer_address] = {
                     'authorizer_address': authorizer_address,
                     'eth_balance': 0,
+                    'last_nonce': authorization['nonce'],
+                    'last_chain_id': authorization['chain_id'],
                     'code_address': "0x0000000000000000000000000000000000000000",
                     'set_code_tx_count': 0,
                     'unset_code_tx_count': 0,
@@ -218,7 +222,7 @@ def get_code_infos():
         code_infos = json.load(f)
     return code_infos
 
-def get_overview(txs, authorizers, codes, relayers):
+def get_overview(txs, authorizers, codes, relayers, code_infos):
     daily_tx_count = {}
     for tx in txs:
         tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
@@ -283,6 +287,7 @@ def get_overview(txs, authorizers, codes, relayers):
         'daily_relayer_count': daily_relayer_count,
         'top10_codes': top10_codes,
         'top10_relayers': top10_relayers,
+        'code_infos': code_infos,
     }
 
 """
