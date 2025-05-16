@@ -20,7 +20,7 @@
   {
     "tag": "Batch",
     "functions": ["executeBatch((address,uint256,bytes)[])"]
-  }
+  },
   {
     "tag": "ERC-7914",
     "functions": ["transferFromNative(address,address,uint256)"]
