@@ -5,7 +5,7 @@ import { Card, Col, Row, Table, Tooltip, Tag, Button, Modal, Descriptions, Typog
 import { Area, Column } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
-import { getOverview, Overview } from '@/services/api';
+import { getOverview, Overview, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 
 // 定义ChartCard组件的属性类型
@@ -68,6 +68,19 @@ interface CodeInfo {
   usage: string;
   [key: string]: any; // 索引签名，允许其他可能的属性
 }
+
+// 标签颜色映射
+const tagColorMap: Record<string, string> = {
+  'ERC-4337': 'blue',
+  'ERC-7579 (Moduler)': 'purple',
+  'ERC-7821 (Batch)': 'green',
+  'ERC-7914': 'orange',
+  'ERC-1271': 'cyan',
+  'ERC-721 Receiver': 'magenta',
+  'ERC-1155 Receiver': 'magenta',
+  'ERC-1967': 'red',
+  'Proxy': 'gold',
+};
 
 // 引入ChartCard和Field组件
 const ChartCard: React.FC<ChartCardProps> = ({ loading, title, total, contentHeight = 46, footer, children, bordered = true }) => {
@@ -149,6 +162,31 @@ const Welcome: React.FC = () => {
   useEffect(() => {
     getOverview()
       .then(data => {
+        // 处理top10_codes，只添加provider信息，保留原有tags
+        if (data.overview && data.overview.top10_codes && data.overview.code_infos) {
+          data.overview.top10_codes = data.overview.top10_codes.map((code: {
+            code_address: string;
+            authorizer_count: number;
+            eth_balance: number;
+            provider?: string;
+            tags?: string[];
+          }) => {
+            // 查找对应的code_info
+            const codeInfo = data.overview.code_infos.find(
+              (info: CodeInfoItem) => info.address.toLowerCase() === code.code_address.toLowerCase()
+            );
+            
+            // 只添加provider信息，保留原有tags
+            if (codeInfo) {
+              return {
+                ...code,
+                provider: codeInfo.provider
+              };
+            }
+            return code;
+          });
+        }
+        
         setOverview(data.overview);
         setLoading(false);
       })
@@ -673,7 +711,7 @@ const Welcome: React.FC = () => {
       </Card>
 
       <Row gutter={24}>
-        <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+        <Col xl={24} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
           <Card
             bordered={false}
             title={intl.formatMessage({ id: 'pages.welcome.codeRanking' })}
@@ -706,6 +744,28 @@ const Welcome: React.FC = () => {
                     }>
                       <Tag color="blue">{formatAddress(text)}</Tag>
                     </Tooltip>
+                  ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.provider', defaultMessage: 'Provider' }),
+                  dataIndex: 'provider',
+                  key: 'provider',
+                  render: (text: string) => (
+                    text ? <Tag color="volcano">{text}</Tag> : null
+                  ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.tags', defaultMessage: 'Tags' }),
+                  dataIndex: 'tags',
+                  key: 'tags',
+                  render: (tags: string[]) => (
+                    <Space wrap>
+                      {tags && tags.map((tag: string) => (
+                        <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+                          {tag}
+                        </Tag>
+                      ))}
+                    </Space>
                   ),
                 },
                 {
@@ -744,7 +804,7 @@ const Welcome: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+        <Col xl={24} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
           <Card
             bordered={false}
             title={intl.formatMessage({ id: 'pages.welcome.relayerRanking' })}

@@ -107,6 +107,8 @@ export interface Overview {
     code_address: string;
     authorizer_count: number;
     eth_balance: number;
+    provider?: string;
+    tags?: string[];
   }>;
   top10_relayers: Array<{
     relayer_address: string;
