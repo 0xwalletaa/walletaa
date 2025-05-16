@@ -310,7 +310,7 @@ def parse_functions(code):
     functions = []
     for i in range(len(arr)):
         if arr[i].startswith("PUSH4"):
-            if i+1 < len(arr) and arr[i+1] == "EQ":
+            if i+1 < len(arr) and arr[i+1] in ["EQ", "SUB"]:
                 if i+2 < len(arr) and arr[i+2].startswith("PUSH2"):
                     if i+3 < len(arr) and arr[i+3] == "JUMPI":
                         functions.append(arr[i][6:])
