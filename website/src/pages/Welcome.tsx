@@ -7,6 +7,7 @@ import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
 import { getOverview, Overview, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
+import tagColorMap from '@/utils/tagColorMap';
 
 // 定义ChartCard组件的属性类型
 interface ChartCardProps {
@@ -68,19 +69,6 @@ interface CodeInfo {
   usage: string;
   [key: string]: any; // 索引签名，允许其他可能的属性
 }
-
-// 标签颜色映射
-const tagColorMap: Record<string, string> = {
-  'ERC-4337': 'blue',
-  'ERC-7579 (Moduler)': 'purple',
-  'ERC-7821 (Batch)': 'green',
-  'ERC-7914': 'orange',
-  'ERC-1271': 'cyan',
-  'ERC-721 Receiver': 'magenta',
-  'ERC-1155 Receiver': 'magenta',
-  'ERC-1967': 'red',
-  'Proxy': 'gold',
-};
 
 // 引入ChartCard和Field组件
 const ChartCard: React.FC<ChartCardProps> = ({ loading, title, total, contentHeight = 46, footer, children, bordered = true }) => {
