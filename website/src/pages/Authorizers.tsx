@@ -4,7 +4,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
-import { Tag, Tooltip, Switch, Space, Input, Button, Card } from 'antd';
+import { Tag, Tooltip, Switch, Space, Input, Button, Card, Row, Col } from 'antd';
 import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getAuthorizers, getAuthorizersWithZero, AuthorizerItem } from '@/services/api';
@@ -203,28 +203,31 @@ const Authorizers: React.FC = () => {
   return (
     <PageContainer>
       <Card style={{ marginBottom: 16 }}>
-        <Space>
-          <Input
-            placeholder={intl.formatMessage({
-              id: 'pages.authorizers.search.placeholder',
-              defaultMessage: '输入授权者地址或代码地址',
-            })}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            style={{ width: 300 }}
-            onPressEnter={handleSearch}
-          />
-          <Button 
-            type="primary" 
-            icon={<SearchOutlined />} 
-            onClick={handleSearch}
-          >
-            {intl.formatMessage({
-              id: 'pages.authorizers.search.button',
-              defaultMessage: '搜索',
-            })}
-          </Button>
-        </Space>
+        <Row gutter={16}>
+          <Col flex="auto">
+            <Input
+              placeholder={intl.formatMessage({
+                id: 'pages.authorizers.search.placeholder',
+                defaultMessage: '输入授权者地址或代码地址',
+              })}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onPressEnter={handleSearch}
+            />
+          </Col>
+          <Col>
+            <Button 
+              type="primary" 
+              icon={<SearchOutlined />} 
+              onClick={handleSearch}
+            >
+              {intl.formatMessage({
+                id: 'pages.authorizers.search.button',
+                defaultMessage: '搜索',
+              })}
+            </Button>
+          </Col>
+        </Row>
       </Card>
       
       <ProTable<AuthorizerItem>
