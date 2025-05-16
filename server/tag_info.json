@@ -2,56 +2,55 @@
   {
     "tag": "ERC-4337",
     "functions": [
-        "validateUserOp((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes),bytes32,uint256)"
+      "validateUserOp((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes),bytes32,uint256)"
     ]
   },
   {
-    "tag": "ERC-7579 (Moduler)",
-    "functions": [
-        "installModule(uint256,address,bytes)"
-    ]
+    "tag": "ERC-7579 Moduler",
+    "functions": ["installModule(uint256,address,bytes)"]
   },
   {
-    "tag": "ERC-7821 (Batch)",
-    "functions": [
-        "execute(bytes32,bytes)"
-    ]
+    "tag": "ERC-6900 Moduler",
+    "functions": ["getExecutionData(bytes4)"]
   },
+  {
+    "tag": "ERC-7821 Batch",
+    "functions": ["execute(bytes32,bytes)"]
+  },
+  {
+    "tag": "Batch",
+    "functions": ["executeBatch((address,uint256,bytes)[])"]
+  }
   {
     "tag": "ERC-7914",
-    "functions": [
-        "transferFromNative(address,address,uint256)"
-    ]
+    "functions": ["transferFromNative(address,address,uint256)"]
   },
   {
     "tag": "ERC-1271",
-    "functions": [
-        "isValidSignature(bytes32,bytes)"
-    ]
+    "functions": ["isValidSignature(bytes32,bytes)"]
   },
   {
     "tag": "ERC-721 Receiver",
-    "functions": [
-        "onERC721Received(address,address,uint256,bytes)"
-    ]
+    "functions": ["onERC721Received(address,address,uint256,bytes)"]
   },
   {
     "tag": "ERC-1155 Receiver",
-    "functions": [
-        "onERC1155Received(address,address,uint256,uint256,bytes)"
-    ]
+    "functions": ["onERC1155Received(address,address,uint256,uint256,bytes)"]
   },
   {
     "tag": "ERC-1967",
-    "functions": [
-        "upgradeToAndCall(address,bytes)"
-    ]
+    "functions": ["upgradeToAndCall(address,bytes)"]
   },
   {
     "tag": "Proxy",
-    "functions": [
-        "getImplementation()"
-    ]
+    "functions": ["getImplementation()"]
+  },
+  {
+    "tag": "ERC-165",
+    "functions": ["supportsInterface(bytes4)"]
+  },
+  {
+    "tag": "ERC-7779",
+    "functions": ["accountStorageBases()"]
   }
 ]
-
