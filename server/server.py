@@ -228,6 +228,14 @@ def get_codes_by_eth_balance():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        
+        if search_by != '':
+            current_codes_by_eth_balance = [
+                code for code in current_codes_by_eth_balance 
+                if util.is_target_code_info_item(code, search_by)
+            ]
+        
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
