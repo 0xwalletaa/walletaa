@@ -126,6 +126,7 @@ export async function getTransactions(params: {
   page?: number;
   page_size?: number;
   order?: string;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/transactions`, {
     method: 'GET',
