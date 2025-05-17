@@ -46,7 +46,7 @@
   },
   {
     "tag": "UUPSUpgradeable",
-    "functions": ["upgradeToAndCall(address,bytes)"]
+    "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"]
   },
   {
     "tag": "ERC-165",
