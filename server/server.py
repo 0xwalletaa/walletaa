@@ -331,6 +331,12 @@ def get_relayers_by_tx_count():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        
+        if search_by != '':
+            current_relayers_by_tx_count = [
+                relayer for relayer in current_relayers_by_tx_count if relayer['relayer_address'] == search_by
+            ]
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
@@ -371,7 +377,13 @@ def get_relayers_by_authorization_count():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
         
+        if search_by != '':
+            current_relayers_by_authorization_count = [
+                relayer for relayer in current_relayers_by_authorization_count if relayer['relayer_address'] == search_by
+            ]
+            
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
             sorted_relayers = current_relayers_by_authorization_count
@@ -411,6 +423,13 @@ def get_relayers_by_tx_fee():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        
+        if search_by != '':
+            current_relayers_by_tx_fee = [
+                relayer for relayer in current_relayers_by_tx_fee if relayer['relayer_address'] == search_by
+            ]
+            
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
