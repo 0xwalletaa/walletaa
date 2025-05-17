@@ -759,7 +759,7 @@ const Welcome: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xl={24} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+        <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
           <Card
             bordered={false}
             title={intl.formatMessage({ id: 'pages.welcome.authorizerRanking', defaultMessage: 'Authorizer Ranking' })}
@@ -831,7 +831,7 @@ const Welcome: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xl={24} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+        <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
           <Card
             bordered={false}
             title={intl.formatMessage({ id: 'pages.welcome.relayerRanking' })}
