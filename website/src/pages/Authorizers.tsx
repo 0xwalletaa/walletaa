@@ -265,7 +265,7 @@ const Authorizers: React.FC = () => {
           const msg = await fetchFunction({
             page: current,
             page_size: pageSize,
-            search_by: searchByParam,
+            search_by: searchByParam.toLowerCase(),
             ...rest,
           });
           return {
