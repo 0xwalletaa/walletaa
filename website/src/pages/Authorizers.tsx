@@ -149,6 +149,18 @@ const Authorizers: React.FC = () => {
     },
     {
       title: intl.formatMessage({
+        id: 'pages.authorizers.provider',
+        defaultMessage: 'Provider',
+      }),
+      dataIndex: 'provider',
+      render: (dom, record) => {
+        return record.provider ? (
+          <Tag color="volcano">{record.provider}</Tag>
+        ) : null;
+      },
+    },
+    {
+      title: intl.formatMessage({
         id: 'pages.authorizers.set_code_tx_count',
         defaultMessage: 'Set Code Count',
       }),
