@@ -156,4 +156,10 @@ export default {
   'pages.authorizers.newEOATag': '新地址',
   'pages.authorizers.crossAuth': '跨链授权，last_chain_id=0',
   'pages.authorizers.crossAuthTag': '跨链授权',
+  'pages.authorizers.set_code_tx_count': '设置代码次数',
+  'pages.authorizers.unset_code_tx_count': '取消代码次数',
+  'pages.authorizers.historical_code_address': '历史代码地址',
+  'pages.authorizers.search.placeholder': '输入授权者地址或代码地址',
+  'pages.authorizers.search.button': '搜索',
+  'pages.authorizers.includeZero': '包含已取消',
 };
