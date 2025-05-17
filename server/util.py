@@ -193,6 +193,14 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
 
     return authorizer_info
 
+def is_target_authorizer_info_item(authorizer_info_item, search_by):
+    if len(search_by) == 42:
+        if authorizer_info_item['authorizer_address'] == search_by:
+            return True
+    else:
+        if search_by in authorizer_info_item['provider'].lower():
+            return True
+    return False
 
 def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_balance"):
     code_info_dict = {}
@@ -230,13 +238,15 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
     return code_info
 
 def is_target_code_info_item(code_info_item, search_by):
-    if search_by in code_info_item['provider'].lower():
-        return True
-    for tag in code_info_item['tags']:
-        if search_by in tag.lower():
+    if len(search_by) == 42:
+        if code_info_item['code_address'].lower() == search_by:
             return True
-    if code_info_item['code_address'].lower() == search_by:
-        return True
+    else:
+        if search_by in code_info_item['provider'].lower():
+            return True
+        for tag in code_info_item['tags']:
+            if search_by in tag.lower():
+                return True
     return False
 
 def get_relayer_info(txs, sort_by="tx_count"):

@@ -162,7 +162,7 @@ export default {
   'pages.authorizers.set_code_tx_count': 'Set Code Count',
   'pages.authorizers.unset_code_tx_count': 'Unset Code Count',
   'pages.authorizers.historical_code_address': 'Historical Code Address',
-  'pages.authorizers.search.placeholder': 'Enter authorizer or code address',
+  'pages.authorizers.search.placeholder': 'Enter authorizer address, code address or provider name',
   'pages.authorizers.search.button': 'Search',
   'pages.authorizers.includeZero': 'Include Canceled',
   'pages.transactions.search.placeholder': 'Enter transaction hash, relayer address, authorizer address or code address',

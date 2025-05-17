@@ -161,7 +161,7 @@ export default {
   'pages.authorizers.set_code_tx_count': '设置代码次数',
   'pages.authorizers.unset_code_tx_count': '取消代码次数',
   'pages.authorizers.historical_code_address': '历史代码地址',
-  'pages.authorizers.search.placeholder': '输入授权者地址或代码地址',
+  'pages.authorizers.search.placeholder': '输入授权者地址、代码地址或提供者名称',
   'pages.authorizers.search.button': '搜索',
   'pages.authorizers.includeZero': '包含已取消',
   'pages.transactions.search.placeholder': '输入交易哈希、中继地址、授权者地址或代码地址',
