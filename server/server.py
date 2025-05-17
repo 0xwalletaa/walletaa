@@ -63,7 +63,6 @@ def get_data():
             relayers_by_tx_count = loaded_data['relayers_by_tx_count']
             relayers_by_authorization_count = loaded_data['relayers_by_authorization_count']
             relayers_by_tx_fee = loaded_data['relayers_by_tx_fee']
-            code_infos = loaded_data['code_infos']
             overview = loaded_data['overview']
             last_update_time = loaded_data['last_update_time']
         app.logger.info(f"{NAME}数据获取成功，共 {len(txs)} 条记录")
@@ -417,22 +416,6 @@ def get_relayers_by_tx_fee():
         app.logger.error(f"获取以交易费用排序的中继者数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# 添加新的接口，返回完整的code_info.json内容
-@app.route('/code_infos', methods=['GET'])
-def get_code_infos():
-    try:
-        with data_lock: 
-            current_code_infos = code_infos.copy()
-            current_last_update_time = last_update_time
-        
-        return jsonify({
-            'code_infos': current_code_infos,
-            'total': len(current_code_infos),
-            'last_update_time': current_last_update_time
-        })
-    except Exception as e:
-        app.logger.error(f"获取code_infos数据时出错: {str(e)}")
-        return jsonify({'error': str(e)}), 500
 
 # overview查询接口
 @app.route('/overview', methods=['GET'])

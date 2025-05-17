@@ -150,31 +150,7 @@ const Welcome: React.FC = () => {
   useEffect(() => {
     getOverview()
       .then(data => {
-        // 处理top10_codes，只添加provider信息，保留原有tags
-        if (data.overview && data.overview.top10_codes && data.overview.code_infos) {
-          data.overview.top10_codes = data.overview.top10_codes.map((code: {
-            code_address: string;
-            authorizer_count: number;
-            eth_balance: number;
-            provider?: string;
-            tags?: string[];
-          }) => {
-            // 查找对应的code_info
-            const codeInfo = data.overview.code_infos.find(
-              (info: CodeInfoItem) => info.address.toLowerCase() === code.code_address.toLowerCase()
-            );
-            
-            // 只添加provider信息，保留原有tags
-            if (codeInfo) {
-              return {
-                ...code,
-                provider: codeInfo.provider
-              };
-            }
-            return code;
-          });
-        }
-        
+        // 不再需要从code_infos处理数据，直接使用top10_codes中的details和provider字段
         setOverview(data.overview);
         setLoading(false);
       })
@@ -192,23 +168,14 @@ const Welcome: React.FC = () => {
   };
 
   // 检查是否有详情可以显示
-  const hasDetails = (codeAddress: string) => {
-    if (!overview || !overview.code_infos) return false;
-    return overview.code_infos.some(item => 
-      item.address && item.address.toLowerCase() === codeAddress.toLowerCase()
-    );
+  const hasDetails = (record: any) => {
+    return record.details !== null && record.details !== undefined;
   };
 
   // 处理显示详情
-  const handleViewDetails = (codeAddress: string) => {
-    if (!overview || !overview.code_infos) return;
-    
-    const codeInfo = overview.code_infos.find(item => 
-      item.address && item.address.toLowerCase() === codeAddress.toLowerCase()
-    );
-    
-    if (codeInfo) {
-      setCurrentCode(codeInfo);
+  const handleViewDetails = (record: any) => {
+    if (record.details) {
+      setCurrentCode(record.details);
       setModalVisible(true);
     }
   };
@@ -771,11 +738,11 @@ const Welcome: React.FC = () => {
                   title: intl.formatMessage({ id: 'pages.codes.details', defaultMessage: 'Details' }),
                   dataIndex: 'code_address',
                   key: 'details',
-                  render: (text: string) => (
-                    hasDetails(text) ? (
+                  render: (_, record) => (
+                    hasDetails(record) ? (
                       <Button 
                         type="link" 
-                        onClick={() => handleViewDetails(text)}
+                        onClick={() => handleViewDetails(record)}
                         style={{ padding: '0', height: 'auto', minWidth: 'auto', lineHeight: '1' }}
                       >
                         {intl.formatMessage({
