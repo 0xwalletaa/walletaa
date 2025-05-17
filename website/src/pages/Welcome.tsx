@@ -698,7 +698,7 @@ const Welcome: React.FC = () => {
                         </a>
                       </span>
                     }>
-                      <Tag color="blue">{formatAddress(text)}</Tag>
+                      <Tag color="green">{formatAddress(text)}</Tag>
                     </Tooltip>
                   ),
                 },
