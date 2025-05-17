@@ -167,4 +167,6 @@ export default {
   'pages.transactions.search.button': 'Search',
   'pages.codes.search.placeholder': 'Enter code address, provider name or tag',
   'pages.codes.search.button': 'Search',
+  'pages.relayers.search.placeholder': 'Enter relayer address',
+  'pages.relayers.search.button': 'Search',
 };

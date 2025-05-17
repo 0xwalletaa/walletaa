@@ -166,4 +166,6 @@ export default {
   'pages.transactions.search.button': '搜索',
   'pages.codes.search.placeholder': '输入代码地址、提供者名称或标签',
   'pages.codes.search.button': '搜索',
+  'pages.relayers.search.placeholder': '输入中继器地址',
+  'pages.relayers.search.button': '搜索',
 };
