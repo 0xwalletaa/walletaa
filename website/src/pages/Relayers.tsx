@@ -3,23 +3,62 @@ import {
   PageContainer,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Tag, Tooltip } from 'antd';
-import { LinkOutlined } from '@ant-design/icons';
-import React, { useRef, useState } from 'react';
+import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
+import { Tag, Tooltip, Button, Card, Row, Col, Input } from 'antd';
+import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import React, { useRef, useState, useEffect } from 'react';
 import { getRelayersByTxCount, getRelayersByAuthorizationCount, getRelayersByTxFee, RelayerItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 
 const Relayers: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [sortApi, setSortApi] = useState<'tx_count' | 'authorization_count' | 'tx_fee'>('tx_count');
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchByParam, setSearchByParam] = useState<string>('');
   const { EXPLORER_URL } = getChainConfig();
+  const location = useLocation();
 
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
+
+  // 从URL参数中获取search_by
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchBy = params.get('search_by');
+    if (searchBy) {
+      setSearchValue(searchBy);
+      setSearchByParam(searchBy);
+    }
+  }, [location.search]);
+
+  // 处理搜索操作
+  const handleSearch = () => {
+    setSearchByParam(searchValue);
+    
+    // 更新URL参数
+    const params = new URLSearchParams(location.search);
+    if (searchValue) {
+      params.set('search_by', searchValue);
+    } else {
+      params.delete('search_by');
+    }
+    
+    // 构建新的URL
+    const newSearch = params.toString();
+    const pathname = location.pathname;
+    const newPath = newSearch ? `${pathname}?${newSearch}` : pathname;
+    
+    // 使用history更新URL，不刷新页面
+    history.push(newPath);
+    
+    // 重新加载表格数据
+    if (actionRef.current) {
+      actionRef.current.reload();
+    }
+  };
 
   const formatAddress = (address: string) => {
     return typeof address === 'string' && address.length > 10
@@ -93,6 +132,34 @@ const Relayers: React.FC = () => {
 
   return (
     <PageContainer>
+      <Card style={{ marginBottom: 16 }}>
+        <Row gutter={16}>
+          <Col flex="auto">
+            <Input
+              placeholder={intl.formatMessage({
+                id: 'pages.relayers.search.placeholder',
+                defaultMessage: '输入中继器地址',
+              })}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onPressEnter={handleSearch}
+            />
+          </Col>
+          <Col>
+            <Button 
+              type="primary" 
+              icon={<SearchOutlined />} 
+              onClick={handleSearch}
+            >
+              {intl.formatMessage({
+                id: 'pages.relayers.search.button',
+                defaultMessage: '搜索',
+              })}
+            </Button>
+          </Col>
+        </Row>
+      </Card>
+      
       <ProTable<RelayerItem>
         headerTitle={getHeaderTitle()}
         actionRef={actionRef}
@@ -136,6 +203,7 @@ const Relayers: React.FC = () => {
               page: current,
               page_size: pageSize,
               order: orderParam,
+              search_by: searchByParam.toLowerCase(),
               ...rest,
             });
           } else if (selectedApi === 'authorization_count') {
@@ -143,6 +211,7 @@ const Relayers: React.FC = () => {
               page: current,
               page_size: pageSize,
               order: orderParam,
+              search_by: searchByParam.toLowerCase(),
               ...rest,
             });
           } else {
@@ -150,6 +219,7 @@ const Relayers: React.FC = () => {
               page: current,
               page_size: pageSize,
               order: orderParam,
+              search_by: searchByParam.toLowerCase(),
               ...rest,
             });
           }

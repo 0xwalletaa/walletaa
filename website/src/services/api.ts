@@ -198,6 +198,7 @@ export async function getRelayersByTxCount(params: {
   page?: number;
   page_size?: number;
   order?: string;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/relayers_by_tx_count`, {
     method: 'GET',
@@ -210,6 +211,7 @@ export async function getRelayersByAuthorizationCount(params: {
   page?: number;
   page_size?: number;
   order?: string;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/relayers_by_authorization_count`, {
     method: 'GET',
@@ -222,6 +224,7 @@ export async function getRelayersByTxFee(params: {
   page?: number;
   page_size?: number;
   order?: string;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/relayers_by_tx_fee`, {
     method: 'GET',
