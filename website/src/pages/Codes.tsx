@@ -3,9 +3,9 @@ import {
   PageContainer,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography } from 'antd';
-import { LinkOutlined } from '@ant-design/icons';
+import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
+import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography, Input, Card, Row, Col } from 'antd';
+import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
@@ -50,7 +50,10 @@ const Codes: React.FC = () => {
   const [codeInfos, setCodeInfos] = useState<CodeInfo[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentCode, setCurrentCode] = useState<CodeInfo | null>(null);
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchByParam, setSearchByParam] = useState<string>('');
   const { EXPLORER_URL } = getChainConfig();
+  const location = useLocation();
 
   /**
    * @en-US International configuration
@@ -59,6 +62,41 @@ const Codes: React.FC = () => {
   const intl = useIntl();
   const { Text, Link } = Typography;
 
+  // 从URL参数中获取search_by
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchBy = params.get('search_by');
+    if (searchBy) {
+      setSearchValue(searchBy);
+      setSearchByParam(searchBy);
+    }
+  }, [location.search]);
+
+  // 处理搜索操作
+  const handleSearch = () => {
+    setSearchByParam(searchValue);
+    
+    // 更新URL参数
+    const params = new URLSearchParams(location.search);
+    if (searchValue) {
+      params.set('search_by', searchValue);
+    } else {
+      params.delete('search_by');
+    }
+    
+    // 构建新的URL
+    const newSearch = params.toString();
+    const pathname = location.pathname;
+    const newPath = newSearch ? `${pathname}?${newSearch}` : pathname;
+    
+    // 使用history更新URL，不刷新页面
+    history.push(newPath);
+    
+    // 重新加载表格数据
+    if (actionRef.current) {
+      actionRef.current.reload();
+    }
+  };
 
   const formatAddress = (address: string) => {
     return typeof address === 'string' && address.length > 10
@@ -468,6 +506,34 @@ const Codes: React.FC = () => {
 
   return (
     <PageContainer>
+      <Card style={{ marginBottom: 16 }}>
+        <Row gutter={16}>
+          <Col flex="auto">
+            <Input
+              placeholder={intl.formatMessage({
+                id: 'pages.codes.search.placeholder',
+                defaultMessage: '输入代码地址或提供者名称',
+              })}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onPressEnter={handleSearch}
+            />
+          </Col>
+          <Col>
+            <Button 
+              type="primary" 
+              icon={<SearchOutlined />} 
+              onClick={handleSearch}
+            >
+              {intl.formatMessage({
+                id: 'pages.codes.search.button',
+                defaultMessage: '搜索',
+              })}
+            </Button>
+          </Col>
+        </Row>
+      </Card>
+      
       <ProTable<CodeItem>
         headerTitle={getHeaderTitle()}
         actionRef={actionRef}
@@ -505,6 +571,7 @@ const Codes: React.FC = () => {
               page: current,
               page_size: pageSize,
               order: orderParam,
+              search_by: searchByParam.toLowerCase(),
               ...rest,
             });
           } else {
@@ -512,6 +579,7 @@ const Codes: React.FC = () => {
               page: current,
               page_size: pageSize,
               order: orderParam,
+              search_by: searchByParam.toLowerCase(),
               ...rest,
             });
           }

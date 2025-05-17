@@ -162,6 +162,7 @@ export async function getCodesByEthBalance(params: {
   page?: number;
   page_size?: number;
   order?: string;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/codes_by_eth_balance`, {
     method: 'GET',
@@ -174,6 +175,7 @@ export async function getCodesByAuthorizerCount(params: {
   page?: number;
   page_size?: number;
   order?: string;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/codes_by_authorizer_count`, {
     method: 'GET',
