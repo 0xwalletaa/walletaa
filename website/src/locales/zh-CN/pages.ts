@@ -170,4 +170,5 @@ export default {
   'pages.codes.search.button': '搜索',
   'pages.relayers.search.placeholder': '输入中继器地址',
   'pages.relayers.search.button': '搜索',
+  'pages.welcome.viewAll': '查看全部',
 };

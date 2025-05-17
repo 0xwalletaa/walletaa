@@ -171,4 +171,5 @@ export default {
   'pages.codes.search.button': 'Search',
   'pages.relayers.search.placeholder': 'Enter relayer address',
   'pages.relayers.search.button': 'Search',
+  'pages.welcome.viewAll': 'View All',
 };
