@@ -134,9 +134,9 @@ def get_authorizers():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', 'all')  # 获取过滤search_by参数，默认为all
+        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
         
-        if search_by != 'all':
+        if search_by != '':
             current_authorizers = [
                 authorizer for authorizer in current_authorizers 
                 if (authorizer['code_address'] == search_by or authorizer['authorizer_address'] == search_by)
@@ -182,9 +182,9 @@ def get_authorizers_with_zero():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', 'all')  # 获取过滤search_by参数，默认为all
+        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
         
-        if search_by != 'all':
+        if search_by != '':
             current_authorizers_with_zero = [
                 authorizer for authorizer in current_authorizers_with_zero 
                 if (authorizer['code_address'] == search_by or authorizer['authorizer_address'] == search_by)
