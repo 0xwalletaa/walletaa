@@ -198,7 +198,7 @@ def is_target_authorizer_info_item(authorizer_info_item, search_by):
         if authorizer_info_item['authorizer_address'] == search_by:
             return True
     else:
-        if search_by in authorizer_info_item['provider'].lower():
+        if 'provider' in authorizer_info_item and search_by in authorizer_info_item['provider'].lower():
             return True
     return False
 
