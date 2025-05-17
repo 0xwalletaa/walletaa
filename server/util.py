@@ -138,7 +138,7 @@ def is_target_tx(tx, search_by):
             return True
     return False
 
-def get_authorizer_info(txs, include_zero=False):
+def get_authorizer_info(txs, code_infos, include_zero=False):
     balance_of= {}
 
     conn = sqlite3.connect(f'../backend/{NAME}_address.db')
@@ -173,9 +173,15 @@ def get_authorizer_info(txs, include_zero=False):
                     authorizer_info_dict[authorizer_address]['set_code_tx_count'] += 1
                 authorizer_info_dict[authorizer_address]['code_address'] = authorization['code_address']
     
+    code_to_provider = {}
+    for code_info in code_infos:
+        code_to_provider[code_info['address'].lower()] = code_info['provider']
+    
     for authorizer_address in authorizer_info_dict:
         if authorizer_address in balance_of:
             authorizer_info_dict[authorizer_address]['eth_balance'] = balance_of[authorizer_address]
+        if authorizer_info_dict[authorizer_address]['code_address'] in code_to_provider:
+            authorizer_info_dict[authorizer_address]['provider'] = code_to_provider[authorizer_info_dict[authorizer_address]['code_address']]
 
     authorizer_info = []
     for authorizer_address in authorizer_info_dict:
@@ -266,7 +272,7 @@ def get_code_infos():
         code_infos = json.load(f)
     return code_infos
 
-def get_overview(txs, authorizers, codes, relayers):
+def get_overview(txs, authorizers, codes, relayers, code_infos):
     daily_tx_count = {}
     for tx in txs:
         tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
@@ -318,6 +324,15 @@ def get_overview(txs, authorizers, codes, relayers):
     top10_codes = codes[:10]
     top10_relayers = relayers[:10]
     
+    top10_authorizers = authorizers[:10]
+    code_to_provider = {}
+    for code_info in code_infos:
+        code_to_provider[code_info['address'].lower()] = code_info['provider']
+    
+    for i in range(len(top10_authorizers)):
+        if top10_authorizers[i]['code_address'] in code_to_provider:
+            top10_authorizers[i]['provider'] = code_to_provider[top10_authorizers[i]['code_address']]
+    
     return {
         'tx_count': len(txs),
         'authorizer_count': len(authorizers),
@@ -330,7 +345,8 @@ def get_overview(txs, authorizers, codes, relayers):
         'daily_code_count': daily_code_count,
         'daily_relayer_count': daily_relayer_count,
         'top10_codes': top10_codes,
-        'top10_relayers': top10_relayers
+        'top10_relayers': top10_relayers,
+        'top10_authorizers': top10_authorizers,
     }
 
 
