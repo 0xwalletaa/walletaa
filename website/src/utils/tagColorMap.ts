@@ -14,7 +14,12 @@ const tagColorMap: Record<string, string> = {
   'ERC-1967': 'red',
   'Proxy': 'gold',
   'ERC-165': 'lime',
-  'ERC-7779': 'volcano'
+  'ERC-7779': 'volcano',
+  'ERC-7821 Execution': 'green',
+  'ERC-1967 Proxy': 'red',
+  'UUPSUpgradeable': 'pink',
+  'ERC-7579 Executor': 'purple',
+  'ERC-7710 Delegation': 'geekblue'
 };
 
 export default tagColorMap; 
