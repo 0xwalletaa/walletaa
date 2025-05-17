@@ -14,12 +14,15 @@
     "functions": ["getExecutionData(bytes4)"]
   },
   {
-    "tag": "ERC-7821 Batch",
+    "tag": "ERC-7821 Execution",
     "functions": ["execute(bytes32,bytes)"]
   },
   {
     "tag": "Batch",
-    "functions": ["executeBatch((address,uint256,bytes)[])"]
+    "functions": [
+      "executeBatch((address,uint256,bytes)[])",
+      "execute(bytes32,bytes)"
+    ]
   },
   {
     "tag": "ERC-7914",
@@ -38,12 +41,12 @@
     "functions": ["onERC1155Received(address,address,uint256,uint256,bytes)"]
   },
   {
-    "tag": "ERC-1967",
-    "functions": ["upgradeToAndCall(address,bytes)"]
+    "tag": "ERC-1967 Proxy",
+    "functions": ["getImplementation()", "upgradeToAndCall(address,bytes)"]
   },
   {
-    "tag": "Proxy",
-    "functions": ["getImplementation()"]
+    "tag": "UUPSUpgradeable",
+    "functions": ["upgradeToAndCall(address,bytes)"]
   },
   {
     "tag": "ERC-165",
@@ -52,5 +55,13 @@
   {
     "tag": "ERC-7779",
     "functions": ["accountStorageBases()"]
+  },
+  {
+    "tag": "ERC-7579 Executor",
+    "functions": ["executeFromExecutor(bytes32,bytes)"]
+  },
+  {
+    "tag": "ERC-7710 Delegation",
+    "functions": ["function redeemDelegations(bytes[],bytes32[],bytes[])"]
   }
 ]
