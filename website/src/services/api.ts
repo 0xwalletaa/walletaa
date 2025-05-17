@@ -34,6 +34,7 @@ export interface AuthorizerItem {
   historical_code_address: string[];
   last_nonce: number;
   last_chain_id: number;
+  provider?: string; // 添加provider字段
 }
 
 // 定义代码数据类型
