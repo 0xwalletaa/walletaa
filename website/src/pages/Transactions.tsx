@@ -1,13 +1,13 @@
-import { PlusOutlined, ArrowRightOutlined, LinkOutlined } from '@ant-design/icons';
+import { PlusOutlined, ArrowRightOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   PageContainer,
   ProDescriptions,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Modal, Tag, Tooltip } from 'antd';
-import React, { useRef, useState } from 'react';
+import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
+import { Modal, Tag, Tooltip, Input, Button, Card, Row, Col } from 'antd';
+import React, { useRef, useState, useEffect } from 'react';
 import { getTransactions, TransactionItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 
@@ -15,6 +15,9 @@ const Transactions: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<TransactionItem>();
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchByParam, setSearchByParam] = useState<string>('');
+  const location = useLocation();
 
   /**
    * @en-US International configuration
@@ -22,6 +25,42 @@ const Transactions: React.FC = () => {
    * */
   const intl = useIntl();
   const { EXPLORER_URL } = getChainConfig();
+
+  // 从URL参数中获取search_by
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchBy = params.get('search_by');
+    if (searchBy) {
+      setSearchValue(searchBy);
+      setSearchByParam(searchBy);
+    }
+  }, [location.search]);
+
+  // 处理搜索操作
+  const handleSearch = () => {
+    setSearchByParam(searchValue);
+    
+    // 更新URL参数
+    const params = new URLSearchParams(location.search);
+    if (searchValue) {
+      params.set('search_by', searchValue);
+    } else {
+      params.delete('search_by');
+    }
+    
+    // 构建新的URL
+    const newSearch = params.toString();
+    const pathname = location.pathname;
+    const newPath = newSearch ? `${pathname}?${newSearch}` : pathname;
+    
+    // 使用history更新URL，不刷新页面
+    history.push(newPath);
+    
+    // 重新加载表格数据
+    if (actionRef.current) {
+      actionRef.current.reload();
+    }
+  };
 
   const formatAddress = (address: string) => {
     return typeof address === 'string' && address.length > 10
@@ -215,6 +254,34 @@ const Transactions: React.FC = () => {
 
   return (
     <PageContainer>
+      <Card style={{ marginBottom: 16 }}>
+        <Row gutter={16}>
+          <Col flex="auto">
+            <Input
+              placeholder={intl.formatMessage({
+                id: 'pages.transactions.search.placeholder',
+                defaultMessage: '输入交易哈希、中继地址、授权者地址或代码地址',
+              })}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onPressEnter={handleSearch}
+            />
+          </Col>
+          <Col>
+            <Button 
+              type="primary" 
+              icon={<SearchOutlined />} 
+              onClick={handleSearch}
+            >
+              {intl.formatMessage({
+                id: 'pages.transactions.search.button',
+                defaultMessage: '搜索',
+              })}
+            </Button>
+          </Col>
+        </Row>
+      </Card>
+
       <ProTable<TransactionItem>
         headerTitle={intl.formatMessage({
           id: 'pages.transactions.headerTitle',
@@ -240,6 +307,7 @@ const Transactions: React.FC = () => {
             page: current,
             page_size: pageSize,
             order: orderParam,
+            search_by: searchByParam.toLowerCase(),
             ...rest,
           });
           return {
