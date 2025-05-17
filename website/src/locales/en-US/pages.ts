@@ -157,4 +157,10 @@ export default {
   'pages.authorizers.newEOATag': 'NewEOA',
   'pages.authorizers.crossAuth': 'Cross-chain Authentication with last_chain_id=0',
   'pages.authorizers.crossAuthTag': 'CrossAuth',
+  'pages.authorizers.set_code_tx_count': 'Set Code Count',
+  'pages.authorizers.unset_code_tx_count': 'Unset Code Count',
+  'pages.authorizers.historical_code_address': 'Historical Code Address',
+  'pages.authorizers.search.placeholder': 'Enter authorizer or code address',
+  'pages.authorizers.search.button': 'Search',
+  'pages.authorizers.includeZero': 'Include Canceled',
 };
