@@ -174,7 +174,7 @@ def get_authorizer_info(txs, include_zero=False):
     return authorizer_info
 
 
-def get_code_info(authorizer_info, code_function_info, sort_by="eth_balance"):
+def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_balance"):
     code_info_dict = {}
     for authorizer in authorizer_info:
         code_address = authorizer['code_address']
@@ -184,11 +184,19 @@ def get_code_info(authorizer_info, code_function_info, sort_by="eth_balance"):
                 'authorizer_count': 0,
                 'eth_balance': 0,
                 'tags': [],
+                'details': None,
+                'provider': "",
             }
             if code_address in code_function_info:
                 code_info_dict[code_address]['tags'] = code_function_info[code_address]
         code_info_dict[code_address]['authorizer_count'] += 1
         code_info_dict[code_address]['eth_balance'] += authorizer['eth_balance']
+    
+    for code_info in code_infos:
+        code_address_lower = code_info['address'].lower()
+        if code_address_lower in code_info_dict:
+            code_info_dict[code_address_lower]['details'] = code_info
+            code_info_dict[code_address_lower]['provider'] = code_info['provider']
     
     code_info = []
     for code_address in code_info_dict:
@@ -234,7 +242,7 @@ def get_code_infos():
         code_infos = json.load(f)
     return code_infos
 
-def get_overview(txs, authorizers, codes, relayers, code_infos):
+def get_overview(txs, authorizers, codes, relayers):
     daily_tx_count = {}
     for tx in txs:
         tx_date = datetime.fromtimestamp(tx['timestamp']).strftime('%Y-%m-%d')
@@ -298,8 +306,7 @@ def get_overview(txs, authorizers, codes, relayers, code_infos):
         'daily_code_count': daily_code_count,
         'daily_relayer_count': daily_relayer_count,
         'top10_codes': top10_codes,
-        'top10_relayers': top10_relayers,
-        'code_infos': code_infos,
+        'top10_relayers': top10_relayers
     }
 
 

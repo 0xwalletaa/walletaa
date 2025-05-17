@@ -43,6 +43,8 @@ export interface CodeItem {
   authorization_count: number;
   eth_balance: number;
   tags?: string[]; // 添加标签字段
+  details?: CodeInfoItem; // 添加details字段
+  provider?: string; // 添加provider字段
 }
 
 // 定义中继者数据类型
@@ -221,13 +223,6 @@ export async function getRelayersByTxFee(params: {
   return request(`${BASE_URL()}/relayers_by_tx_fee`, {
     method: 'GET',
     params,
-  });
-}
-
-// 获取完整的code_infos数据
-export async function getCodeInfos() {
-  return request(`${BASE_URL()}/code_infos`, {
-    method: 'GET',
   });
 }
 

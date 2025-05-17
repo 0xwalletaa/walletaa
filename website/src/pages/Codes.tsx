@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from '@umijs/max';
 import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
-import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, getCodeInfos, CodeInfoItem } from '@/services/api';
+import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 import tagColorMap from '@/utils/tagColorMap';
 
@@ -59,16 +59,6 @@ const Codes: React.FC = () => {
   const intl = useIntl();
   const { Text, Link } = Typography;
 
-  // 加载代码详情信息 - 使用API接口替代本地fetch
-  useEffect(() => {
-    getCodeInfos()
-      .then(response => {
-        setCodeInfos(response.code_infos);
-      })
-      .catch(error => {
-        console.error('加载code_infos失败:', error);
-      });
-  }, []);
 
   const formatAddress = (address: string) => {
     return typeof address === 'string' && address.length > 10
@@ -76,23 +66,17 @@ const Codes: React.FC = () => {
       : address;
   };
 
-  // 处理显示详情
-  const handleViewDetails = (codeAddress: string) => {
-    const codeInfo = codeInfos.find(item => 
-      item.address.toLowerCase() === codeAddress.toLowerCase()
-    );
-    if (codeInfo) {
-      setCurrentCode(codeInfo);
+  // 处理显示详情 - 使用record中的details字段
+  const handleViewDetails = (record: CodeItem) => {
+    if (record.details) {
+      setCurrentCode(record.details);
       setModalVisible(true);
     }
   };
 
   // 检查是否有详情可以显示
-  const hasDetails = (codeAddress: string) => {
-    const codeInfo = codeInfos.find(item => 
-      item.address.toLowerCase() === codeAddress.toLowerCase()
-    );
-    return codeInfo;
+  const hasDetails = (record: CodeItem) => {
+    return record.details !== null && record.details !== undefined;
   };
 
   const columns: ProColumns<CodeItem>[] = [
@@ -123,14 +107,9 @@ const Codes: React.FC = () => {
         defaultMessage: 'Provider',
       }),
       dataIndex: 'code_address',
-      render: (codeAddress) => {
-        if (typeof codeAddress !== 'string') return null;
-        
-        const codeInfo = codeInfos.find(item => 
-          item.address.toLowerCase() === codeAddress.toLowerCase()
-        );
-        return codeInfo && codeInfo.provider ? (
-          <Tag color="volcano">{codeInfo.provider}</Tag>
+      render: (_, record) => {
+        return record.provider ? (
+          <Tag color="volcano">{record.provider}</Tag>
         ) : null;
       },
     },
@@ -179,10 +158,10 @@ const Codes: React.FC = () => {
       dataIndex: 'code_address',
       valueType: 'option',
       render: (_, record) => (
-        hasDetails(record.code_address) ? (
+        hasDetails(record) ? (
           <Button 
             type="link" 
-            onClick={() => handleViewDetails(record.code_address)}
+            onClick={() => handleViewDetails(record)}
           >
             {intl.formatMessage({
               id: 'pages.codes.view_details',

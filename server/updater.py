@@ -19,13 +19,13 @@ while True:
         authorizers = util.get_authorizer_info(txs)
         authorizers_with_zero = util.get_authorizer_info(txs, include_zero=True)
         code_function_info = util.get_code_function_info()
-        codes_by_eth_balance = util.get_code_info(authorizers, code_function_info, sort_by="eth_balance")
-        codes_by_authorizer_count = util.get_code_info(authorizers, code_function_info, sort_by="authorizer_count")
+        code_infos = util.get_code_infos()
+        codes_by_eth_balance = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="eth_balance")
+        codes_by_authorizer_count = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="authorizer_count")
         relayers_by_tx_count = util.get_relayer_info(txs, sort_by="tx_count")
         relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
         relayers_by_tx_fee = util.get_relayer_info(txs, sort_by="tx_fee")
-        code_infos = util.get_code_infos()
-        overview = util.get_overview(txs, authorizers, codes_by_authorizer_count, relayers_by_tx_count, code_infos)
+        overview = util.get_overview(txs, authorizers, codes_by_authorizer_count, relayers_by_tx_count)
         last_update_time = time.time()
         end_time = time.time()
         print(f"{NAME} txs: {len(txs)}, 计算时间: {end_time - start_time} 秒")
@@ -40,7 +40,6 @@ while True:
             'relayers_by_tx_count': relayers_by_tx_count,
             'relayers_by_authorization_count': relayers_by_authorization_count,
             'relayers_by_tx_fee': relayers_by_tx_fee,
-            'code_infos': code_infos,
             'overview': overview,
             'last_update_time': last_update_time
         }, open(f'/dev/shm/{NAME}_data_temp.pkl', 'wb'))

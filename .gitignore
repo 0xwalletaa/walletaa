@@ -21,3 +21,5 @@ mainnet_blocks.db
 temp/
 *.db
 logs_*
+server/test.sh
+backend/db.zip
