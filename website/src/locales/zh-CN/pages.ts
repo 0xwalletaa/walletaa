@@ -162,4 +162,8 @@ export default {
   'pages.authorizers.search.placeholder': '输入授权者地址或代码地址',
   'pages.authorizers.search.button': '搜索',
   'pages.authorizers.includeZero': '包含已取消',
+  'pages.transactions.search.placeholder': '输入交易哈希、中继地址、授权者地址或代码地址',
+  'pages.transactions.search.button': '搜索',
+  'pages.codes.search.placeholder': '输入代码地址或提供者名称',
+  'pages.codes.search.button': '搜索',
 };

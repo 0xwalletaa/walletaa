@@ -163,4 +163,8 @@ export default {
   'pages.authorizers.search.placeholder': 'Enter authorizer or code address',
   'pages.authorizers.search.button': 'Search',
   'pages.authorizers.includeZero': 'Include Canceled',
+  'pages.transactions.search.placeholder': 'Enter transaction hash, relayer address, authorizer address or code address',
+  'pages.transactions.search.button': 'Search',
+  'pages.codes.search.placeholder': 'Enter code address or provider name',
+  'pages.codes.search.button': 'Search',
 };
