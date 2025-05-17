@@ -18,6 +18,12 @@ export default [
     component: './Welcome',
   },
   {
+    name: 'codes',
+    icon: 'code',
+    path: '/codes',
+    component: './Codes',
+  },
+  {
     name: 'transactions',
     icon: 'table',
     path: '/transactions',
@@ -28,12 +34,6 @@ export default [
     icon: 'team',
     path: '/authorizers',
     component: './Authorizers',
-  },
-  {
-    name: 'codes',
-    icon: 'code',
-    path: '/codes',
-    component: './Codes',
   },
   {
     name: 'relayers',
