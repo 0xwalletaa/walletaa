@@ -149,6 +149,8 @@ export default {
   'pages.welcome.eip7702Title': 'Welcome to the World of EIP-7702',
   'pages.welcome.provider': 'Provider',
   'pages.welcome.tags': 'Tags',
+  'pages.welcome.authorizerRanking': 'Authorizer Ranking',
+  'pages.welcome.authorizerAddress': 'Authorizer Address',
   'pages.transactions.newEOA': 'New Account with nonce=0',
   'pages.transactions.newEOATag': 'NewEOA',
   'pages.transactions.crossAuth': 'Cross-chain Authentication with chainId=0',

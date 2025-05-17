@@ -762,6 +762,78 @@ const Welcome: React.FC = () => {
         <Col xl={24} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
           <Card
             bordered={false}
+            title={intl.formatMessage({ id: 'pages.welcome.authorizerRanking', defaultMessage: 'Authorizer Ranking' })}
+            loading={loading}
+            style={{ height: '100%' }}
+            bodyStyle={{ padding: '0 24px 24px 24px' }}
+          >
+            <Table
+              rowKey="authorizer_address"
+              size="small"
+              columns={[
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.ranking', defaultMessage: 'Ranking' }),
+                  dataIndex: 'index',
+                  key: 'index',
+                  render: (_: any, __: any, index: number) => index + 1,
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.authorizerAddress', defaultMessage: 'Authorizer Address' }),
+                  dataIndex: 'authorizer_address',
+                  key: 'authorizer_address',
+                  render: (text: string) => (
+                    <Tooltip title={
+                      <span>
+                        {text}
+                        <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                          <LinkOutlined />
+                        </a>
+                      </span>
+                    }>
+                      <Tag color="blue">{formatAddress(text)}</Tag>
+                    </Tooltip>
+                  ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.codeAddress', defaultMessage: 'Code Address' }),
+                  dataIndex: 'code_address',
+                  key: 'code_address',
+                  render: (text: string) => (
+                    <Tooltip title={
+                      <span>
+                        {text}
+                        <a href={`${chainConfig.EXPLORER_URL}/address/${text}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                          <LinkOutlined />
+                        </a>
+                      </span>
+                    }>
+                      <Tag color="green">{formatAddress(text)}</Tag>
+                    </Tooltip>
+                  ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.provider', defaultMessage: 'Provider' }),
+                  dataIndex: 'provider',
+                  key: 'provider',
+                  render: (text: string) => (
+                    text ? <Tag color="volcano">{text}</Tag> : null
+                  ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.welcome.ethBalance', defaultMessage: 'ETH Balance' }),
+                  dataIndex: 'eth_balance',
+                  key: 'eth_balance',
+                  render: (text: number) => numeral(text).format('0,0.0000'),
+                },
+              ]}
+              dataSource={overview ? overview.top10_authorizers : []}
+              pagination={false}
+            />
+          </Card>
+        </Col>
+        <Col xl={24} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+          <Card
+            bordered={false}
             title={intl.formatMessage({ id: 'pages.welcome.relayerRanking' })}
             loading={loading}
             style={{ height: '100%' }}
