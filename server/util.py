@@ -124,6 +124,20 @@ def get_all_type4_txs_with_timestamp():
         txs[i]['timestamp'] = timestamp_of_block[txs[i]['block_number']]
     return txs
 
+def is_target_tx(tx, search_by):
+    if len(search_by) == 42:
+        if search_by == tx['relayer_address']:
+            return True
+        for authorization in tx['authorization_list']:
+            if search_by == authorization['code_address']:
+                return True
+            if search_by == authorization['authorizer_address']:
+                return True
+    if len(search_by) == 66:
+        if search_by == tx['tx_hash']:
+            return True
+    return False
+
 def get_authorizer_info(txs, include_zero=False):
     balance_of= {}
 

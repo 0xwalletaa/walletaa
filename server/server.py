@@ -92,6 +92,13 @@ def get_transactions():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
+        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        
+        if search_by != '':
+            current_txs = [
+                tx for tx in current_txs 
+                if util.is_target_tx(tx, search_by)
+            ]
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
