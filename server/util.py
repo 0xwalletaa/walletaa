@@ -209,6 +209,16 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
     
     return code_info
 
+def is_target_code_info_item(code_info_item, search_by):
+    if search_by in code_info_item['provider'].lower():
+        return True
+    for tag in code_info_item['tags']:
+        if search_by in tag.lower():
+            return True
+    if code_info_item['code_address'].lower() == search_by:
+        return True
+    return False
+
 def get_relayer_info(txs, sort_by="tx_count"):
     relayer_info_dict = {}
     for tx in txs:
