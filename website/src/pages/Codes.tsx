@@ -92,9 +92,9 @@ const Codes: React.FC = () => {
     // 使用history更新URL，不刷新页面
     history.push(newPath);
     
-    // 重新加载表格数据
+    // 重新加载表格数据并重置到第一页
     if (actionRef.current) {
-      actionRef.current.reload();
+      actionRef.current.reload(true);
     }
   };
 
