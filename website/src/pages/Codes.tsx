@@ -315,7 +315,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Provider',
           })}
         >
-          {code.provider || '-'}
+          {code.provider ? <Tag color="volcano">{code.provider}</Tag> : '-'}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
