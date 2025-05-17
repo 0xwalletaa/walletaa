@@ -11,7 +11,7 @@ https://bsc.meowrpc.com \
 https://rpc-bsc.48.club \
 https://bsc.rpc.blxrbdn.com \
 https://bsc.blockrazor.xyz \
---num_threads 10 \
+--num_threads 5 \
 --start_block 47600000
 python3 get_address.py --name bsc --endpoints \
 https://api.zan.top/bsc-mainnet \
@@ -25,7 +25,7 @@ https://bsc.meowrpc.com \
 https://rpc-bsc.48.club \
 https://bsc.rpc.blxrbdn.com \
 https://bsc.blockrazor.xyz \
---num_threads 10
+--num_threads 5
 python3 get_code.py --name bsc --endpoints \
 https://api.zan.top/bsc-mainnet \
 https://bsc-mainnet.public.blastapi.io \
@@ -38,6 +38,6 @@ https://bsc.meowrpc.com \
 https://rpc-bsc.48.club \
 https://bsc.rpc.blxrbdn.com \
 https://bsc.blockrazor.xyz \
---num_threads 10
+--num_threads 5
 sleep 1
 done

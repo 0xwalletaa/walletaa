@@ -57,4 +57,4 @@ while True:
         print(f"{NAME} 加载时间: {end_time - start_time} 秒")
         print("--------------------------------")
 
-    time.sleep(30)
+    time.sleep(120)

@@ -15,7 +15,7 @@ https://api.zan.top/base-mainnet \
 https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
---num_threads 10 \
+--num_threads 5 \
 --start_block 30000000
 python3 get_address.py --name base --endpoints \
 https://base.llamarpc.com \
@@ -33,7 +33,7 @@ https://api.zan.top/base-mainnet \
 https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
---num_threads 10
+--num_threads 5
 python3 get_code.py --name base --endpoints \
 https://base.llamarpc.com \
 https://base.api.onfinality.io/public \
@@ -50,6 +50,6 @@ https://api.zan.top/base-mainnet \
 https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
---num_threads 10
+--num_threads 5
 sleep 60
 done
