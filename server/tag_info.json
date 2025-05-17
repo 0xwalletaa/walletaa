@@ -43,7 +43,11 @@
   },
   {
     "tag": "ERC-1967 Proxy",
-    "functions": ["getImplementation()", "upgradeToAndCall(address,bytes)"]
+    "functions": [
+      "getImplementation()",
+      "upgradeToAndCall(address,bytes)",
+      "upgradeTo(address)"
+    ]
   },
   {
     "tag": "UUPSUpgradeable",
