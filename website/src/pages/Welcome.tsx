@@ -6,8 +6,9 @@ import { Area, Column } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
 import { getOverview, Overview, CodeInfoItem } from '@/services/api';
-import { getChainConfig } from '@/services/config';
+import { getChainConfig, getUrlWithChain } from '@/services/config';
 import tagColorMap from '@/utils/tagColorMap';
+import { history } from '@umijs/max';
 
 // 定义ChartCard组件的属性类型
 interface ChartCardProps {
@@ -756,6 +757,13 @@ const Welcome: React.FC = () => {
               ]}
               dataSource={overview ? overview.top10_codes : []}
               pagination={false}
+              footer={() => (
+                <div style={{ textAlign: 'center' }}>
+                  <Button type="link" onClick={() => history.push(getUrlWithChain('/codes'))}>
+                    {intl.formatMessage({ id: 'pages.welcome.viewAll', defaultMessage: '查看全部' })}
+                  </Button>
+                </div>
+              )}
             />
           </Card>
         </Col>
@@ -828,6 +836,13 @@ const Welcome: React.FC = () => {
               ]}
               dataSource={overview ? overview.top10_authorizers : []}
               pagination={false}
+              footer={() => (
+                <div style={{ textAlign: 'center' }}>
+                  <Button type="link" onClick={() => history.push(getUrlWithChain('/authorizers'))}>
+                    {intl.formatMessage({ id: 'pages.welcome.viewAll', defaultMessage: '查看全部' })}
+                  </Button>
+                </div>
+              )}
             />
           </Card>
         </Col>
@@ -885,6 +900,13 @@ const Welcome: React.FC = () => {
               ]}
               dataSource={overview ? overview.top10_relayers : []}
               pagination={false}
+              footer={() => (
+                <div style={{ textAlign: 'center' }}>
+                  <Button type="link" onClick={() => history.push(getUrlWithChain('/relayers'))}>
+                    {intl.formatMessage({ id: 'pages.welcome.viewAll', defaultMessage: '查看全部' })}
+                  </Button>
+                </div>
+              )}
             />
           </Card>
         </Col>
