@@ -119,6 +119,12 @@ export interface Overview {
     authorization_count: number;
     tx_fee: number;
   }>;
+  top10_authorizers?: Array<{
+    authorizer_address: string;
+    code_address: string;
+    eth_balance: number;
+    provider?: string;
+  }>;
   code_infos?: CodeInfoItem[];
 }
 

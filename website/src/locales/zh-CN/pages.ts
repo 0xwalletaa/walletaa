@@ -148,6 +148,8 @@ export default {
   'pages.welcome.eip7702Title': '欢迎来到EIP-7702的世界',
   'pages.welcome.provider': '提供方',
   'pages.welcome.tags': '标签',
+  'pages.welcome.authorizerRanking': '授权者排行榜',
+  'pages.welcome.authorizerAddress': '授权者地址',
   'pages.transactions.newEOA': '新账户，nonce=0',
   'pages.transactions.newEOATag': '新地址',
   'pages.transactions.crossAuth': '跨链授权，chainId=0',
