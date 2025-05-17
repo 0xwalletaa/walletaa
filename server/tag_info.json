@@ -21,7 +21,8 @@
     "tag": "Batch",
     "functions": [
       "executeBatch((address,uint256,bytes)[])",
-      "execute(bytes32,bytes)"
+      "execute(bytes32,bytes)",
+      "executeFromSelf((address,uint256,bytes)[])"
     ]
   },
   {
