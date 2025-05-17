@@ -318,12 +318,13 @@ def parse_functions(code):
 
 
 TAG_INFO = json.load(open('tag_info.json'))
-FUNCTION_TO_TAG = {}
+FUNCTION_TO_TAGS = {}
 for tag in TAG_INFO:
     for function in tag['functions']:
         function = "0x"+keccak(function.encode()).hex()[:8]
-        FUNCTION_TO_TAG[function] = tag['tag']
-        print(function, tag['tag'])
+        if function not in FUNCTION_TO_TAGS:
+            FUNCTION_TO_TAGS[function] = []
+        FUNCTION_TO_TAGS[function].append(tag['tag'])
 
 
 def get_code_function_info():
@@ -338,8 +339,8 @@ def get_code_function_info():
         functions = parse_functions(code)
         tags = []
         for function in functions:
-            if function in FUNCTION_TO_TAG:
-                tags.append(FUNCTION_TO_TAG[function])
+            if function in FUNCTION_TO_TAGS:
+                tags.extend(FUNCTION_TO_TAGS[function])
         if len(tags) > 0:
             ret[code_address.lower()] = tags
         
