@@ -135,6 +135,7 @@ export async function getTransactions(params: {
 export async function getAuthorizers(params: {
   page?: number;
   page_size?: number;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/authorizers`, {
     method: 'GET',
@@ -146,6 +147,7 @@ export async function getAuthorizers(params: {
 export async function getAuthorizersWithZero(params: {
   page?: number;
   page_size?: number;
+  search_by?: string;
 }) {
   return request(`${BASE_URL()}/authorizers_with_zero`, {
     method: 'GET',

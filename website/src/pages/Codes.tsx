@@ -9,6 +9,7 @@ import { LinkOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, getCodeInfos, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
+import tagColorMap from '@/utils/tagColorMap';
 
 // 定义代码详情类型
 interface CodeInfo {
@@ -41,17 +42,7 @@ interface CodeInfo {
 }
 
 // 标签颜色映射
-const tagColorMap: Record<string, string> = {
-  'ERC-4337': 'blue',
-  'ERC-7579 (Moduler)': 'purple',
-  'ERC-7821 (Batch)': 'green',
-  'ERC-7914': 'orange',
-  'ERC-1271': 'cyan',
-  'ERC-721 Receiver': 'magenta',
-  'ERC-1155 Receiver': 'magenta',
-  'ERC-1967': 'red',
-  'Proxy': 'gold',
-};
+// 删除本地定义的tagColorMap
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
