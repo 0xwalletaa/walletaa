@@ -410,13 +410,13 @@ def get_relayers_by_authorization_count():
         app.logger.error(f"获取以授权数量排序的中继者数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# relayers_by_tx_fee分页查询接口
-@app.route('/relayers_by_tx_fee', methods=['GET'])
-def get_relayers_by_tx_fee():
+# relayers_by_authorization_fee分页查询接口
+@app.route('/relayers_by_authorization_fee', methods=['GET'])
+def get_relayers_by_authorization_fee():
     try:
         with data_lock:
             # 创建副本避免竞态条件
-            current_relayers_by_tx_fee = relayers_by_tx_fee.copy()
+            current_relayers_by_authorization_fee = relayers_by_authorization_fee.copy()
             current_last_update_time = last_update_time
         
         # 获取分页参数，默认第1页，每页10条
@@ -426,16 +426,16 @@ def get_relayers_by_tx_fee():
         search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
         
         if search_by != '':
-            current_relayers_by_tx_fee = [
-                relayer for relayer in current_relayers_by_tx_fee if relayer['relayer_address'] == search_by
+            current_relayers_by_authorization_fee = [
+                relayer for relayer in current_relayers_by_authorization_fee if relayer['relayer_address'] == search_by
             ]
             
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
-            sorted_relayers = current_relayers_by_tx_fee
+            sorted_relayers = current_relayers_by_authorization_fee
         else:
-            sorted_relayers = current_relayers_by_tx_fee[::-1]
+            sorted_relayers = current_relayers_by_authorization_fee[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
@@ -446,7 +446,7 @@ def get_relayers_by_tx_fee():
         
         # 返回结果
         return jsonify({
-            'total': len(current_relayers_by_tx_fee),
+            'total': len(current_relayers_by_authorization_fee),
             'page': page,
             'page_size': page_size,
             'order': order,
@@ -454,7 +454,7 @@ def get_relayers_by_tx_fee():
             'last_update_time': current_last_update_time
         })
     except Exception as e:
-        app.logger.error(f"获取以交易费用排序的中继者数据时出错: {str(e)}")
+        app.logger.error(f"获取以授权费用排序的中继者数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
