@@ -399,7 +399,9 @@ def get_code_function_info():
         tags = []
         for function in functions:
             if function in FUNCTION_TO_TAGS:
-                tags.extend(FUNCTION_TO_TAGS[function])
+                for tag in FUNCTION_TO_TAGS[function]:
+                    if tag not in tags:
+                        tags.append(tag)
         if len(tags) > 0:
             ret[code_address.lower()] = tags
         
