@@ -75,5 +75,9 @@
   {
     "tag": "ERC-7710 Delegation",
     "functions": ["redeemDelegations(bytes[],bytes32[],bytes[])"]
+  },
+  {
+    "tag": "ERC-6551",
+    "functions": ["token()", "state()"]
   }
 ]
