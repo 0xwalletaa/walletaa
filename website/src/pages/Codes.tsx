@@ -11,45 +11,15 @@ import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem
 import { getChainConfig } from '@/services/config';
 import tagColorMap from '@/utils/tagColorMap';
 
-// 定义代码详情类型
-interface CodeInfo {
-  address: string;
-  name: string;
-  provider: string;
-  code: string;
-  repo: string;
-  contractAccountStandard: string | boolean;
-  verificationMethod: string;
-  batchCall: string | boolean;
-  executor: string | boolean;
-  receiveETH: string | boolean;
-  receiveNFT: string | boolean;
-  recovery: string | boolean;
-  sessionKey: string | boolean;
-  storage: string;
-  nativeETHApprovalAndTransfer: string | boolean;
-  hooks: string | boolean;
-  signature: string;
-  txInitiationMethod: string;
-  feePaymentMethod: string;
-  upgradable: string | boolean;
-  modularContractAccount: string | boolean;
-  moduleRegistry: string | boolean;
-  isContractAddress: boolean;
-  production: string | boolean;
-  tags?: string[]; // 添加标签字段
-  [key: string]: any; // 索引签名，允许其他可能的属性
-}
-
 // 标签颜色映射
 // 删除本地定义的tagColorMap
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [sortApi, setSortApi] = useState<'eth_balance' | 'authorizer_count'>('eth_balance');
-  const [codeInfos, setCodeInfos] = useState<CodeInfo[]>([]);
+  const [codeInfos, setCodeInfos] = useState<CodeInfoItem[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [currentCode, setCurrentCode] = useState<CodeInfo | null>(null);
+  const [currentCode, setCurrentCode] = useState<CodeInfoItem | null>(null);
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchByParam, setSearchByParam] = useState<string>('');
   const { EXPLORER_URL } = getChainConfig();
@@ -220,7 +190,7 @@ const Codes: React.FC = () => {
   };
 
   // 渲染代码详情内容
-  const renderCodeDetail = (code: CodeInfo | null) => {
+  const renderCodeDetail = (code: CodeInfoItem | null) => {
     if (!code) return null;
 
     const renderBooleanOrText = (value: boolean | string) => {
@@ -251,13 +221,16 @@ const Codes: React.FC = () => {
     };
 
     // 用于渲染带有Extra信息的字段
-    const renderWithExtra = (value: boolean | string, extraValue?: string) => {
+    const renderWithExtra = (value: boolean | string | undefined, extraValue?: string) => {
+      // 如果值为undefined，返回'-'
+      if (value === undefined) return '-';
+      
       // 如果值是类似 "true (ERC-7821)" 这样的格式，需要先提取布尔值部分
       let baseValue = value;
       if (typeof value === 'string') {
-        if (value.toLowerCase().startsWith('true')) {
+        if (value.toLowerCase() == 'true') {
           baseValue = true;
-        } else if (value.toLowerCase().startsWith('false')) {
+        } else if (value.toLowerCase() == 'false') {
           baseValue = false;
         }
       }
@@ -265,17 +238,7 @@ const Codes: React.FC = () => {
       // 显示基本值（是/否标签）
       const renderedBaseValue = renderBooleanOrText(baseValue);
       
-      // 如果有额外信息，则在下面显示
-      if (!extraValue) {
-        // 如果原始值是字符串且包含括号，提取括号内的额外信息
-        if (typeof value === 'string') {
-          const match = value.match(/\((.*?)\)/);
-          if (match && match[1]) {
-            extraValue = match[1];
-          }
-        }
-      }
-      
+      // 如果没有extraValue，就直接返回基本值
       if (!extraValue) return renderedBaseValue;
       
       return (
@@ -347,7 +310,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Verification Method',
           })}
         >
-          {code.verificationMethod || '-'}
+          {renderWithExtra(code.verificationMethod, code.verificationMethodExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -355,7 +318,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Batch Call',
           })}
         >
-          {renderBooleanOrText(code.batchCall)}
+          {renderWithExtra(code.batchCall, code.batchCallExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -363,7 +326,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Executor',
           })}
         >
-          {renderBooleanOrText(code.executor)}
+          {renderWithExtra(code.executor, code.executorExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -387,7 +350,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Recovery',
           })}
         >
-          {renderBooleanOrText(code.recovery)}
+          {renderWithExtra(code.recovery, code.recoveryExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -395,7 +358,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Session Key',
           })}
         >
-          {renderBooleanOrText(code.sessionKey)}
+          {renderWithExtra(code.sessionKey, code.sessionKeyExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -403,7 +366,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Storage',
           })}
         >
-          {code.storage || '-'}
+          {renderWithExtra(code.storage, code.storageExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -411,7 +374,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Native ETH Approval & Transfer',
           })}
         >
-          {renderBooleanOrText(code.nativeETHApprovalAndTransfer)}
+          {renderWithExtra(code.nativeETHApprovalAndTransfer, code.nativeETHApprovalAndTransferExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -419,7 +382,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Hooks',
           })}
         >
-          {renderBooleanOrText(code.hooks)}
+          {renderWithExtra(code.hooks, code.hooksExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -427,7 +390,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Signature',
           })}
         >
-          {code.signature || '-'}
+          {renderWithExtra(code.signature, code.signatureExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -451,7 +414,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Upgradable',
           })}
         >
-          {renderBooleanOrText(code.upgradable)}
+          {renderWithExtra(code.upgradable, code.upgradableExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -459,7 +422,7 @@ const Codes: React.FC = () => {
             defaultMessage: 'Modular Contract Account',
           })}
         >
-          {renderBooleanOrText(code.modularContractAccount)}
+          {renderWithExtra(code.modularContractAccount, code.modularContractAccountExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -484,6 +447,22 @@ const Codes: React.FC = () => {
           })}
         >
           {renderBooleanOrText(code.production)}
+        </Descriptions.Item>
+        <Descriptions.Item 
+          label={intl.formatMessage({
+            id: 'pages.codes.audit',
+            defaultMessage: 'Audit',
+          })}
+        >
+          {renderWithExtra(code.audit, code.auditExtra)}
+        </Descriptions.Item>
+        <Descriptions.Item 
+          label={intl.formatMessage({
+            id: 'pages.codes.usage',
+            defaultMessage: 'Usage',
+          })}
+        >
+          {code.usage || '-'}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({

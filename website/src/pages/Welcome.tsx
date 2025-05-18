@@ -33,44 +33,6 @@ interface ChartDataItem {
   y: number;
 }
 
-// 定义代码详情类型
-interface CodeInfo {
-  address: string;
-  name: string;
-  provider: string;
-  code: string;
-  repo: string;
-  contractAccountStandard: string | boolean;
-  verificationMethod: string;
-  batchCall: string | boolean;
-  batchCallExtra?: string;
-  executor: string | boolean;
-  executorExtra?: string;
-  receiveETH: string | boolean;
-  receiveNFT: string | boolean;
-  recovery: string | boolean;
-  recoveryExtra?: string;
-  sessionKey: string | boolean;
-  sessionKeyExtra?: string;
-  storage: string;
-  nativeETHApprovalAndTransfer: string | boolean;
-  nativeETHApprovalAndTransferExtra?: string;
-  hooks: string | boolean;
-  hooksExtra?: string;
-  signature: string;
-  txInitiationMethod: string;
-  feePaymentMethod: string;
-  upgradable: string | boolean;
-  upgradableExtra?: string;
-  modularContractAccount: string | boolean;
-  moduleRegistry: string | boolean;
-  isContractAddress: boolean;
-  production: string | boolean;
-  audit: string | boolean;
-  usage: string;
-  [key: string]: any; // 索引签名，允许其他可能的属性
-}
-
 // 引入ChartCard和Field组件
 const ChartCard: React.FC<ChartCardProps> = ({ loading, title, total, contentHeight = 46, footer, children, bordered = true }) => {
   const intl = useIntl();
@@ -144,7 +106,7 @@ const Welcome: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [currentCode, setCurrentCode] = useState<CodeInfo | null>(null);
+  const [currentCode, setCurrentCode] = useState<CodeInfoItem | null>(null);
   const chainConfig = getChainConfig();
   const { Text, Link } = Typography;
 
@@ -231,7 +193,7 @@ const Welcome: React.FC = () => {
   };
 
   // 渲染代码详情内容
-  const renderCodeDetail = (code: CodeInfo | null) => {
+  const renderCodeDetail = (code: CodeInfoItem | null) => {
     if (!code) return null;
 
     const renderBooleanOrText = (value: boolean | string) => {
@@ -262,7 +224,10 @@ const Welcome: React.FC = () => {
     };
 
     // 用于渲染带有Extra信息的字段
-    const renderWithExtra = (value: boolean | string, extraValue?: string) => {
+    const renderWithExtra = (value: boolean | string | undefined, extraValue?: string) => {
+      // 如果值为undefined，返回'-'
+      if (value === undefined) return '-';
+      
       // 如果值是类似 "true (ERC-7821)" 这样的格式，需要先提取布尔值部分
       let baseValue = value;
       if (typeof value === 'string') {
@@ -276,17 +241,7 @@ const Welcome: React.FC = () => {
       // 显示基本值（是/否标签）
       const renderedBaseValue = renderBooleanOrText(baseValue);
       
-      // 如果有额外信息，则在下面显示
-      if (!extraValue) {
-        // 如果原始值是字符串且包含括号，提取括号内的额外信息
-        if (typeof value === 'string') {
-          const match = value.match(/\((.*?)\)/);
-          if (match && match[1]) {
-            extraValue = match[1];
-          }
-        }
-      }
-      
+      // 如果没有extraValue，就直接返回基本值
       if (!extraValue) return renderedBaseValue;
       
       return (
@@ -358,7 +313,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Verification Method',
           })}
         >
-          {code.verificationMethod || '-'}
+          {renderWithExtra(code.verificationMethod, code.verificationMethodExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -414,7 +369,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Storage',
           })}
         >
-          {code.storage || '-'}
+          {renderWithExtra(code.storage, code.storageExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -438,7 +393,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Signature',
           })}
         >
-          {code.signature || '-'}
+          {renderWithExtra(code.signature, code.signatureExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -470,7 +425,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Modular Contract Account',
           })}
         >
-          {renderBooleanOrText(code.modularContractAccount)}
+          {renderWithExtra(code.modularContractAccount, code.modularContractAccountExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
@@ -502,7 +457,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Audit',
           })}
         >
-          {renderBooleanOrText(code.audit)}
+          {renderWithExtra(code.audit, code.auditExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({

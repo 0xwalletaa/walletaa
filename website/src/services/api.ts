@@ -65,6 +65,7 @@ export interface CodeInfoItem {
   repo: string;
   contractAccountStandard: string | boolean;
   verificationMethod: string;
+  verificationMethodExtra?: string;
   batchCall: string | boolean;
   batchCallExtra?: string;
   executor: string | boolean;
@@ -76,21 +77,25 @@ export interface CodeInfoItem {
   sessionKey: string | boolean;
   sessionKeyExtra?: string;
   storage: string;
+  storageExtra?: string;
   nativeETHApprovalAndTransfer: string | boolean;
   nativeETHApprovalAndTransferExtra?: string;
   hooks: string | boolean;
   hooksExtra?: string;
   signature: string;
+  signatureExtra?: string;
   txInitiationMethod: string;
   feePaymentMethod: string;
   upgradable: string | boolean;
   upgradableExtra?: string;
   modularContractAccount: string | boolean;
+  modularContractAccountExtra?: string;
   moduleRegistry: string | boolean;
   isContractAddress: boolean;
   production: string | boolean;
-  audit: string | boolean;
-  usage: string;
+  audit?: string | boolean;
+  auditExtra?: string;
+  usage?: string;
   [key: string]: any; // 允许其他可能的属性
 }
 
