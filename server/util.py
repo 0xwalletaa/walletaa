@@ -195,7 +195,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
 
 def is_target_authorizer_info_item(authorizer_info_item, search_by):
     if len(search_by) == 42:
-        if authorizer_info_item['authorizer_address'] == search_by:
+        if authorizer_info_item['authorizer_address'] == search_by or authorizer_info_item['code_address'] == search_by:
             return True
     else:
         if 'provider' in authorizer_info_item and search_by in authorizer_info_item['provider'].lower():
