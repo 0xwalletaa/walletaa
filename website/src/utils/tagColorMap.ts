@@ -19,7 +19,8 @@ const tagColorMap: Record<string, string> = {
   'ERC-1967 Proxy': 'red',
   'UUPSUpgradeable': 'pink',
   'ERC-7579 Executor': 'purple',
-  'ERC-7710 Delegation': 'geekblue'
+  'ERC-7710 Delegation': 'geekblue',
+  'ERC-6900 Execution': 'green'
 };
 
 export default tagColorMap; 
