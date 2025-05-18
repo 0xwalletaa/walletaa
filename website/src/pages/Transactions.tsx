@@ -145,10 +145,10 @@ const Transactions: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.transactions.tx_fee',
-        defaultMessage: 'Transaction Fee (ETH)',
+        id: 'pages.transactions.authorization_fee',
+        defaultMessage: 'Authorization Fee (ETH)',
       }),
-      dataIndex: 'tx_fee',
+      dataIndex: 'authorization_fee',
       sorter: true,
       sortDirections: ['descend', 'ascend'],
     },

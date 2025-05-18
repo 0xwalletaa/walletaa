@@ -15,7 +15,7 @@ export interface TransactionItem {
   tx_index: number;
   timestamp: number;
   relayer_address: string;
-  tx_fee: number;
+  authorization_fee: number;
   authorization_list: Array<{
     authorizer_address: string;
     code_address: string;
@@ -53,7 +53,7 @@ export interface RelayerItem {
   relayer_address: string;
   tx_count: number;
   authorization_count: number;
-  tx_fee: number;
+  authorization_fee: number;
 }
 
 // 定义代码信息详情类型
