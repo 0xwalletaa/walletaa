@@ -79,5 +79,9 @@
   {
     "tag": "ERC-6551",
     "functions": ["token()", "state()"]
+  },
+  {
+    "tag": "Proto Account",
+    "functions": ["pay(uint256,bytes32,bytes32,bytes)", "initializePREP(bytes)"]
   }
 ]
