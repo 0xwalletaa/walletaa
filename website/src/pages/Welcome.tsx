@@ -892,9 +892,9 @@ const Welcome: React.FC = () => {
                   key: 'authorization_count',
                 },
                 {
-                  title: intl.formatMessage({ id: 'pages.welcome.txFee' }),
-                  dataIndex: 'tx_fee',
-                  key: 'tx_fee',
+                  title: intl.formatMessage({ id: 'pages.welcome.authorizationFee' }),
+                  dataIndex: 'authorization_fee',
+                  key: 'authorization_fee',
                   render: (text: number) => numeral(text).format('0,0.0000'),
                 },
               ]}

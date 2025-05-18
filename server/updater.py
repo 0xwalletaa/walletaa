@@ -23,7 +23,7 @@ for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
     codes_by_authorizer_count = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="authorizer_count")
     relayers_by_tx_count = util.get_relayer_info(txs, sort_by="tx_count")
     relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
-    relayers_by_tx_fee = util.get_relayer_info(txs, sort_by="tx_fee")
+    relayers_by_authorization_fee = util.get_relayer_info(txs, sort_by="authorization_fee")
     overview = util.get_overview(txs, authorizers, codes_by_authorizer_count, relayers_by_tx_count, code_infos)
     last_update_time = time.time()
     end_time = time.time()
@@ -38,7 +38,7 @@ for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
         'codes_by_authorizer_count': codes_by_authorizer_count,
         'relayers_by_tx_count': relayers_by_tx_count,
         'relayers_by_authorization_count': relayers_by_authorization_count,
-        'relayers_by_tx_fee': relayers_by_tx_fee,
+        'relayers_by_authorization_fee': relayers_by_authorization_fee,
         'overview': overview,
         'last_update_time': last_update_time
     }, open(f'/dev/shm/{NAME}_data_temp.pkl', 'wb'))

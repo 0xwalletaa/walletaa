@@ -117,7 +117,7 @@ export interface Overview {
     relayer_address: string;
     tx_count: number;
     authorization_count: number;
-    tx_fee: number;
+    authorization_fee: number;
   }>;
   top10_authorizers?: Array<{
     authorizer_address: string;
@@ -226,14 +226,14 @@ export async function getRelayersByAuthorizationCount(params: {
   });
 }
 
-// 获取中继者列表接口（按交易费用排序）
-export async function getRelayersByTxFee(params: {
+// 获取中继者列表接口（按授权费用排序）
+export async function getRelayersByAuthorizationFee(params: {
   page?: number;
   page_size?: number;
   order?: string;
   search_by?: string;
 }) {
-  return request(`${BASE_URL()}/relayers_by_tx_fee`, {
+  return request(`${BASE_URL()}/relayers_by_authorization_fee`, {
     method: 'GET',
     params,
   });

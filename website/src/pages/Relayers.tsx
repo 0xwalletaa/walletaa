@@ -7,12 +7,12 @@ import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
 import { Tag, Tooltip, Button, Card, Row, Col, Input } from 'antd';
 import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
-import { getRelayersByTxCount, getRelayersByAuthorizationCount, getRelayersByTxFee, RelayerItem } from '@/services/api';
+import { getRelayersByTxCount, getRelayersByAuthorizationCount, getRelayersByAuthorizationFee, RelayerItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 
 const Relayers: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [sortApi, setSortApi] = useState<'tx_count' | 'authorization_count' | 'tx_fee'>('tx_count');
+  const [sortApi, setSortApi] = useState<'tx_count' | 'authorization_count' | 'authorization_fee'>('tx_count');
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchByParam, setSearchByParam] = useState<string>('');
   const { EXPLORER_URL } = getChainConfig();
@@ -112,13 +112,13 @@ const Relayers: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.relayers.tx_fee',
-        defaultMessage: 'Transaction Fee (ETH)',
+        id: 'pages.relayers.authorization_fee',
+        defaultMessage: 'Authorization Fee (ETH)',
       }),
-      dataIndex: 'tx_fee',
+      dataIndex: 'authorization_fee',
       sorter: true,
       sortDirections: ['descend', 'ascend'],
-      defaultSortOrder: sortApi === 'tx_fee' ? 'descend' : undefined,
+      defaultSortOrder: sortApi === 'authorization_fee' ? 'descend' : undefined,
     },
   ];
 
@@ -188,9 +188,9 @@ const Relayers: React.FC = () => {
             } else if (sortField === 'authorization_count') {
               selectedApi = 'authorization_count';
               setSortApi('authorization_count');
-            } else if (sortField === 'tx_fee') {
-              selectedApi = 'tx_fee';
-              setSortApi('tx_fee');
+            } else if (sortField === 'authorization_fee') {
+              selectedApi = 'authorization_fee';
+              setSortApi('authorization_fee');
             }
             
             orderParam = sortOrder;
@@ -215,7 +215,7 @@ const Relayers: React.FC = () => {
               ...rest,
             });
           } else {
-            msg = await getRelayersByTxFee({
+            msg = await getRelayersByAuthorizationFee({
               page: current,
               page_size: pageSize,
               order: orderParam,

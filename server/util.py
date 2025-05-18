@@ -10,6 +10,8 @@ from pyevmasm import disassemble_hex
 
 NAME = ""
 
+PER_EMPTY_ACCOUNT_COST = 25000
+
 def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
     try:            
         chain_id = to_bytes(hexstr=chain_id_)
@@ -75,7 +77,7 @@ def parse_type4_tx_data(tx_data_str_):
         if parsed_result is not None:
             authorization_list.append(parsed_result)
         
-    tx_fee = tx_data['gas'] * tx_data['gasPrice'] / 10**18
+    authorization_fee = PER_EMPTY_ACCOUNT_COST * len(authorization_list) * tx_data['gasPrice'] / 10**18
     
     ret = {
         'block_number': tx_data['blockNumber'],
@@ -83,7 +85,7 @@ def parse_type4_tx_data(tx_data_str_):
         'tx_index': tx_data['transactionIndex'],
         'tx_hash': '0x' + tx_data['hash'],
         'relayer_address': tx_data['from'].lower(),
-        'tx_fee': tx_fee,
+        'authorization_fee': authorization_fee,
         'authorization_list': authorization_list,
     }
     return ret
@@ -258,10 +260,10 @@ def get_relayer_info(txs, sort_by="tx_count"):
                 'relayer_address': relayer_address,
                 'tx_count': 0,
                 'authorization_count': 0,
-                'tx_fee': 0,
+                'authorization_fee': 0,
             }
         relayer_info_dict[relayer_address]['tx_count'] += 1
-        relayer_info_dict[relayer_address]['tx_fee'] += tx['tx_fee']
+        relayer_info_dict[relayer_address]['authorization_fee'] += tx['authorization_fee']
         relayer_info_dict[relayer_address]['authorization_count'] += len(tx['authorization_list'])
     
     relayer_info = []
@@ -272,8 +274,8 @@ def get_relayer_info(txs, sort_by="tx_count"):
         relayer_info.sort(key=lambda x: x['tx_count'], reverse=True)
     elif sort_by == "authorization_count":
         relayer_info.sort(key=lambda x: x['authorization_count'], reverse=True)
-    elif sort_by == "tx_fee":
-        relayer_info.sort(key=lambda x: x['tx_fee'], reverse=True)
+    elif sort_by == "authorization_fee":
+        relayer_info.sort(key=lambda x: x['authorization_fee'], reverse=True)
         
     return relayer_info
 
