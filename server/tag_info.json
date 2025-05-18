@@ -18,6 +18,13 @@
     "functions": ["execute(bytes32,bytes)"]
   },
   {
+    "tag": "ERC-6900 Execution",
+    "functions": [
+      "executeBatch((address,uint256,bytes)[])",
+      "execute(address,uint256,bytes)"
+    ]
+  },
+  {
     "tag": "Batch",
     "functions": [
       "executeBatch((address,uint256,bytes)[])",
