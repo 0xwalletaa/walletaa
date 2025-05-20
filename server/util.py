@@ -181,7 +181,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
     
     for authorizer_address in authorizer_info_dict:
         if authorizer_address in balance_of:
-            authorizer_info_dict[authorizer_address]['eth_balance'] = balance_of[authorizer_address]
+            authorizer_info_dict[authorizer_address]['tvl_balance'] = balance_of[authorizer_address]
         if authorizer_info_dict[authorizer_address]['code_address'] in code_to_provider:
             authorizer_info_dict[authorizer_address]['provider'] = code_to_provider[authorizer_info_dict[authorizer_address]['code_address']]
 
@@ -191,7 +191,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
             if not include_zero and authorizer_info_dict[authorizer_address]['code_address'] == "0x0000000000000000000000000000000000000000":
                 continue
             authorizer_info.append(authorizer_info_dict[authorizer_address]) 
-    authorizer_info.sort(key=lambda x: x['eth_balance'], reverse=True)
+    authorizer_info.sort(key=lambda x: x['tvl_balance'], reverse=True)
 
     return authorizer_info
 
@@ -204,7 +204,7 @@ def is_target_authorizer_info_item(authorizer_info_item, search_by):
             return True
     return False
 
-def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_balance"):
+def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="tvl_balance"):
     code_info_dict = {}
     for authorizer in authorizer_info:
         code_address = authorizer['code_address']
@@ -212,7 +212,7 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
             code_info_dict[code_address] = {
                 'code_address': code_address,
                 'authorizer_count': 0,
-                'eth_balance': 0,
+                'tvl_balance': 0,
                 'tags': [],
                 'details': None,
                 'provider': "",
@@ -220,7 +220,7 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
             if code_address in code_function_info:
                 code_info_dict[code_address]['tags'] = code_function_info[code_address]
         code_info_dict[code_address]['authorizer_count'] += 1
-        code_info_dict[code_address]['eth_balance'] += authorizer['eth_balance']
+        code_info_dict[code_address]['tvl_balance'] += authorizer['tvl_balance']
     
     for code_info in code_infos:
         code_address_lower = code_info['address'].lower()
@@ -232,8 +232,8 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
     for code_address in code_info_dict:
         code_info.append(code_info_dict[code_address])
     
-    if sort_by == "eth_balance":
-        code_info.sort(key=lambda x: x['eth_balance'], reverse=True)
+    if sort_by == "tvl_balance":
+        code_info.sort(key=lambda x: x['tvl_balance'], reverse=True)
     elif sort_by == "authorizer_count":
         code_info.sort(key=lambda x: x['authorizer_count'], reverse=True)
     
