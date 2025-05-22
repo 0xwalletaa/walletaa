@@ -19,7 +19,7 @@ for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
     authorizers = util.get_authorizer_info(txs, code_infos)
     authorizers_with_zero = util.get_authorizer_info(txs, code_infos, include_zero=True)
     code_function_info = util.get_code_function_info()
-    codes_by_eth_balance = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="eth_balance")
+    codes_by_tvl_balance = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="tvl_balance")
     codes_by_authorizer_count = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="authorizer_count")
     relayers_by_tx_count = util.get_relayer_info(txs, sort_by="tx_count")
     relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
@@ -34,7 +34,7 @@ for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
         'txs': txs,
         'authorizers': authorizers,
         'authorizers_with_zero': authorizers_with_zero,
-        'codes_by_eth_balance': codes_by_eth_balance,
+        'codes_by_tvl_balance': codes_by_tvl_balance,
         'codes_by_authorizer_count': codes_by_authorizer_count,
         'relayers_by_tx_count': relayers_by_tx_count,
         'relayers_by_authorization_count': relayers_by_authorization_count,
