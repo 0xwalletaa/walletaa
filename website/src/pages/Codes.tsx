@@ -5,11 +5,12 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
 import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography, Input, Card, Row, Col } from 'antd';
-import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { LinkOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getCodesByTvlBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 import tagColorMap from '@/utils/tagColorMap';
+import numeral from 'numeral';
 
 // 标签颜色映射
 // 删除本地定义的tagColorMap
@@ -133,14 +134,28 @@ const Codes: React.FC = () => {
       defaultSortOrder: sortApi === 'authorizer_count' ? 'descend' : undefined,
     },
     {
-      title: intl.formatMessage({
-        id: 'pages.codes.tvl_balance',
-        defaultMessage: 'TVL Balance',
-      }),
+      title: (
+        <Space>
+          <Tooltip title="TVL = ETH + WETH + WBTC + USDT + USDC + DAI">
+            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+          </Tooltip>
+          {intl.formatMessage({
+            id: 'pages.codes.tvl_balance',
+            defaultMessage: 'TVL Balance',
+          })}
+        </Space>
+      ),
       dataIndex: 'tvl_balance',
       sorter: true,
       sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'tvl_balance' ? 'descend' : undefined,
+      align: 'right',
+      render: (dom: any) => {
+        if (typeof dom === 'number') {
+          return numeral(dom).format('0,0.00');
+        }
+        return dom;
+      },
     },
     {
       title: intl.formatMessage({

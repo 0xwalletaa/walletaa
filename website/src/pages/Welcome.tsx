@@ -685,10 +685,18 @@ const Welcome: React.FC = () => {
                   key: 'authorizer_count',
                 },
                 {
-                  title: intl.formatMessage({ id: 'pages.welcome.tvlBalance' }),
+                  title: (
+                    <Space>
+                      <Tooltip title="TVL = ETH + WETH + WBTC + USDT + USDC + DAI">
+                        <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+                      </Tooltip>
+                      {intl.formatMessage({ id: 'pages.welcome.tvlBalance' })}
+                    </Space>
+                  ),
                   dataIndex: 'tvl_balance',
                   key: 'tvl_balance',
-                  render: (text: number) => numeral(text).format('0,0.0000'),
+                  align: 'right',
+                  render: (text: number) => numeral(text).format('0,0.00'),
                 },
                 {
                   title: intl.formatMessage({ id: 'pages.codes.details', defaultMessage: 'Details' }),
@@ -783,10 +791,18 @@ const Welcome: React.FC = () => {
                   ),
                 },
                 {
-                  title: intl.formatMessage({ id: 'pages.welcome.tvlBalance', defaultMessage: 'TVL Balance' }),
+                  title: (
+                    <Space>
+                      <Tooltip title="TVL = ETH + WETH + WBTC + USDT + USDC + DAI">
+                        <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+                      </Tooltip>
+                      {intl.formatMessage({ id: 'pages.welcome.tvlBalance' })}
+                    </Space>
+                  ),
                   dataIndex: 'tvl_balance',
                   key: 'tvl_balance',
-                  render: (text: number) => numeral(text).format('0,0.0000'),
+                  align: 'right',
+                  render: (text: number) => numeral(text).format('0,0.00'),
                 },
               ]}
               dataSource={overview ? overview.top10_authorizers : []}
@@ -850,7 +866,7 @@ const Welcome: React.FC = () => {
                   title: intl.formatMessage({ id: 'pages.welcome.authorizationFee' }),
                   dataIndex: 'authorization_fee',
                   key: 'authorization_fee',
-                  render: (text: number) => numeral(text).format('0,0.0000'),
+                  render: (text: number) => numeral(text).format('0,0.00'),
                 },
               ]}
               dataSource={overview ? overview.top10_relayers : []}
