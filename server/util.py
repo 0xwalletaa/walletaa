@@ -7,6 +7,7 @@ import rlp
 from eth_utils import keccak
 from datetime import datetime
 from pyevmasm import disassemble_hex
+import requests
 
 NAME = ""
 
@@ -143,13 +144,24 @@ def is_target_tx(tx, search_by):
 def get_authorizer_info(txs, code_infos, include_zero=False):
     balance_of= {}
 
-    conn = sqlite3.connect(f'../backend/{NAME}_address.db')
+    conn = sqlite3.connect(f'../backend/{NAME}_tvl.db')
     cursor = conn.cursor()
     # 查询所有地址和余额
-    cursor.execute("SELECT author_address, eth_balance FROM author_balances")
+    
+    BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT").json()['price']
+    ETH_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=ETHUSDT").json()['price']
+    
+    if NAME == "bsc":
+        BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT").json()['price']
+    
+    cursor.execute("SELECT author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance FROM author_balances")
     data = cursor.fetchall()
-    for address, balance in data:
-        balance_of[address] = float(balance)
+    for address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance in data:
+        if NAME != "bsc":
+            balance_of[address] = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
+        else:
+            balance_of[address] = float(eth_balance) * float(BNB_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
+
     conn.close()
             
     authorizer_info_dict = {}
@@ -408,8 +420,17 @@ def get_code_function_info():
     conn.close()
     return ret
 
-# import time
 # NAME = "mainnet"
+# authorizer_info = get_authorizer_info(get_all_type4_txs(), get_code_infos())
+# for i in authorizer_info[0:10]:
+#     print(i["authorizer_address"], i["tvl_balance"])
+
+# print("")
+# code_info = get_code_info(authorizer_info, get_code_infos(), get_code_function_info())
+# for i in code_info[0:10]:
+#     print(i["code_address"], i["tvl_balance"])
+
+# import time
 # start_time = time.time()
 # print(get_code_function_info())
 # end_time = time.time()
