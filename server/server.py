@@ -193,7 +193,7 @@ def get_authorizers_with_zero():
         if search_by != '':
             current_authorizers_with_zero = [
                 authorizer for authorizer in current_authorizers_with_zero 
-                if (authorizer['code_address'] == search_by or authorizer['authorizer_address'] == search_by)
+                if util.is_target_authorizer_info_item(authorizer, search_by)
             ]
         
         # 根据排序参数决定数据顺序
