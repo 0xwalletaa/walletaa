@@ -171,7 +171,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
             if authorizer_address not in authorizer_info_dict:
                 authorizer_info_dict[authorizer_address] = {
                     'authorizer_address': authorizer_address,
-                    'eth_balance': 0,
+                    'tvl_balance': 0,
                     'last_nonce': authorization['nonce'],
                     'last_chain_id': authorization['chain_id'],
                     'code_address': "0x0000000000000000000000000000000000000000",

@@ -177,10 +177,10 @@ const Authorizers: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.authorizers.eth_balance',
-        defaultMessage: 'ETH Balance',
+        id: 'pages.authorizers.tvl_balance',
+        defaultMessage: 'TVL Balance',
       }),
-      dataIndex: 'eth_balance',
+      dataIndex: 'tvl_balance',
     },
     {
       title: intl.formatMessage({

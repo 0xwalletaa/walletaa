@@ -685,9 +685,9 @@ const Welcome: React.FC = () => {
                   key: 'authorizer_count',
                 },
                 {
-                  title: intl.formatMessage({ id: 'pages.welcome.ethBalance' }),
-                  dataIndex: 'eth_balance',
-                  key: 'eth_balance',
+                  title: intl.formatMessage({ id: 'pages.welcome.tvlBalance' }),
+                  dataIndex: 'tvl_balance',
+                  key: 'tvl_balance',
                   render: (text: number) => numeral(text).format('0,0.0000'),
                 },
                 {
@@ -783,9 +783,9 @@ const Welcome: React.FC = () => {
                   ),
                 },
                 {
-                  title: intl.formatMessage({ id: 'pages.welcome.ethBalance', defaultMessage: 'ETH Balance' }),
-                  dataIndex: 'eth_balance',
-                  key: 'eth_balance',
+                  title: intl.formatMessage({ id: 'pages.welcome.tvlBalance', defaultMessage: 'TVL Balance' }),
+                  dataIndex: 'tvl_balance',
+                  key: 'tvl_balance',
                   render: (text: number) => numeral(text).format('0,0.0000'),
                 },
               ]}
