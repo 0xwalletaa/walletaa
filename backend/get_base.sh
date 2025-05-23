@@ -21,7 +21,7 @@ https://base.gateway.tenderly.co \
 
 counter=$((counter + 1))
 if [ $counter -eq 30 ]; then
-    python3 get_tvl.py --name base --endpoints \
+    python3 get_tvl.py --name base --contract 0x5213279d75d7dB259D15Bb43029b83c909EA2F20  --endpoints \
     https://base.llamarpc.com \
     https://base.api.onfinality.io/public \
     https://base-mainnet.public.blastapi.io \
