@@ -6,5 +6,5 @@ export default {
   'component.chainSelect.sepolia': 'Sepolia',
   'component.chainSelect.op': 'Optimism',
   'component.chainSelect.base': 'Base',
-  'component.chainSelect.bsc': 'BSC(Syncing)',
+  'component.chainSelect.bsc': 'BSC',
 };

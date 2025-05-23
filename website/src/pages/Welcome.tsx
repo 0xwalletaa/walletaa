@@ -687,10 +687,10 @@ const Welcome: React.FC = () => {
                 {
                   title: (
                     <Space>
+                      {intl.formatMessage({ id: 'pages.welcome.tvlBalance' })}
                       <Tooltip title="TVL = ETH + WETH + WBTC + USDT + USDC + DAI">
                         <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
                       </Tooltip>
-                      {intl.formatMessage({ id: 'pages.welcome.tvlBalance' })}
                     </Space>
                   ),
                   dataIndex: 'tvl_balance',
@@ -793,10 +793,10 @@ const Welcome: React.FC = () => {
                 {
                   title: (
                     <Space>
+                      {intl.formatMessage({ id: 'pages.welcome.tvlBalance' })}
                       <Tooltip title="TVL = ETH + WETH + WBTC + USDT + USDC + DAI">
                         <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
                       </Tooltip>
-                      {intl.formatMessage({ id: 'pages.welcome.tvlBalance' })}
                     </Space>
                   ),
                   dataIndex: 'tvl_balance',

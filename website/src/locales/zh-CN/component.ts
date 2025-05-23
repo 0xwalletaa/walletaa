@@ -6,5 +6,5 @@ export default {
   'component.chainSelect.sepolia': 'Sepolia',
   'component.chainSelect.op': 'Optimism',
   'component.chainSelect.base': 'Base',
-  'component.chainSelect.bsc': '币安链(同步中)',
+  'component.chainSelect.bsc': '币安链',
 };
