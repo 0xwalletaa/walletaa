@@ -5,18 +5,19 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
 import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography, Input, Card, Row, Col } from 'antd';
-import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { LinkOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
-import { getCodesByEthBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem } from '@/services/api';
+import { getCodesByTvlBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 import tagColorMap from '@/utils/tagColorMap';
+import numeral from 'numeral';
 
 // 标签颜色映射
 // 删除本地定义的tagColorMap
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [sortApi, setSortApi] = useState<'eth_balance' | 'authorizer_count'>('eth_balance');
+  const [sortApi, setSortApi] = useState<'tvl_balance' | 'authorizer_count'>('tvl_balance');
   const [codeInfos, setCodeInfos] = useState<CodeInfoItem[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentCode, setCurrentCode] = useState<CodeInfoItem | null>(null);
@@ -133,14 +134,28 @@ const Codes: React.FC = () => {
       defaultSortOrder: sortApi === 'authorizer_count' ? 'descend' : undefined,
     },
     {
-      title: intl.formatMessage({
-        id: 'pages.codes.eth_balance',
-        defaultMessage: 'ETH Balance',
-      }),
-      dataIndex: 'eth_balance',
+      title: (
+        <Space>
+          <Tooltip title="TVL = ETH + WETH + WBTC + USDT + USDC + DAI">
+            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+          </Tooltip>
+          {intl.formatMessage({
+            id: 'pages.codes.tvl_balance',
+            defaultMessage: 'TVL Balance',
+          })}
+        </Space>
+      ),
+      dataIndex: 'tvl_balance',
       sorter: true,
       sortDirections: ['descend', 'ascend'],
-      defaultSortOrder: sortApi === 'eth_balance' ? 'descend' : undefined,
+      defaultSortOrder: sortApi === 'tvl_balance' ? 'descend' : undefined,
+      align: 'right',
+      render: (dom: any) => {
+        if (typeof dom === 'number') {
+          return numeral(dom).format('0,0.00');
+        }
+        return dom;
+      },
     },
     {
       title: intl.formatMessage({
@@ -532,9 +547,9 @@ const Codes: React.FC = () => {
             const sortOrder = sort[sortField] === 'ascend' ? 'desc' : 'asc';
             
             // 根据排序字段选择API
-            if (sortField === 'eth_balance') {
-              selectedApi = 'eth_balance';
-              setSortApi('eth_balance');
+            if (sortField === 'tvl_balance') {
+              selectedApi = 'tvl_balance';
+              setSortApi('tvl_balance');
             } else if (sortField === 'authorizer_count') {
               selectedApi = 'authorizer_count';
               setSortApi('authorizer_count');
@@ -545,8 +560,8 @@ const Codes: React.FC = () => {
 
           // 根据选择的API调用不同的接口
           let msg;
-          if (selectedApi === 'eth_balance') {
-            msg = await getCodesByEthBalance({
+          if (selectedApi === 'tvl_balance') {
+            msg = await getCodesByTvlBalance({
               page: current,
               page_size: pageSize,
               order: orderParam,

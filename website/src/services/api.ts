@@ -4,7 +4,8 @@ import { getChainConfig } from './config';
 // 定义API基础地址 - 动态获取
 export const BASE_URL = () => {
   const config = getChainConfig();
-  return `https://walletaa.com${config.BASE_URL}`;
+  const isDev = process.env.NODE_ENV === 'development';
+  return `https://${isDev ? 'dev.' : ''}walletaa.com${config.BASE_URL}`;
 };
 
 // 定义交易数据类型
@@ -28,7 +29,7 @@ export interface TransactionItem {
 export interface AuthorizerItem {
   authorizer_address: string;
   code_address: string;
-  eth_balance: number;
+  tvl_balance: number;
   set_code_tx_count: number;
   unset_code_tx_count: number;
   historical_code_address: string[];
@@ -42,7 +43,7 @@ export interface CodeItem {
   code_address: string;
   authorizer_count: number;
   authorization_count: number;
-  eth_balance: number;
+  tvl_balance: number;
   tags?: string[]; // 添加标签字段
   details?: CodeInfoItem; // 添加details字段
   provider?: string; // 添加provider字段
@@ -114,7 +115,7 @@ export interface Overview {
   top10_codes: Array<{
     code_address: string;
     authorizer_count: number;
-    eth_balance: number;
+    tvl_balance: number;
     provider?: string;
     tags?: string[];
   }>;
@@ -127,7 +128,7 @@ export interface Overview {
   top10_authorizers?: Array<{
     authorizer_address: string;
     code_address: string;
-    eth_balance: number;
+    tvl_balance: number;
     provider?: string;
   }>;
   code_infos?: CodeInfoItem[];
@@ -171,13 +172,13 @@ export async function getAuthorizersWithZero(params: {
 }
 
 // 获取代码列表接口（按ETH余额排序）
-export async function getCodesByEthBalance(params: {
+export async function getCodesByTvlBalance(params: {
   page?: number;
   page_size?: number;
   order?: string;
   search_by?: string;
 }) {
-  return request(`${BASE_URL()}/codes_by_eth_balance`, {
+  return request(`${BASE_URL()}/codes_by_tvl_balance`, {
     method: 'GET',
     params,
   });

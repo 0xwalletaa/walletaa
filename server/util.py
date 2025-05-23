@@ -7,6 +7,7 @@ import rlp
 from eth_utils import keccak
 from datetime import datetime
 from pyevmasm import disassemble_hex
+import requests
 
 NAME = ""
 
@@ -143,13 +144,24 @@ def is_target_tx(tx, search_by):
 def get_authorizer_info(txs, code_infos, include_zero=False):
     balance_of= {}
 
-    conn = sqlite3.connect(f'../backend/{NAME}_address.db')
+    conn = sqlite3.connect(f'../backend/{NAME}_tvl.db')
     cursor = conn.cursor()
     # 查询所有地址和余额
-    cursor.execute("SELECT author_address, eth_balance FROM author_balances")
+    
+    BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT").json()['price']
+    ETH_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=ETHUSDT").json()['price']
+    
+    if NAME == "bsc":
+        BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT").json()['price']
+    
+    cursor.execute("SELECT author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance FROM author_balances")
     data = cursor.fetchall()
-    for address, balance in data:
-        balance_of[address] = float(balance)
+    for address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance in data:
+        if NAME != "bsc":
+            balance_of[address] = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
+        else:
+            balance_of[address] = float(eth_balance) * float(BNB_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
+
     conn.close()
             
     authorizer_info_dict = {}
@@ -159,7 +171,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
             if authorizer_address not in authorizer_info_dict:
                 authorizer_info_dict[authorizer_address] = {
                     'authorizer_address': authorizer_address,
-                    'eth_balance': 0,
+                    'tvl_balance': 0,
                     'last_nonce': authorization['nonce'],
                     'last_chain_id': authorization['chain_id'],
                     'code_address': "0x0000000000000000000000000000000000000000",
@@ -181,7 +193,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
     
     for authorizer_address in authorizer_info_dict:
         if authorizer_address in balance_of:
-            authorizer_info_dict[authorizer_address]['eth_balance'] = balance_of[authorizer_address]
+            authorizer_info_dict[authorizer_address]['tvl_balance'] = balance_of[authorizer_address]
         if authorizer_info_dict[authorizer_address]['code_address'] in code_to_provider:
             authorizer_info_dict[authorizer_address]['provider'] = code_to_provider[authorizer_info_dict[authorizer_address]['code_address']]
 
@@ -191,7 +203,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
             if not include_zero and authorizer_info_dict[authorizer_address]['code_address'] == "0x0000000000000000000000000000000000000000":
                 continue
             authorizer_info.append(authorizer_info_dict[authorizer_address]) 
-    authorizer_info.sort(key=lambda x: x['eth_balance'], reverse=True)
+    authorizer_info.sort(key=lambda x: x['tvl_balance'], reverse=True)
 
     return authorizer_info
 
@@ -204,7 +216,7 @@ def is_target_authorizer_info_item(authorizer_info_item, search_by):
             return True
     return False
 
-def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_balance"):
+def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="tvl_balance"):
     code_info_dict = {}
     for authorizer in authorizer_info:
         code_address = authorizer['code_address']
@@ -212,7 +224,7 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
             code_info_dict[code_address] = {
                 'code_address': code_address,
                 'authorizer_count': 0,
-                'eth_balance': 0,
+                'tvl_balance': 0,
                 'tags': [],
                 'details': None,
                 'provider': "",
@@ -220,7 +232,7 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
             if code_address in code_function_info:
                 code_info_dict[code_address]['tags'] = code_function_info[code_address]
         code_info_dict[code_address]['authorizer_count'] += 1
-        code_info_dict[code_address]['eth_balance'] += authorizer['eth_balance']
+        code_info_dict[code_address]['tvl_balance'] += authorizer['tvl_balance']
     
     for code_info in code_infos:
         code_address_lower = code_info['address'].lower()
@@ -232,8 +244,8 @@ def get_code_info(authorizer_info, code_infos, code_function_info, sort_by="eth_
     for code_address in code_info_dict:
         code_info.append(code_info_dict[code_address])
     
-    if sort_by == "eth_balance":
-        code_info.sort(key=lambda x: x['eth_balance'], reverse=True)
+    if sort_by == "tvl_balance":
+        code_info.sort(key=lambda x: x['tvl_balance'], reverse=True)
     elif sort_by == "authorizer_count":
         code_info.sort(key=lambda x: x['authorizer_count'], reverse=True)
     
@@ -408,8 +420,17 @@ def get_code_function_info():
     conn.close()
     return ret
 
-# import time
 # NAME = "mainnet"
+# authorizer_info = get_authorizer_info(get_all_type4_txs(), get_code_infos())
+# for i in authorizer_info[0:10]:
+#     print(i["authorizer_address"], i["tvl_balance"])
+
+# print("")
+# code_info = get_code_info(authorizer_info, get_code_infos(), get_code_function_info())
+# for i in code_info[0:10]:
+#     print(i["code_address"], i["tvl_balance"])
+
+# import time
 # start_time = time.time()
 # print(get_code_function_info())
 # end_time = time.time()

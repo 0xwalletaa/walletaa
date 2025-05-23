@@ -41,7 +41,7 @@ txs = []
 last_update_time = 0
 authorizers = []
 authorizers_with_zero = []
-codes_by_eth_balance = []
+codes_by_tvl_balance = []
 codes_by_authorizer_count = []
 relayers_by_tx_count = []
 relayers_by_authorization_count = []
@@ -51,14 +51,14 @@ overview = {}
 
 # 获取数据
 def get_data():
-    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_authorization_fee, code_infos, overview
+    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_tvl_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_authorization_fee, code_infos, overview
     try:
         loaded_data = pickle.load(open(f'/dev/shm/{NAME}_data.pkl', 'rb'))
         with data_lock:
             txs = loaded_data['txs']
             authorizers = loaded_data['authorizers']
             authorizers_with_zero = loaded_data['authorizers_with_zero']
-            codes_by_eth_balance = loaded_data['codes_by_eth_balance']
+            codes_by_tvl_balance = loaded_data['codes_by_tvl_balance']
             codes_by_authorizer_count = loaded_data['codes_by_authorizer_count']
             relayers_by_tx_count = loaded_data['relayers_by_tx_count']
             relayers_by_authorization_count = loaded_data['relayers_by_authorization_count']
@@ -72,7 +72,7 @@ def get_data():
 
 # 后台更新线程
 def update_data():
-    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_eth_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_authorization_fee
+    global txs, last_update_time, authorizers, authorizers_with_zero, codes_by_tvl_balance, codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count, relayers_by_authorization_fee
     time.sleep(random.randint(1, 30))
     while True:
         time.sleep(30)  # 每30秒更新一次
@@ -222,13 +222,13 @@ def get_authorizers_with_zero():
         app.logger.error(f"获取带零授权者数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# codes_by_eth_balance分页查询接口
-@app.route('/codes_by_eth_balance', methods=['GET'])
-def get_codes_by_eth_balance():
+# codes_by_tvl_balance分页查询接口
+@app.route('/codes_by_tvl_balance', methods=['GET'])
+def get_codes_by_tvl_balance():
     try:
         with data_lock:
             # 创建副本避免竞态条件
-            current_codes_by_eth_balance = codes_by_eth_balance.copy()
+            current_codes_by_tvl_balance = codes_by_tvl_balance.copy()
             current_last_update_time = last_update_time
         
         # 获取分页参数，默认第1页，每页10条
@@ -238,17 +238,17 @@ def get_codes_by_eth_balance():
         search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
         
         if search_by != '':
-            current_codes_by_eth_balance = [
-                code for code in current_codes_by_eth_balance 
+            current_codes_by_tvl_balance = [
+                code for code in current_codes_by_tvl_balance 
                 if util.is_target_code_info_item(code, search_by)
             ]
         
         
         # 根据排序参数决定数据顺序
         if order.lower() == 'asc':
-            sorted_codes = current_codes_by_eth_balance
+            sorted_codes = current_codes_by_tvl_balance
         else:
-            sorted_codes = current_codes_by_eth_balance[::-1]
+            sorted_codes = current_codes_by_tvl_balance[::-1]
         
         # 计算分页
         start_idx = (page - 1) * page_size
@@ -259,7 +259,7 @@ def get_codes_by_eth_balance():
         
         # 返回结果
         return jsonify({
-            'total': len(current_codes_by_eth_balance),
+            'total': len(current_codes_by_tvl_balance),
             'page': page,
             'page_size': page_size,
             'order': order,

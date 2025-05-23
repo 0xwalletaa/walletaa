@@ -5,10 +5,11 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
 import { Tag, Tooltip, Switch, Space, Input, Button, Card, Row, Col } from 'antd';
-import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { LinkOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getAuthorizers, getAuthorizersWithZero, AuthorizerItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
+import numeral from 'numeral';
 
 const Authorizers: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -176,11 +177,25 @@ const Authorizers: React.FC = () => {
       valueType: 'digit',
     },
     {
-      title: intl.formatMessage({
-        id: 'pages.authorizers.eth_balance',
-        defaultMessage: 'ETH Balance',
-      }),
-      dataIndex: 'eth_balance',
+      title: (
+        <Space>
+          <Tooltip title="TVL = ETH + WETH + WBTC + USDT + USDC + DAI">
+            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+          </Tooltip>
+          {intl.formatMessage({
+            id: 'pages.authorizers.tvl_balance',
+            defaultMessage: 'TVL Balance',
+          })}
+        </Space>
+      ),
+      dataIndex: 'tvl_balance',
+      align: 'right',
+      render: (dom: any) => {
+        if (typeof dom === 'number') {
+          return numeral(dom).format('0,0.00');
+        }
+        return dom;
+      },
     },
     {
       title: intl.formatMessage({
