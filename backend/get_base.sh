@@ -1,4 +1,4 @@
-counter=0
+counter=29
 while true; do
 python3 get_block.py --name base --endpoints \
 https://base.llamarpc.com \
@@ -21,7 +21,7 @@ https://base.gateway.tenderly.co \
 
 counter=$((counter + 1))
 if [ $counter -eq 30 ]; then
-    python3 get_address.py --name base --endpoints \
+    python3 get_tvl.py --name base --endpoints \
     https://base.llamarpc.com \
     https://base.api.onfinality.io/public \
     https://base-mainnet.public.blastapi.io \

@@ -1,4 +1,4 @@
-counter=0
+counter=29
 while true; do
 python3 get_block.py --name bsc --endpoints \
 https://api.zan.top/bsc-mainnet \
@@ -17,7 +17,7 @@ https://bsc.blockrazor.xyz \
 
 counter=$((counter + 1))
 if [ $counter -eq 30 ]; then
-    python3 get_address.py --name bsc --endpoints \
+    python3 get_tvl.py --name bsc --endpoints \
     https://api.zan.top/bsc-mainnet \
     https://bsc-mainnet.public.blastapi.io \
     https://bsc.drpc.org \

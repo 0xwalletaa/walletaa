@@ -1,4 +1,4 @@
-counter=0
+counter=29
 while true; do
 python3 get_block.py --name op --endpoints \
 https://api.zan.top/opt-mainnet \
@@ -18,7 +18,7 @@ https://optimism.api.onfinality.io/public \
 
 counter=$((counter + 1))
 if [ $counter -eq 30 ]; then
-    python3 get_address.py --name op --endpoints \
+    python3 get_tvl.py --name op --endpoints \
     https://api.zan.top/opt-mainnet \
     https://gateway.tenderly.co/public/optimism \
     https://optimism-mainnet.public.blastapi.io \
