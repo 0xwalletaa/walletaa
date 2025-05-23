@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useIntl } from '@umijs/max';
-import { Select } from 'antd';
+import { Radio, Select } from 'antd';
 import { ChainType, CHAIN_CONFIGS, getCurrentChain, DEFAULT_CHAIN } from '@/services/config';
 import { history } from '@umijs/max';
 
@@ -10,6 +10,24 @@ import { history } from '@umijs/max';
 const ChainSelect: React.FC = () => {
   const intl = useIntl();
   const currentChain = getCurrentChain();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 检测屏幕尺寸
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // 768px以下认为是移动端
+    };
+
+    // 初始检测
+    checkMobile();
+
+    // 监听窗口尺寸变化
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // 切换链
   const handleChange = (value: ChainType) => {
@@ -31,19 +49,42 @@ const ChainSelect: React.FC = () => {
     window.location.reload();
   };
 
+  // 选项数据
+  const options = [
+    { value: 'mainnet', label: intl.formatMessage({ id: 'component.chainSelect.mainnet', defaultMessage: 'Mainnet' }) },
+    { value: 'base', label: intl.formatMessage({ id: 'component.chainSelect.base', defaultMessage: 'Base' }) },
+    { value: 'op', label: intl.formatMessage({ id: 'component.chainSelect.op', defaultMessage: 'Optimism' }) },
+    { value: 'sepolia', label: intl.formatMessage({ id: 'component.chainSelect.sepolia', defaultMessage: 'Sepolia' }) },
+    { value: 'bsc', label: intl.formatMessage({ id: 'component.chainSelect.bsc', defaultMessage: 'BSC' }) },
+  ];
+
+  // 移动端渲染下拉框
+  if (isMobile) {
+    return (
+      <Select
+        value={currentChain}
+        onChange={handleChange}
+        options={options}
+        size="large"
+        style={{ marginRight: 12, width: 120 }}
+      />
+    );
+  }
+
+  // 桌面端渲染单选框
   return (
-    <Select
+    <Radio.Group
       value={currentChain}
-      onChange={handleChange}
-      options={[
-        { value: 'mainnet', label: intl.formatMessage({ id: 'component.chainSelect.mainnet', defaultMessage: 'Mainnet' }) },
-        { value: 'base', label: intl.formatMessage({ id: 'component.chainSelect.base', defaultMessage: 'Base' }) },
-        { value: 'op', label: intl.formatMessage({ id: 'component.chainSelect.op', defaultMessage: 'Optimism' }) },
-        { value: 'sepolia', label: intl.formatMessage({ id: 'component.chainSelect.sepolia', defaultMessage: 'Sepolia' }) },
-        { value: 'bsc', label: intl.formatMessage({ id: 'component.chainSelect.bsc', defaultMessage: 'BSC' }) },
-      ]}
-      style={{ marginRight: 12, width: 120 }}
-    />
+      onChange={(e) => handleChange(e.target.value)}
+      buttonStyle="solid"
+      style={{ marginRight: 12 }}
+    >
+      {options.map(option => (
+        <Radio.Button key={option.value} value={option.value}>
+          {option.label}
+        </Radio.Button>
+      ))}
+    </Radio.Group>
   );
 };
 
