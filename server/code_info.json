@@ -984,15 +984,16 @@
     "hooksExtra": "ERC-7579 Module",
     "signature": "Readable Typed Signatures for Smart Accounts",
     "signatureExtra": "ERC-7739",
-    "txInitiationMethod": "ERC-4337",
-    "feePaymentMethod": "ERC-4337",
+    "txInitiationMethod": "ERC-4337, Modular Execution Environment (MEE)",
+    "feePaymentMethod": "ERC-4337, Modular Execution Environment (MEE)",
     "upgradable": true,
     "upgradableExtra": "UUPS",
     "modularContractAccount": "ERC-7579",
     "moduleRegistry": "ERC-7484",
     "isContractAddress": true,
     "audit": true,
-    "usage": ""
+    "production": true,
+    "usage": "account abstraction"
   },
   {
     "address": "0x227380efd3392ec33cf148ade5e0a89d33121814",
