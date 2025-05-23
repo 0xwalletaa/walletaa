@@ -8,8 +8,8 @@ interface IERC20 {
 contract BalanceQuery {
     address public constant WETH = 0x2170Ed0880ac9A755fd29B2688956BD959F933F8;
     address public constant WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
-    address public constant USDT = 0x55d398326f99059fF775485246999027B3197955;
-    address public constant USDC = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
+    address public constant USDT = 0x55d398326f99059fF775485246999027B3197955; // decimals 18
+    address public constant USDC = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // decimals 18
     address public constant DAI = 0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3;
 
     struct TokenBalances {
