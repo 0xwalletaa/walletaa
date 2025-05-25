@@ -5,7 +5,9 @@ import os
 import json
 import sqlite3
 
-def create_info_database(db_path):
+NAME = os.environ.get("NAME")
+
+def create_db_if_not_exists(db_path):
     """创建信息数据库和表结构"""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -23,20 +25,22 @@ def create_info_database(db_path):
         authorization_list TEXT
     )
     ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_transactions_block_number ON transactions(block_number)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_transactions_timestamp ON transactions(timestamp DESC)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_transactions_relayer ON transactions(relayer_address)')
+    
     
     # 创建authorizations表
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS authorizations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
         tx_hash TEXT,
         authorizer_address TEXT,
-        code_address TEXT,
-        chain_id INTEGER,
-        nonce INTEGER,
-        FOREIGN KEY (tx_hash) REFERENCES transactions(tx_hash)
+        code_address TEXT
     )
     ''')
-    
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_authorizer ON authorizations(authorizer_address)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_code ON authorizations(code_address)')
+
     # 创建authorizers表
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS authorizers (
@@ -51,21 +55,8 @@ def create_info_database(db_path):
         provider TEXT
     )
     ''')
-    
-    # 创建authorizers_with_zero表
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS authorizers_with_zero (
-        authorizer_address TEXT PRIMARY KEY,
-        tvl_balance REAL,
-        last_nonce INTEGER,
-        last_chain_id INTEGER,
-        code_address TEXT,
-        set_code_tx_count INTEGER,
-        unset_code_tx_count INTEGER,
-        historical_code_address TEXT,
-        provider TEXT
-    )
-    ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_tvl_balance ON authorizers(tvl_balance DESC)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_code_address ON authorizers(code_address)')
     
     # 创建codes表
     cursor.execute('''
@@ -78,6 +69,8 @@ def create_info_database(db_path):
         details TEXT
     )
     ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_tvl_balance ON codes(tvl_balance DESC)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_authorizer_count ON codes(authorizer_count DESC)')
     
     # 创建relayers表
     cursor.execute('''
@@ -88,232 +81,90 @@ def create_info_database(db_path):
         authorization_fee REAL
     )
     ''')
-    
-    # 创建overview表
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS overview (
-        key TEXT PRIMARY KEY,
-        value TEXT
-    )
-    ''')
-    
-    # 创建last_update_time表
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS last_update_time (
-        id INTEGER PRIMARY KEY,
-        timestamp REAL
-    )
-    ''')
-    
-    # 创建索引
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_transactions_relayer ON transactions(relayer_address)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_transactions_timestamp ON transactions(timestamp)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_authorizer ON authorizations(authorizer_address)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_code ON authorizations(code_address)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_tx_hash ON authorizations(tx_hash)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_tvl_balance ON authorizers(tvl_balance DESC)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_provider ON authorizers(provider)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_code_address ON authorizers(code_address)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_with_zero_tvl_balance ON authorizers_with_zero(tvl_balance DESC)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_with_zero_provider ON authorizers_with_zero(provider)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_with_zero_code_address ON authorizers_with_zero(code_address)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_tvl_balance ON codes(tvl_balance DESC)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_authorizer_count ON codes(authorizer_count DESC)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_provider ON codes(provider)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_relayers_tx_count ON relayers(tx_count DESC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_relayers_authorization_count ON relayers(authorization_count DESC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_relayers_authorization_fee ON relayers(authorization_fee DESC)')
     
-    conn.commit()
-    conn.close()
 
-def store_data_to_database(db_path, txs, authorizers, authorizers_with_zero, codes_by_tvl_balance, 
-                          codes_by_authorizer_count, relayers_by_tx_count, relayers_by_authorization_count,
-                          relayers_by_authorization_fee, overview, last_update_time):
-    """将数据存储到SQLite数据库"""
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    # 清空所有表
-    cursor.execute('DELETE FROM transactions')
-    cursor.execute('DELETE FROM authorizations')
-    cursor.execute('DELETE FROM authorizers')
-    cursor.execute('DELETE FROM authorizers_with_zero')
-    cursor.execute('DELETE FROM codes')
-    cursor.execute('DELETE FROM relayers')
-    cursor.execute('DELETE FROM overview')
-    cursor.execute('DELETE FROM last_update_time')
-    
-    # 插入transactions数据
-    for tx in txs:
-        cursor.execute('''
-        INSERT INTO transactions 
-        (tx_hash, block_number, block_hash, tx_index, relayer_address, authorization_fee, timestamp, authorization_list)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            tx['tx_hash'],
-            tx['block_number'],
-            tx['block_hash'],
-            tx['tx_index'],
-            tx['relayer_address'],
-            tx['authorization_fee'],
-            tx['timestamp'],
-            json.dumps(tx['authorization_list'])
-        ))
-        
-        # 插入authorizations数据
-        for auth in tx['authorization_list']:
-            cursor.execute('''
-            INSERT INTO authorizations 
-            (tx_hash, authorizer_address, code_address, chain_id, nonce)
-            VALUES (?, ?, ?, ?, ?)
-            ''', (
-                tx['tx_hash'],
-                auth['authorizer_address'],
-                auth['code_address'],
-                auth['chain_id'],
-                auth['nonce']
-            ))
-    
-    # 插入authorizers数据
-    for auth in authorizers:
-        cursor.execute('''
-        INSERT INTO authorizers 
-        (authorizer_address, tvl_balance, last_nonce, last_chain_id, code_address, 
-         set_code_tx_count, unset_code_tx_count, historical_code_address, provider)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            auth['authorizer_address'],
-            auth['tvl_balance'],
-            auth['last_nonce'],
-            auth['last_chain_id'],
-            auth['code_address'],
-            auth['set_code_tx_count'],
-            auth['unset_code_tx_count'],
-            json.dumps(auth['historical_code_address']),
-            auth.get('provider', '')
-        ))
-    
-    # 插入authorizers_with_zero数据
-    for auth in authorizers_with_zero:
-        cursor.execute('''
-        INSERT INTO authorizers_with_zero 
-        (authorizer_address, tvl_balance, last_nonce, last_chain_id, code_address, 
-         set_code_tx_count, unset_code_tx_count, historical_code_address, provider)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            auth['authorizer_address'],
-            auth['tvl_balance'],
-            auth['last_nonce'],
-            auth['last_chain_id'],
-            auth['code_address'],
-            auth['set_code_tx_count'],
-            auth['unset_code_tx_count'],
-            json.dumps(auth['historical_code_address']),
-            auth.get('provider', '')
-        ))
-    
-    # 插入codes数据（按TVL余额排序）
-    for code in codes_by_tvl_balance:
-        cursor.execute('''
-        INSERT OR REPLACE INTO codes 
-        (code_address, authorizer_count, tvl_balance, tags, provider, details)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ''', (
-            code['code_address'],
-            code['authorizer_count'],
-            code['tvl_balance'],
-            json.dumps(code['tags']),
-            code['provider'],
-            json.dumps(code['details']) if code['details'] else None
-        ))
-    
-    # 插入relayers数据
-    for relayer in relayers_by_tx_count:
-        cursor.execute('''
-        INSERT OR REPLACE INTO relayers 
-        (relayer_address, tx_count, authorization_count, authorization_fee)
-        VALUES (?, ?, ?, ?)
-        ''', (
-            relayer['relayer_address'],
-            relayer['tx_count'],
-            relayer['authorization_count'],
-            relayer['authorization_fee']
-        ))
-    
-    # 插入overview数据
-    for key, value in overview.items():
-        cursor.execute('''
-        INSERT INTO overview (key, value) VALUES (?, ?)
-        ''', (key, json.dumps(value)))
-    
-    # 插入last_update_time
+    # 创建daily表
     cursor.execute('''
-    INSERT INTO last_update_time (timestamp) VALUES (?)
-    ''', (last_update_time,))
-    
+    CREATE TABLE IF NOT EXISTS daily_stats (
+        date TEXT PRIMARY KEY,
+        tx_count INTEGER,
+        authorization_count INTEGER,
+        code_count INTEGER,
+        relayer_count INTEGER,
+        cumulative_transaction_count INTEGER,
+        cumulative_authorization_count INTEGER
+    )
+    ''')
+
     conn.commit()
     conn.close()
 
-def main():
-    for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
-        util.NAME = NAME
-        
-        print(f"开始处理 {NAME} 网络...")
-        start_time = time.time()
-        
-        # 获取数据
-        code_infos = util.get_code_infos()
-        txs = util.get_all_type4_txs_with_timestamp()
-        authorizers = util.get_authorizer_info(txs, code_infos)
-        authorizers_with_zero = util.get_authorizer_info(txs, code_infos, include_zero=True)
-        code_function_info = util.get_code_function_info()
-        codes_by_tvl_balance = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="tvl_balance")
-        codes_by_authorizer_count = util.get_code_info(authorizers, code_infos, code_function_info, sort_by="authorizer_count")
-        relayers_by_tx_count = util.get_relayer_info(txs, sort_by="tx_count")
-        relayers_by_authorization_count = util.get_relayer_info(txs, sort_by="authorization_count")
-        relayers_by_authorization_fee = util.get_relayer_info(txs, sort_by="authorization_fee")
-        overview = util.get_overview(txs, authorizers, codes_by_authorizer_count, relayers_by_tx_count, code_infos)
-        last_update_time = time.time()
-        
-        end_time = time.time()
-        print(f"{NAME} txs: {len(txs)}, 计算时间: {end_time - start_time:.2f} 秒")
-        
-        # 存储到数据库
-        start_time = time.time()
-        db_path = f'/dev/shm/{NAME}_info.db'
-        temp_db_path = f'/dev/shm/{NAME}_info_temp.db'
-        
-        # 创建临时数据库
-        create_info_database(temp_db_path)
-        
-        # 存储数据到临时数据库
-        store_data_to_database(
-            temp_db_path, txs, authorizers, authorizers_with_zero, 
-            codes_by_tvl_balance, codes_by_authorizer_count,
-            relayers_by_tx_count, relayers_by_authorization_count,
-            relayers_by_authorization_fee, overview, last_update_time
-        )
-        
-        # 原子性替换
-        os.rename(temp_db_path, db_path)
-        
-        end_time = time.time()
-        print(f"{NAME} txs: {len(txs)}, 存储时间: {end_time - start_time:.2f} 秒")
-        print("--------------------------------")
-    
-    # 测试加载时间
-    for NAME in ["mainnet", "sepolia", "bsc", "op", "base"]:
-        start_time = time.time()
-        db_path = f'/dev/shm/{NAME}_info.db'
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        cursor.execute('SELECT COUNT(*) FROM transactions')
-        tx_count = cursor.fetchone()[0]
-        conn.close()
-        end_time = time.time()
-        print(f"{NAME} 数据库连接和查询时间: {end_time - start_time:.2f} 秒, 交易数: {tx_count}")
-        print("--------------------------------")
 
-if __name__ == '__main__':
-    main() 
+def update_info_by_block(info_db_path, block_db_path):
+    info_conn = sqlite3.connect(info_db_path)
+    info_cursor = info_conn.cursor()
+    
+    block_conn = sqlite3.connect(block_db_path)
+    block_tx_cursor = block_conn.cursor()
+    block_timestamp_cursor = block_conn.cursor()
+    block_tx_cursor.execute("SELECT tx_hash, tx_data FROM type4_transactions ORDER BY block_number ASC")
+    
+    # 逐行处理，避免一次性加载所有数据
+    for row in block_tx_cursor:  # 直接迭代cursor
+        tx_hash, tx_data_str = row
+        
+        tx_hash = "0x"+tx_hash
+        info_cursor.execute("SELECT tx_hash FROM transactions WHERE tx_hash = ?", (tx_hash,))
+        if info_cursor.fetchone() is not None:
+            continue
+                     
+        type4_tx = util.parse_type4_tx_data(tx_data_str)
+        
+        block_timestamp_cursor.execute("SELECT timestamp FROM blocks WHERE block_number = ?", (type4_tx['block_number'],))
+        timestamp = block_timestamp_cursor.fetchone()[0]
+        
+        info_cursor.execute("INSERT INTO transactions (tx_hash, block_number, block_hash, tx_index, relayer_address, authorization_fee, timestamp, authorization_list) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (type4_tx['tx_hash'], type4_tx['block_number'], type4_tx['block_hash'], type4_tx['tx_index'], type4_tx['relayer_address'], type4_tx['authorization_fee'], timestamp, json.dumps(type4_tx['authorization_list'])))
+        
+        for authorization in type4_tx['authorization_list']:
+            info_cursor.execute("INSERT INTO authorizations (tx_hash, authorizer_address, code_address) VALUES (?, ?, ?)", (type4_tx['tx_hash'], authorization['authorizer_address'], authorization['code_address']))
+            
+         
+            info_cursor.execute("SELECT authorizer_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
+            if info_cursor.fetchone() is not None:
+                continue
+            else:
+                info_cursor.execute("INSERT INTO authorizers (authorizer_address, tvl_balance, last_nonce, last_chain_id, code_address, set_code_tx_count, unset_code_tx_count, historical_code_address, provider) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (authorization['authorizer_address'], 0, 0, 0, authorization['code_address'], 0, 0, "", ""))
+                
+            if authorization['code_address'] == "0x0000000000000000000000000000000000000000":
+                info_cursor.execute("UPDATE authorizers SET unset_code_tx_count = unset_code_tx_count + 1 WHERE authorizer_address = ?", (authorization['authorizer_address'],))
+                row = info_cursor.execute("SELECT code_address, historical_code_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
+                current_code_address, current_historical_code_address_json = row.fetchone()
+                if current_code_address != "0x0000000000000000000000000000000000000000":
+                    current_historical_code_address = json.loads(current_historical_code_address_json)
+                    current_historical_code_address.append(current_code_address)
+                    info_cursor.execute("UPDATE authorizers SET historical_code_address = ? WHERE authorizer_address = ?", (json.dumps(current_historical_code_address), authorization['authorizer_address']))
+            else:
+                info_cursor.execute("UPDATE authorizers SET set_code_tx_count = set_code_tx_count + 1 WHERE authorizer_address = ?", (authorization['authorizer_address'],))
+            
+            info_cursor.execute("UPDATE authorizers SET  last_nonce = ?, last_chain_id = ?, code_address = ? WHERE authorizer_address = ?", (authorization['nonce'], authorization['chain_id'], authorization['code_address'], authorization['authorizer_address']))
+
+        
+    info_conn.commit()
+    
+    block_conn.close()
+    
+    
+
+block_db_path = f'../backend/{NAME}_block.db'
+tvl_db_path = f'../backend/{NAME}_tvl.db'
+
+info_db_path = f'./db/{NAME}.db'
+print(f"开始处理 {NAME} 网络...")
+start_time = time.time()
+
+create_db_if_not_exists(info_db_path)
+update_info_by_block(info_db_path, block_db_path)
+
