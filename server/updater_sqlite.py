@@ -202,10 +202,44 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
     tvl_conn.close()
         
     
-
+def update_info_by_code(info_db_path, code_db_path):
+    info_conn = sqlite3.connect(info_db_path)
+    info_read_cursor = info_conn.cursor()
+    info_write_cursor = info_conn.cursor()
+    
+    code_conn = sqlite3.connect(code_db_path)
+    code_cursor = code_conn.cursor()
+        
+    info_read_cursor.execute("SELECT code_address, count(authorizer_address), sum(tvl_balance) FROM authorizers GROUP BY code_address")
+    for row in info_read_cursor:
+        code_address, authorizer_count, tvl_balance = row
+        info_write_cursor.execute("INSERT INTO codes (code_address, authorizer_count, tvl_balance) VALUES (?, ?, ?) ON CONFLICT(code_address) DO UPDATE SET authorizer_count = excluded.authorizer_count, tvl_balance = excluded.tvl_balance", (code_address, authorizer_count, tvl_balance))
+        
+        code_cursor.execute("SELECT code FROM codes WHERE LOWER(code_address) = ?", (code_address,))
+        row = code_cursor.fetchone()
+        if row is not None:
+            code = row[0]
+            functions = util.parse_functions(code)
+            tags = []
+            for function in functions:
+                if function in util.FUNCTION_TO_TAGS:
+                    for tag in util.FUNCTION_TO_TAGS[function]:
+                        if tag not in tags:
+                            tags.append(tag)
+            info_write_cursor.execute("UPDATE codes SET tags = ? WHERE code_address = ?", (json.dumps(tags), code_address))
+    
+    code_info = json.load(open(f'code_info.json'))
+    for item in code_info:
+        code_address = item['address'].lower()
+        info_write_cursor.execute("UPDATE codes SET provider = ?, details = ? WHERE code_address = ?", (item['provider'], json.dumps(item), code_address))
+    
+    info_conn.commit()
+    info_conn.close()
+    
 
 block_db_path = f'../backend/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
+code_db_path = f'../backend/{NAME}_code.db'
 
 info_db_path = f'./db/{NAME}.db'
 print(f"开始处理 {NAME} 网络...")
@@ -220,3 +254,8 @@ start_time = time.time()
 update_info_by_tvl(info_db_path, tvl_db_path)
 end_time = time.time()
 print(f"更新TVL信息完成，耗时 {end_time - start_time} 秒")
+
+start_time = time.time()
+update_info_by_code(info_db_path, code_db_path)
+end_time = time.time()
+print(f"更新代码信息完成，耗时 {end_time - start_time} 秒")
