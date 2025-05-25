@@ -151,9 +151,18 @@ def update_info_by_block(info_db_path, block_db_path):
             
             info_cursor.execute("UPDATE authorizers SET  last_nonce = ?, last_chain_id = ?, code_address = ? WHERE authorizer_address = ?", (authorization['nonce'], authorization['chain_id'], authorization['code_address'], authorization['authorizer_address']))
 
-        
-    info_conn.commit()
-    
+
+        relayer_address = type4_tx['relayer_address']        
+        authorization_fee = util.PER_EMPTY_ACCOUNT_COST * len(type4_tx['authorization_list']) * type4_tx['gasPrice'] / 10**18
+        info_cursor.execute("SELECT relayer_address FROM relayers WHERE relayer_address = ?", (relayer_address,))
+        if info_cursor.fetchone() is not None:
+            info_cursor.execute("UPDATE relayers SET tx_count = tx_count + 1, authorization_count = authorization_count + 1, authorization_fee = authorization_fee + ? WHERE relayer_address = ?", (authorization_fee, relayer_address,))
+        else:
+            info_cursor.execute("INSERT INTO relayers (relayer_address, tx_count, authorization_count, authorization_fee) VALUES (?, ?, ?, ?)", (relayer_address, 1, 1, authorization_fee))
+            
+        info_conn.commit()
+
+    info_conn.close()
     block_conn.close()
     
     
@@ -167,4 +176,3 @@ start_time = time.time()
 
 create_db_if_not_exists(info_db_path)
 update_info_by_block(info_db_path, block_db_path)
-
