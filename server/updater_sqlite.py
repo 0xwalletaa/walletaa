@@ -232,6 +232,7 @@ def update_info_by_code(info_db_path, code_db_path):
     for item in code_info:
         code_address = item['address'].lower()
         info_write_cursor.execute("UPDATE codes SET provider = ?, details = ? WHERE code_address = ?", (item['provider'], json.dumps(item), code_address))
+        info_write_cursor.execute("UPDATE authorizers SET provider = ? WHERE code_address = ?", (item['provider'], code_address))
     
     info_conn.commit()
     info_conn.close()
