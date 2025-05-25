@@ -4,6 +4,7 @@ import logging
 import os
 import json
 import sqlite3
+import requests
 
 NAME = os.environ.get("NAME")
 
@@ -152,27 +153,70 @@ def update_info_by_block(info_db_path, block_db_path):
             info_cursor.execute("UPDATE authorizers SET  last_nonce = ?, last_chain_id = ?, code_address = ? WHERE authorizer_address = ?", (authorization['nonce'], authorization['chain_id'], authorization['code_address'], authorization['authorizer_address']))
 
 
-        relayer_address = type4_tx['relayer_address']        
-        authorization_fee = util.PER_EMPTY_ACCOUNT_COST * len(type4_tx['authorization_list']) * type4_tx['gasPrice'] / 10**18
-        info_cursor.execute("SELECT relayer_address FROM relayers WHERE relayer_address = ?", (relayer_address,))
+        info_cursor.execute("SELECT relayer_address FROM relayers WHERE relayer_address = ?", (type4_tx['relayer_address'] ,))
         if info_cursor.fetchone() is not None:
-            info_cursor.execute("UPDATE relayers SET tx_count = tx_count + 1, authorization_count = authorization_count + 1, authorization_fee = authorization_fee + ? WHERE relayer_address = ?", (authorization_fee, relayer_address,))
+            info_cursor.execute("UPDATE relayers SET tx_count = tx_count + 1, authorization_count = authorization_count + ?, authorization_fee = authorization_fee + ? WHERE relayer_address = ?", (len(type4_tx['authorization_list']), type4_tx['authorization_fee'], type4_tx['relayer_address'] ,))
         else:
-            info_cursor.execute("INSERT INTO relayers (relayer_address, tx_count, authorization_count, authorization_fee) VALUES (?, ?, ?, ?)", (relayer_address, 1, 1, authorization_fee))
+            info_cursor.execute("INSERT INTO relayers (relayer_address, tx_count, authorization_count, authorization_fee) VALUES (?, ?, ?, ?)", (type4_tx['relayer_address'] , 1, len(type4_tx['authorization_list']),  type4_tx['authorization_fee']))
             
         info_conn.commit()
 
     info_conn.close()
     block_conn.close()
     
+
+def update_info_by_tvl(info_db_path, tvl_db_path):
+    info_conn = sqlite3.connect(info_db_path)
+    info_read_cursor = info_conn.cursor()
+    info_write_cursor = info_conn.cursor()
     
+    tvl_conn = sqlite3.connect(tvl_db_path)
+    tvl_cursor = tvl_conn.cursor()
+    
+    while True:
+        try:
+            BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT").json()['price']
+            ETH_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=ETHUSDT").json()['price']
+            
+            if NAME == "bsc":
+                BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT").json()['price']
+            break
+        except:
+            time.sleep(1)
+    
+    info_read_cursor.execute("SELECT authorizer_address FROM authorizers")
+    for row in info_read_cursor:
+        authorizer_address = row[0]
+        tvl_cursor.execute("SELECT eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance FROM author_balances WHERE author_address = ?", (authorizer_address,))
+        result = tvl_cursor.fetchone()
+        if result is not None:
+            eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance = result
+            if NAME != "bsc":
+                tvl_balance = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
+            else:
+                tvl_balance = float(eth_balance) * float(BNB_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) / 10**12 + float(usdc_balance) / 10**12 + float(dai_balance)
+            info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ? WHERE authorizer_address = ?", (tvl_balance, authorizer_address))
+        
+    info_conn.commit()
+    info_conn.close()
+    tvl_conn.close()
+        
+    
+
 
 block_db_path = f'../backend/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
 
 info_db_path = f'./db/{NAME}.db'
 print(f"开始处理 {NAME} 网络...")
-start_time = time.time()
 
 create_db_if_not_exists(info_db_path)
+start_time = time.time()
 update_info_by_block(info_db_path, block_db_path)
+end_time = time.time()
+print(f"更新区块信息完成，耗时 {end_time - start_time} 秒")
+
+start_time = time.time()
+update_info_by_tvl(info_db_path, tvl_db_path)
+end_time = time.time()
+print(f"更新TVL信息完成，耗时 {end_time - start_time} 秒")
