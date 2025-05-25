@@ -8,6 +8,7 @@ from eth_utils import keccak
 from datetime import datetime
 from pyevmasm import disassemble_hex
 import requests
+import time
 
 NAME = ""
 
@@ -148,11 +149,16 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
     cursor = conn.cursor()
     # 查询所有地址和余额
     
-    BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT").json()['price']
-    ETH_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=ETHUSDT").json()['price']
-    
-    if NAME == "bsc":
-        BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT").json()['price']
+    while True:
+        try:
+            BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT").json()['price']
+            ETH_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=ETHUSDT").json()['price']
+            
+            if NAME == "bsc":
+                BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT").json()['price']
+            break
+        except:
+            time.sleep(1)
     
     cursor.execute("SELECT author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance FROM author_balances")
     data = cursor.fetchall()

@@ -27,7 +27,7 @@ parser.add_argument('--name', help='区块链网络名称')
 parser.add_argument('--endpoints', nargs='+',  help='Web3 端点列表')
 parser.add_argument('--contract', required=True, help='合约地址')
 parser.add_argument('--num_threads', type=int, default=4, help='并行线程数')
-parser.add_argument('--data_expiry', type=int, default=86400, help='数据过期时间（秒）')
+parser.add_argument('--data_expiry', type=int, default=864000, help='数据过期时间（秒）')
 
 args = parser.parse_args()
 
@@ -323,6 +323,8 @@ def main():
     for address in author_addresses:
         if not is_data_fresh(address):
             unfresh_author_addresses.append(address)
+    
+    unfresh_author_addresses = unfresh_author_addresses[:10000]
     
     # 使用线程池并行获取余额
     print(f"开始更新 {len(unfresh_author_addresses)} 个地址的余额数据...")
