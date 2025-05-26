@@ -252,11 +252,16 @@ def update_info_daily(info_db_path):
     info_read_cursor = info_conn.cursor()
     info_write_cursor = info_conn.cursor()
     
+    cumulative_tx_count = 0
+    cumulative_authorization_count = 0
+    
     info_read_cursor.execute("SELECT date, count(distinct tx_hash), count(distinct authorizer_address), count(distinct code_address), count(distinct relayer_address) FROM authorizations GROUP BY date")
     for row in info_read_cursor:
         date, tx_count, authorization_count, code_count, relayer_count = row
-        info_write_cursor.execute("INSERT INTO daily_stats (date, tx_count, authorization_count, code_count, relayer_count) VALUES (?, ?, ?, ?, ?) ON CONFLICT(date) DO UPDATE SET tx_count = excluded.tx_count, authorization_count = excluded.authorization_count, code_count = excluded.code_count, relayer_count = excluded.relayer_count", (date, tx_count, authorization_count, code_count, relayer_count))
-        print(date, tx_count, authorization_count, code_count, relayer_count)
+        cumulative_tx_count += tx_count
+        cumulative_authorization_count += authorization_count
+        
+        info_write_cursor.execute("INSERT INTO daily_stats (date, tx_count, authorization_count, code_count, relayer_count, cumulative_transaction_count, cumulative_authorization_count) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(date) DO UPDATE SET tx_count = excluded.tx_count, authorization_count = excluded.authorization_count, code_count = excluded.code_count, relayer_count = excluded.relayer_count, cumulative_transaction_count = excluded.cumulative_transaction_count, cumulative_authorization_count = excluded.cumulative_authorization_count", (date, tx_count, authorization_count, code_count, relayer_count, cumulative_tx_count, cumulative_authorization_count))
     
     info_conn.commit()
     info_conn.close()
