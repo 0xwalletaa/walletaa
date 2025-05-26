@@ -583,7 +583,7 @@ def get_overview():
             daily_relayer_count[date] = row['relayer_count']
         
         # 获取top10数据
-        cursor.execute('SELECT * FROM codes ORDER BY tvl_balance DESC LIMIT 10')
+        cursor.execute('SELECT * FROM codes ORDER BY authorizer_count DESC LIMIT 10')
         top10_codes_rows = cursor.fetchall()
         top10_codes = []
         for row in top10_codes_rows:
