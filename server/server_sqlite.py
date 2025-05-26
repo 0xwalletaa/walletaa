@@ -34,84 +34,13 @@ app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
 
 # 数据库路径
-DB_PATH = f'/dev/shm/{NAME}_info.db'
+DB_PATH = f'./db/{NAME}.db'
 
 def get_db_connection():
     """获取数据库连接"""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row  # 使返回结果可以像字典一样访问
     return conn
-
-def get_last_update_time():
-    """获取最后更新时间"""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT timestamp FROM last_update_time ORDER BY id DESC LIMIT 1')
-        result = cursor.fetchone()
-        conn.close()
-        return result['timestamp'] if result else 0
-    except Exception as e:
-        app.logger.error(f"获取更新时间失败: {str(e)}")
-        return 0
-
-def build_transaction_search_query(search_by):
-    """构建交易搜索查询"""
-    if len(search_by) == 42:  # 地址
-        return '''
-        SELECT t.* FROM transactions t 
-        WHERE t.relayer_address = ? 
-        OR EXISTS (
-            SELECT 1 FROM authorizations a 
-            WHERE a.tx_hash = t.tx_hash 
-            AND (a.authorizer_address = ? OR a.code_address = ?)
-        )
-        ''', [search_by, search_by, search_by]
-    elif len(search_by) == 66:  # 交易哈希
-        return 'SELECT * FROM transactions WHERE tx_hash = ?', [search_by]
-    else:
-        return 'SELECT * FROM transactions WHERE 1=0', []
-
-def build_authorizer_search_query(search_by, include_zero=False):
-    """构建授权者搜索查询"""
-    table_name = 'authorizers_with_zero' if include_zero else 'authorizers'
-    base_query = f'SELECT * FROM {table_name}'
-    conditions = []
-    params = []
-    
-    if search_by:
-        if len(search_by) == 42:  # 地址
-            conditions.append('(authorizer_address = ? OR code_address = ?)')
-            params.extend([search_by, search_by])
-        else:  # 提供者名称
-            conditions.append('provider LIKE ?')
-            params.append(f'%{search_by}%')
-    
-    if conditions:
-        base_query += ' WHERE ' + ' AND '.join(conditions)
-    
-    return base_query, params
-
-def build_code_search_query(search_by):
-    """构建代码搜索查询"""
-    base_query = 'SELECT * FROM codes'
-    
-    if search_by:
-        if len(search_by) == 42:  # 地址
-            return base_query + ' WHERE code_address = ?', [search_by]
-        else:  # 提供者名称或标签
-            return base_query + ' WHERE provider LIKE ? OR tags LIKE ?', [f'%{search_by}%', f'%{search_by}%']
-    
-    return base_query, []
-
-def build_relayer_search_query(search_by):
-    """构建中继者搜索查询"""
-    base_query = 'SELECT * FROM relayers'
-    
-    if search_by and len(search_by) == 42:  # 地址
-        return base_query + ' WHERE relayer_address = ?', [search_by]
-    
-    return base_query, []
 
 # 分页查询接口
 @app.route('/transactions', methods=['GET'])
@@ -127,8 +56,16 @@ def get_transactions():
         cursor = conn.cursor()
         
         # 构建查询
-        if search_by:
-            query, params = build_transaction_search_query(search_by)
+        if search_by != '':
+            if len(search_by) == 42:  # 地址
+                query = 'SELECT * FROM transactions WHERE relayer_address = ? OR EXISTS (SELECT 1 FROM authorizations WHERE tx_hash = transactions.tx_hash AND (authorizer_address = ? OR code_address = ?))'
+                params = [search_by.lower(), search_by.lower(), search_by.lower()]
+            elif len(search_by) == 66:  # 交易哈希
+                query = 'SELECT * FROM transactions WHERE tx_hash = ?'
+                params = [search_by]
+            else:
+                query = 'SELECT * FROM transactions WHERE 1=0'
+                params = []
         else:
             query = 'SELECT * FROM transactions'
             params = []
@@ -159,9 +96,6 @@ def get_transactions():
             tx['authorization_list'] = json.loads(tx['authorization_list'])
             transactions.append(tx)
         
-        conn.close()
-        
-        last_update_time = get_last_update_time()
         
         # 返回结果
         return jsonify({
@@ -169,8 +103,7 @@ def get_transactions():
             'page': page,
             'page_size': page_size,
             'order': order,
-            'transactions': transactions,
-            'last_update_time': last_update_time
+            'transactions': transactions
         })
     except Exception as e:
         app.logger.error(f"获取交易数据时出错: {str(e)}")
@@ -190,7 +123,16 @@ def get_authorizers():
         cursor = conn.cursor()
         
         # 构建查询
-        query, params = build_authorizer_search_query(search_by, include_zero=False)
+        if search_by != '':
+            if len(search_by) == 42:
+                query = 'SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000" AND (authorizer_address = ? or code_address = ?)'
+                params = [search_by.lower(), search_by.lower()]
+            else:
+                query = 'SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000" AND provider LIKE ?'
+                params = [f'%{search_by}%']
+        else:
+            query = 'SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000"'
+            params = []
         
         # 添加排序
         if order.lower() == 'asc':
@@ -220,16 +162,13 @@ def get_authorizers():
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         # 返回结果
         return jsonify({
             'total': total,
             'page': page,
             'page_size': page_size,
             'order': order,
-            'authorizers': authorizers,
-            'last_update_time': last_update_time
+            'authorizers': authorizers
         })
     except Exception as e:
         app.logger.error(f"获取授权者数据时出错: {str(e)}")
@@ -249,7 +188,16 @@ def get_authorizers_with_zero():
         cursor = conn.cursor()
         
         # 构建查询
-        query, params = build_authorizer_search_query(search_by, include_zero=True)
+        if search_by != '':
+            if len(search_by) == 42:
+                query = 'SELECT * FROM authorizers WHERE authorizer_address = ? or code_address = ?'
+                params = [search_by.lower(), search_by.lower()]
+            else:
+                query = 'SELECT * FROM authorizers WHERE provider LIKE ?'
+                params = [f'%{search_by}%']
+        else:
+            query = 'SELECT * FROM authorizers'
+            params = []
         
         # 添加排序
         if order.lower() == 'asc':
@@ -279,16 +227,13 @@ def get_authorizers_with_zero():
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         # 返回结果
         return jsonify({
             'total': total,
             'page': page,
             'page_size': page_size,
             'order': order,
-            'authorizers': authorizers,
-            'last_update_time': last_update_time
+            'authorizers': authorizers
         })
     except Exception as e:
         app.logger.error(f"获取带零授权者数据时出错: {str(e)}")
@@ -308,7 +253,16 @@ def get_codes_by_tvl_balance():
         cursor = conn.cursor()
         
         # 构建查询
-        query, params = build_code_search_query(search_by)
+        if search_by != '':
+            if len(search_by) == 42:
+                query = 'SELECT * FROM codes WHERE code_address = ?'
+                params = [search_by.lower()]
+            else:
+                query = 'SELECT * FROM codes WHERE provider LIKE ? or tags LIKE ?'
+                params = [f'%{search_by}%', f'%{search_by}%']
+        else:
+            query = 'SELECT * FROM codes'
+            params = []
         
         # 添加排序
         if order.lower() == 'asc':
@@ -339,16 +293,13 @@ def get_codes_by_tvl_balance():
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         # 返回结果
         return jsonify({
             'total': total,
             'page': page,
             'page_size': page_size,
             'order': order,
-            'codes': codes,
-            'last_update_time': last_update_time
+            'codes': codes
         })
     except Exception as e:
         app.logger.error(f"获取以TVL余额排序的代码数据时出错: {str(e)}")
@@ -368,7 +319,16 @@ def get_codes_by_authorizer_count():
         cursor = conn.cursor()
         
         # 构建查询
-        query, params = build_code_search_query(search_by)
+        if search_by != '':
+            if len(search_by) == 42:
+                query = 'SELECT * FROM codes WHERE code_address = ?'
+                params = [search_by.lower()]
+            else:
+                query = 'SELECT * FROM codes WHERE provider LIKE ? or tags LIKE ?'
+                params = [f'%{search_by}%', f'%{search_by}%']
+        else:
+            query = 'SELECT * FROM codes'
+            params = []
         
         # 添加排序
         if order.lower() == 'asc':
@@ -399,16 +359,13 @@ def get_codes_by_authorizer_count():
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         # 返回结果
         return jsonify({
             'total': total,
             'page': page,
             'page_size': page_size,
             'order': order,
-            'codes': codes,
-            'last_update_time': last_update_time
+            'codes': codes
         })
     except Exception as e:
         app.logger.error(f"获取以授权者数量排序的代码数据时出错: {str(e)}")
@@ -428,7 +385,12 @@ def get_relayers_by_tx_count():
         cursor = conn.cursor()
         
         # 构建查询
-        query, params = build_relayer_search_query(search_by)
+        if search_by != '':
+            query = 'SELECT * FROM relayers WHERE relayer_address = ?'
+            params = [search_by.lower()]
+        else:
+            query = 'SELECT * FROM relayers'
+            params = []
         
         # 添加排序
         if order.lower() == 'asc':
@@ -454,16 +416,13 @@ def get_relayers_by_tx_count():
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         # 返回结果
         return jsonify({
             'total': total,
             'page': page,
             'page_size': page_size,
             'order': order,
-            'relayers': relayers,
-            'last_update_time': last_update_time
+            'relayers': relayers
         })
     except Exception as e:
         app.logger.error(f"获取以交易数量排序的中继者数据时出错: {str(e)}")
@@ -483,7 +442,12 @@ def get_relayers_by_authorization_count():
         cursor = conn.cursor()
         
         # 构建查询
-        query, params = build_relayer_search_query(search_by)
+        if search_by != '':
+            query = 'SELECT * FROM relayers WHERE relayer_address = ?'
+            params = [search_by.lower()]
+        else:
+            query = 'SELECT * FROM relayers'
+            params = []
         
         # 添加排序
         if order.lower() == 'asc':
@@ -509,16 +473,13 @@ def get_relayers_by_authorization_count():
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         # 返回结果
         return jsonify({
             'total': total,
             'page': page,
             'page_size': page_size,
             'order': order,
-            'relayers': relayers,
-            'last_update_time': last_update_time
+            'relayers': relayers
         })
     except Exception as e:
         app.logger.error(f"获取以授权数量排序的中继者数据时出错: {str(e)}")
@@ -538,7 +499,12 @@ def get_relayers_by_authorization_fee():
         cursor = conn.cursor()
         
         # 构建查询
-        query, params = build_relayer_search_query(search_by)
+        if search_by != '':
+            query = 'SELECT * FROM relayers WHERE relayer_address = ?'
+            params = [search_by.lower()]
+        else:
+            query = 'SELECT * FROM relayers'
+            params = []
         
         # 添加排序
         if order.lower() == 'asc':
@@ -564,16 +530,13 @@ def get_relayers_by_authorization_fee():
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         # 返回结果
         return jsonify({
             'total': total,
             'page': page,
             'page_size': page_size,
             'order': order,
-            'relayers': relayers,
-            'last_update_time': last_update_time
+            'relayers': relayers
         })
     except Exception as e:
         app.logger.error(f"获取以授权费用排序的中继者数据时出错: {str(e)}")
@@ -586,35 +549,88 @@ def get_overview():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 获取overview数据
-        cursor.execute('SELECT key, value FROM overview')
-        rows = cursor.fetchall()
+        # 获取基本统计信息
+        cursor.execute('SELECT COUNT(*) as tx_count FROM transactions')
+        tx_count = cursor.fetchone()['tx_count']
         
-        overview = {}
-        for row in rows:
-            overview[row['key']] = json.loads(row['value'])
+        cursor.execute('SELECT COUNT(*) as authorizer_count FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000"')
+        authorizer_count = cursor.fetchone()['authorizer_count']
+        
+        cursor.execute('SELECT COUNT(*) as code_count FROM codes')
+        code_count = cursor.fetchone()['code_count']
+        
+        cursor.execute('SELECT COUNT(*) as relayer_count FROM relayers')
+        relayer_count = cursor.fetchone()['relayer_count']
+        
+        # 获取每日统计数据
+        cursor.execute('SELECT * FROM daily_stats ORDER BY date')
+        daily_stats = cursor.fetchall()
+        
+        daily_tx_count = {}
+        daily_cumulative_tx_count = {}
+        daily_authorization_count = {}
+        daily_cumulative_authorization_count = {}
+        daily_code_count = {}
+        daily_relayer_count = {}
+        
+        for row in daily_stats:
+            date = row['date']
+            daily_tx_count[date] = row['tx_count']
+            daily_cumulative_tx_count[date] = row['cumulative_transaction_count']
+            daily_authorization_count[date] = row['authorization_count']
+            daily_cumulative_authorization_count[date] = row['cumulative_authorization_count']
+            daily_code_count[date] = row['code_count']
+            daily_relayer_count[date] = row['relayer_count']
+        
+        # 获取top10数据
+        cursor.execute('SELECT * FROM codes ORDER BY tvl_balance DESC LIMIT 10')
+        top10_codes_rows = cursor.fetchall()
+        top10_codes = []
+        for row in top10_codes_rows:
+            code = dict(row)
+            code['tags'] = json.loads(code['tags']) if code['tags'] else []
+            code['details'] = json.loads(code['details']) if code['details'] else None
+            top10_codes.append(code)
+        
+        cursor.execute('SELECT * FROM relayers ORDER BY tx_count DESC LIMIT 10')
+        top10_relayers = [dict(row) for row in cursor.fetchall()]
+        
+        cursor.execute('SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000" ORDER BY tvl_balance DESC LIMIT 10')
+        top10_authorizers_rows = cursor.fetchall()
+        top10_authorizers = []
+        for row in top10_authorizers_rows:
+            auth = dict(row)
+            auth['historical_code_address'] = json.loads(auth['historical_code_address']) if auth['historical_code_address'] else []
+            top10_authorizers.append(auth)
+        
+        overview = {
+            'tx_count': tx_count,
+            'authorizer_count': authorizer_count,
+            'code_count': code_count,
+            'relayer_count': relayer_count,
+            'daily_tx_count': daily_tx_count,
+            'daily_cumulative_tx_count': daily_cumulative_tx_count,
+            'daily_authorizaion_count': daily_authorization_count,
+            'daily_cumulative_authorizaion_count': daily_cumulative_authorization_count,
+            'daily_code_count': daily_code_count,
+            'daily_relayer_count': daily_relayer_count,
+            'top10_codes': top10_codes,
+            'top10_relayers': top10_relayers,
+            'top10_authorizers': top10_authorizers,
+        }
         
         conn.close()
         
-        last_update_time = get_last_update_time()
-        
         return jsonify({
-            'overview': overview,
-            'last_update_time': last_update_time
+            'overview': overview
         })
     except Exception as e:
         app.logger.error(f"获取overview数据时出错: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# 健康检查接口
-@app.route('/health', methods=['GET'])
-def health_check():
-    last_update_time = get_last_update_time()
-    return jsonify({'status': 'ok', 'last_update_time': last_update_time})
-
 if __name__ == '__main__':
     # 开发环境使用
-    app.run(host='0.0.0.0', port=3001, debug=False)
+    app.run(host='0.0.0.0', port=3000, debug=False)
 else:
     # 生产环境入口点
     # 使用Gunicorn或uWSGI运行时，这里是WSGI入口点
