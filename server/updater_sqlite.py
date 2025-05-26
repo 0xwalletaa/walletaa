@@ -135,13 +135,11 @@ def update_info_by_block(info_db_path, block_db_path):
         
         block_timestamp_cursor.execute("SELECT timestamp FROM blocks WHERE block_number = ?", (type4_tx['block_number'],))
         timestamp = block_timestamp_cursor.fetchone()[0]
+        date = datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d')
         
         info_cursor.execute("INSERT INTO transactions (tx_hash, block_number, block_hash, tx_index, relayer_address, authorization_fee, timestamp, authorization_list) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (type4_tx['tx_hash'], type4_tx['block_number'], type4_tx['block_hash'], type4_tx['tx_index'], type4_tx['relayer_address'], type4_tx['authorization_fee'], timestamp, json.dumps(type4_tx['authorization_list'])))
         
         for authorization in type4_tx['authorization_list']:
-            # 将timestamp转换为日期格式
-            date = datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d')
-            
             info_cursor.execute("INSERT INTO authorizations (tx_hash, authorizer_address, code_address, relayer_address, date) VALUES (?, ?, ?, ?, ?)", (type4_tx['tx_hash'], authorization['authorizer_address'], authorization['code_address'], type4_tx['relayer_address'], date))
             
             info_cursor.execute("SELECT authorizer_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
