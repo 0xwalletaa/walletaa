@@ -544,7 +544,7 @@ const Codes: React.FC = () => {
           if (sort && Object.keys(sort).length > 0) {
             // 获取排序字段和顺序
             const sortField = Object.keys(sort)[0];
-            const sortOrder = sort[sortField] === 'ascend' ? 'desc' : 'asc';
+            const sortOrder = sort[sortField] === 'ascend' ? 'asc' : 'desc';
             
             // 根据排序字段选择API
             if (sortField === 'tvl_balance') {

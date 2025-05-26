@@ -176,10 +176,7 @@ const Relayers: React.FC = () => {
           if (sort && Object.keys(sort).length > 0) {
             // 获取排序字段和顺序
             const sortField = Object.keys(sort)[0];
-            // 修正：在这些API中，正序倒序的逻辑是相反的
-            // ProTable的ascend（升序）对应后端的desc（倒序）
-            // ProTable的descend（降序）对应后端的asc（正序）
-            const sortOrder = sort[sortField] === 'ascend' ? 'desc' : 'asc';
+            const sortOrder = sort[sortField] === 'ascend' ? 'asc' : 'desc';
             
             // 根据排序字段选择API
             if (sortField === 'tx_count') {

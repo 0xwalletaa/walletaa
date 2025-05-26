@@ -203,7 +203,7 @@ export async function getCodes(params: {
   page_size?: number;
   order?: string;
 }) {
-  return getCodesByEthBalance(params);
+  return getCodesByTvlBalance(params);
 }
 
 // 获取中继者列表接口（按交易数量排序）

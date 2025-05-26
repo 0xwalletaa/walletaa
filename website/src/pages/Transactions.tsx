@@ -149,8 +149,6 @@ const Transactions: React.FC = () => {
         defaultMessage: 'Authorization Fee (ETH)',
       }),
       dataIndex: 'authorization_fee',
-      sorter: true,
-      sortDirections: ['descend', 'ascend'],
     },
     {
       title: intl.formatMessage({
