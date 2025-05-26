@@ -1,9 +1,18 @@
 from web3 import Web3
 import json
+import time
+
+def format_balance(balance, decimals=18, symbol=""):
+    """格式化余额显示"""
+    if decimals == 18:
+        formatted = Web3.from_wei(balance, 'ether')
+    else:
+        formatted = balance / (10 ** decimals)
+    return f"{formatted:.{decimals//3}f} {symbol}".strip()
 
 # 连接到以太坊网络
 # 这里使用Infura提供的以太坊主网节点，您需要替换为您自己的API密钥
-w3 = Web3(Web3.HTTPProvider('https://eth-mainnet.public.blastapi.io'))
+w3 = Web3(Web3.HTTPProvider('https://base-mainnet.public.blastapi.io'))
 
 # 检查连接
 if not w3.is_connected():
@@ -18,9 +27,9 @@ contract_abi = [
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "target",
-                "type": "address"
+                "internalType": "address[]",
+                "name": "targets",
+                "type": "address[]"
             }
         ],
         "name": "get",
@@ -58,9 +67,9 @@ contract_abi = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct BalanceQuery.TokenBalances",
+                "internalType": "struct BalanceQuery.TokenBalances[]",
                 "name": "",
-                "type": "tuple"
+                "type": "tuple[]"
             }
         ],
         "stateMutability": "view",
@@ -71,29 +80,33 @@ contract_abi = [
 # 创建合约实例
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-# 要查询的钱包地址
-wallet_address = ''
+# 要查询的钱包地址列表
+wallet_addresses = [
+    '','',''
+]
+
 
 # 调用合约的get函数查询余额
 try:
-    result = contract.functions.get(wallet_address).call()
+    start_time = time.time()
+    result = contract.functions.get(wallet_addresses).call()
     
     # 解析结果
-    eth_balance = w3.from_wei(result[0], 'ether')
-    weth_balance = w3.from_wei(result[1], 'ether')
-    wbtc_balance = w3.from_wei(result[2], 'ether')  # 注意WBTC的精度可能是8
-    usdt_balance = w3.from_wei(result[3], 'mwei')   # USDT通常是6位精度
-    usdc_balance = w3.from_wei(result[4], 'mwei')   # USDC通常是6位精度
-    dai_balance = w3.from_wei(result[5], 'ether')
+    item_cnt = 0
+    for i, address in enumerate(wallet_addresses):
+        balances = result[i]
+        item_cnt += 1
+        print(f"\n地址 {address} 的余额:")
+        print(f"ETH:  {format_balance(balances[0], 18, 'ETH')}")
+        print(f"WETH: {format_balance(balances[1], 18, 'WETH')}")
+        print(f"WBTC: {format_balance(balances[2], 8, 'WBTC')}")
+        print(f"USDT: {format_balance(balances[3], 6, 'USDT')}")
+        print(f"USDC: {format_balance(balances[4], 6, 'USDC')}")
+        print(f"DAI:  {format_balance(balances[5], 18, 'DAI')}")
     
-    # 打印结果
-    print(f"地址 {wallet_address} 的余额:")
-    print(f"ETH: {eth_balance}")
-    print(f"WETH: {weth_balance}")
-    print(f"WBTC: {wbtc_balance}")
-    print(f"USDT: {usdt_balance}")
-    print(f"USDC: {usdc_balance}")
-    print(f"DAI: {dai_balance}")
+    end_time = time.time()
+    print(f"item_cnt: {item_cnt}")
+    print(f"time: {end_time - start_time}")
     
 except Exception as e:
     print(f"调用合约时出错: {e}") 

@@ -15,11 +15,13 @@ contract BalanceQuery {
         uint256 daiBalance;
     }
 
-    function get(address target) public view returns (TokenBalances memory) {
-        TokenBalances memory balances;
+    function get(address[] memory targets) public view returns (TokenBalances[] memory) {
+        TokenBalances[] memory balances = new TokenBalances[](targets.length);
         
-        // 获取ETH余额
-        balances.ethBalance = target.balance;
+        for (uint256 i = 0; i < targets.length; i++) {
+            // 获取ETH余额
+            balances[i].ethBalance = targets[i].balance;
+        }
         
         return balances;
     }

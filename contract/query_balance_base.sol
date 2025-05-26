@@ -21,18 +21,20 @@ contract BalanceQuery {
         uint256 daiBalance;
     }
 
-    function get(address target) public view returns (TokenBalances memory) {
-        TokenBalances memory balances;
+    function get(address[] memory targets) public view returns (TokenBalances[] memory) {
+        TokenBalances[] memory balances = new TokenBalances[](targets.length);
         
-        // 获取ETH余额
-        balances.ethBalance = target.balance;
+        for (uint256 i = 0; i < targets.length; i++) {
+            // 获取ETH余额
+            balances[i].ethBalance = targets[i].balance;
         
-        // 获取各ERC20代币余额
-        balances.wethBalance = IERC20(WETH).balanceOf(target);
-        balances.wbtcBalance = IERC20(WBTC).balanceOf(target);
-        balances.usdtBalance = IERC20(USDT).balanceOf(target);
-        balances.usdcBalance = IERC20(USDC).balanceOf(target);
-        balances.daiBalance = IERC20(DAI).balanceOf(target);
+            // 获取各ERC20代币余额
+            balances[i].wethBalance = IERC20(WETH).balanceOf(targets[i]);
+            balances[i].wbtcBalance = IERC20(WBTC).balanceOf(targets[i]);
+            balances[i].usdtBalance = IERC20(USDT).balanceOf(targets[i]);
+            balances[i].usdcBalance = IERC20(USDC).balanceOf(targets[i]);
+            balances[i].daiBalance = IERC20(DAI).balanceOf(targets[i]);
+        }
         
         return balances;
     }
