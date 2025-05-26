@@ -5,6 +5,7 @@ import os
 import json
 import sqlite3
 import requests
+import datetime
 
 NAME = os.environ.get("NAME")
 
@@ -36,11 +37,19 @@ def create_db_if_not_exists(db_path):
     CREATE TABLE IF NOT EXISTS authorizations (
         tx_hash TEXT,
         authorizer_address TEXT,
-        code_address TEXT
+        code_address TEXT,
+        relayer_address TEXT,
+        date TEXT
     )
     ''')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_authorizer ON authorizations(authorizer_address)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_code ON authorizations(code_address)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_date ON authorizations(date)')
+    
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_date_tx_hash ON authorizations(date, tx_hash)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_date_authorizer ON authorizations(date, authorizer_address)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_date_code ON authorizations(date, code_address)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_date_relayer ON authorizations(date, relayer_address)')
 
     # 创建authorizers表
     cursor.execute('''
@@ -130,9 +139,11 @@ def update_info_by_block(info_db_path, block_db_path):
         info_cursor.execute("INSERT INTO transactions (tx_hash, block_number, block_hash, tx_index, relayer_address, authorization_fee, timestamp, authorization_list) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (type4_tx['tx_hash'], type4_tx['block_number'], type4_tx['block_hash'], type4_tx['tx_index'], type4_tx['relayer_address'], type4_tx['authorization_fee'], timestamp, json.dumps(type4_tx['authorization_list'])))
         
         for authorization in type4_tx['authorization_list']:
-            info_cursor.execute("INSERT INTO authorizations (tx_hash, authorizer_address, code_address) VALUES (?, ?, ?)", (type4_tx['tx_hash'], authorization['authorizer_address'], authorization['code_address']))
+            # 将timestamp转换为日期格式
+            date = datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d')
             
-         
+            info_cursor.execute("INSERT INTO authorizations (tx_hash, authorizer_address, code_address, relayer_address, date) VALUES (?, ?, ?, ?, ?)", (type4_tx['tx_hash'], authorization['authorizer_address'], authorization['code_address'], type4_tx['relayer_address'], date))
+            
             info_cursor.execute("SELECT authorizer_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
             if info_cursor.fetchone() is not None:
                 continue
@@ -236,7 +247,21 @@ def update_info_by_code(info_db_path, code_db_path):
     
     info_conn.commit()
     info_conn.close()
+
+
+def update_info_daily(info_db_path):
+    info_conn = sqlite3.connect(info_db_path)
+    info_read_cursor = info_conn.cursor()
+    info_write_cursor = info_conn.cursor()
     
+    info_read_cursor.execute("SELECT date, count(distinct tx_hash), count(distinct authorizer_address), count(distinct code_address), count(distinct relayer_address) FROM authorizations GROUP BY date")
+    for row in info_read_cursor:
+        date, tx_count, authorization_count, code_count, relayer_count = row
+        info_write_cursor.execute("INSERT INTO daily_stats (date, tx_count, authorization_count, code_count, relayer_count) VALUES (?, ?, ?, ?, ?) ON CONFLICT(date) DO UPDATE SET tx_count = excluded.tx_count, authorization_count = excluded.authorization_count, code_count = excluded.code_count, relayer_count = excluded.relayer_count", (date, tx_count, authorization_count, code_count, relayer_count))
+        print(date, tx_count, authorization_count, code_count, relayer_count)
+    
+    info_conn.commit()
+    info_conn.close()
 
 block_db_path = f'../backend/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
@@ -260,3 +285,8 @@ start_time = time.time()
 update_info_by_code(info_db_path, code_db_path)
 end_time = time.time()
 print(f"更新代码信息完成，耗时 {end_time - start_time} 秒")
+
+start_time = time.time()
+update_info_daily(info_db_path)
+end_time = time.time()
+print(f"更新每日信息完成，耗时 {end_time - start_time} 秒")
