@@ -182,6 +182,7 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
     tvl_conn = sqlite3.connect(tvl_db_path)
     tvl_cursor = tvl_conn.cursor()
     
+    start_time = time.time()
     while True:
         try:
             BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT").json()['price']
@@ -192,6 +193,8 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
             break
         except:
             time.sleep(1)
+    end_time = time.time()
+    print(f"获取价格信息完成，耗时 {end_time - start_time} 秒")
     
     info_read_cursor.execute("SELECT authorizer_address FROM authorizers")
     for row in info_read_cursor:
