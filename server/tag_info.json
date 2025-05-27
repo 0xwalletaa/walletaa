@@ -57,6 +57,10 @@
     ]
   },
   {
+    "tag": "Proxy",
+    "functions": ["implementation()"]
+  },
+  {
     "tag": "UUPSUpgradeable",
     "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"]
   },
@@ -83,9 +87,5 @@
   {
     "tag": "Proto Account",
     "functions": ["pay(uint256,bytes32,bytes32,bytes)", "initializePREP(bytes)"]
-  },
-  {
-    "tag": "ERC7484",
-    "functions": ["trustAttesters(uint8,address[])"]
   }
 ]
