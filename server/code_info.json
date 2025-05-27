@@ -318,7 +318,7 @@
     "isContractAddress": true,
     "audit": "",
     "usage": "batch call"
-  }
+  },
   {
     "address": "0x1Ec51ea2582B3B49967fc7b7036dC21Ac0a6Bc54",
     "name": "",
