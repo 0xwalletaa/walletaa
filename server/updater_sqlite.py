@@ -157,6 +157,7 @@ def update_info_by_block(info_db_path, block_db_path):
                     current_historical_code_address.append(current_code_address)
                     info_cursor.execute("UPDATE authorizers SET historical_code_address = ? WHERE authorizer_address = ?", (json.dumps(current_historical_code_address), authorization['authorizer_address']))
             else:
+                # TODO historical_code_address
                 info_cursor.execute("UPDATE authorizers SET set_code_tx_count = set_code_tx_count + 1 WHERE authorizer_address = ?", (authorization['authorizer_address'],))
             
             info_cursor.execute("UPDATE authorizers SET  last_nonce = ?, last_chain_id = ?, code_address = ? WHERE authorizer_address = ?", (authorization['nonce'], authorization['chain_id'], authorization['code_address'], authorization['authorizer_address']))

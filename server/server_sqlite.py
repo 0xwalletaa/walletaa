@@ -58,7 +58,7 @@ def get_transactions():
         # 构建查询
         if search_by != '':
             if len(search_by) == 42:  # 地址
-                query = 'SELECT * FROM transactions WHERE relayer_address = ? OR EXISTS (SELECT 1 FROM authorizations WHERE tx_hash = transactions.tx_hash AND (authorizer_address = ? OR code_address = ?))'
+                query = 'SELECT * FROM transactions WHERE relayer_address = ? OR tx_hash in (SELECT tx_hash FROM authorizations WHERE authorizer_address = ? OR code_address = ?)'
                 params = [search_by.lower(), search_by.lower(), search_by.lower()]
             elif len(search_by) == 66:  # 交易哈希
                 query = 'SELECT * FROM transactions WHERE tx_hash = ?'
