@@ -81,6 +81,11 @@ def init_db():
         )
         ''')
         print("创建blocks表")
+        cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_blocks_block_number 
+        ON blocks(block_number ASC);
+        ''')
+        print("创建idx_blocks_block_number索引")
     
     # 检查type4_transactions表是否存在
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='type4_transactions'")
@@ -95,6 +100,11 @@ def init_db():
         )
         ''')
         print("创建type4_transactions表")
+        cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_type4_transactions_block_number 
+        ON type4_transactions(block_number ASC);
+        ''')
+        print("创建idx_type4_transactions_block_number索引")
     
     conn.commit()
     return conn
