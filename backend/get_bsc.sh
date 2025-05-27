@@ -17,7 +17,7 @@ https://bsc.blockrazor.xyz \
 
 counter=$((counter + 1))
 if [ $counter -eq 30 ]; then
-    python3 get_tvl.py --name bsc --contract 0x5213279d75d7dB259D15Bb43029b83c909EA2F20  --endpoints \
+    python3 get_tvl.py --name bsc --contract 0x27c81Cb1281a9643E7Ace9E843579316Be56456E  --endpoints \
     https://api.zan.top/bsc-mainnet \
     https://bsc-mainnet.public.blastapi.io \
     https://bsc.drpc.org \

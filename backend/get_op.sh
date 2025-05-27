@@ -18,7 +18,7 @@ https://optimism.api.onfinality.io/public \
 
 counter=$((counter + 1))
 if [ $counter -eq 30 ]; then
-    python3 get_tvl.py --name op --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \
+    python3 get_tvl.py --name op --contract 0x89038D59C4Bd24970150c92B4f48A819f38d9c69 --endpoints \
     https://api.zan.top/opt-mainnet \
     https://gateway.tenderly.co/public/optimism \
     https://optimism-mainnet.public.blastapi.io \
