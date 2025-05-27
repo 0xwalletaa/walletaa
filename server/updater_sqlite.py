@@ -9,6 +9,8 @@ import datetime
 
 NAME = os.environ.get("NAME")
 
+DATA_EXPIRY = 86400
+
 def create_db_if_not_exists(db_path):
     """创建信息数据库和表结构"""
     conn = sqlite3.connect(db_path)
@@ -188,20 +190,22 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
     start_time = time.time()
     while True:
         try:
-            BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT").json()['price']
-            ETH_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=ETHUSDT").json()['price']
+            BTC_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BTCUSDT",timeout=10).json()['price']
+            ETH_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=ETHUSDT",timeout=10).json()['price']
             
             if NAME == "bsc":
-                BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT").json()['price']
+                BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT",timeout=10).json()['price']
             break
         except:
             time.sleep(1)
     end_time = time.time()
     print(f"获取价格信息完成，耗时 {end_time - start_time} 秒")
     
-    info_read_cursor.execute("SELECT authorizer_address FROM authorizers")
+    info_read_cursor.execute("SELECT authorizer_address FROM authorizers WHERE tvl_timestamp < ?", (int(time.time()) - DATA_EXPIRY,))
+    expired_count = 0
     for row in info_read_cursor:
         authorizer_address = row[0]
+        expired_count += 1
         tvl_cursor.execute("SELECT eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp FROM author_balances WHERE author_address = ?", (authorizer_address,))
         result = tvl_cursor.fetchone()
         if result is not None:
@@ -211,7 +215,8 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
             else:
                 tvl_balance = float(eth_balance) * float(BNB_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) / 10**12 + float(usdc_balance) / 10**12 + float(dai_balance)
             info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ?, tvl_timestamp = ? WHERE authorizer_address = ?", (tvl_balance, timestamp, authorizer_address))
-        
+
+    print(f"过期数据数量：{expired_count}")
     info_conn.commit()
     info_conn.close()
     tvl_conn.close()
