@@ -28,7 +28,7 @@ parser.add_argument('--name', help='区块链网络名称')
 parser.add_argument('--endpoints', nargs='+',  help='Web3 端点列表')
 parser.add_argument('--contract', required=True, help='合约地址')
 parser.add_argument('--num_threads', type=int, default=4, help='并行线程数')
-parser.add_argument('--data_expiry', type=int, default=864000, help='数据过期时间（秒）')
+parser.add_argument('--data_expiry', type=int, default=86400, help='数据过期时间（秒）')
 parser.add_argument('--limit', type=int, default=10000, help='限制处理数量')
 
 args = parser.parse_args()
@@ -172,9 +172,9 @@ def get_author_addresses():
     if os.path.exists(info_db_path):
         conn = sqlite3.connect(info_db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT authorizer_address FROM authorizers")
+        cursor.execute("SELECT authorizer_address FROM authorizers WHERE tvl_timestamp < ? LIMIT ?", (int(time.time()) - DATA_EXPIRY, LIMIT))
         for row in cursor:
-            if not is_data_fresh(row[0]):
+            if row[0] != 'error':
                 author_addresses.add(row[0])
             if len(author_addresses) >= LIMIT:
                 break
@@ -257,8 +257,6 @@ def get_address_balances(author_addresses):
 
 def is_data_fresh(author_address):
     """检查数据是否在过期时间内"""
-    if author_address == 'error':
-        return True
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(

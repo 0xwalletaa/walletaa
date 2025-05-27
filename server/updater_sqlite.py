@@ -56,6 +56,7 @@ def create_db_if_not_exists(db_path):
     CREATE TABLE IF NOT EXISTS authorizers (
         authorizer_address TEXT PRIMARY KEY,
         tvl_balance REAL,
+        tvl_timestamp INTEGER,
         last_nonce INTEGER,
         last_chain_id INTEGER,
         code_address TEXT,
@@ -66,6 +67,7 @@ def create_db_if_not_exists(db_path):
     )
     ''')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_tvl_balance ON authorizers(tvl_balance DESC)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_tvl_timestamp ON authorizers(tvl_timestamp ASC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_code_address ON authorizers(code_address)')
     
     # 创建codes表
@@ -144,7 +146,7 @@ def update_info_by_block(info_db_path, block_db_path):
             
             info_cursor.execute("SELECT authorizer_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
             if info_cursor.fetchone() is None:
-                info_cursor.execute("INSERT INTO authorizers (authorizer_address, tvl_balance, last_nonce, last_chain_id, code_address, set_code_tx_count, unset_code_tx_count, historical_code_address, provider) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (authorization['authorizer_address'], 0, 0, 0, "", 0, 0, json.dumps([]), ""))
+                info_cursor.execute("INSERT INTO authorizers (authorizer_address, tvl_balance, tvl_timestamp, last_nonce, last_chain_id, code_address, set_code_tx_count, unset_code_tx_count, historical_code_address, provider) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (authorization['authorizer_address'], 0, 0, 0, 0, "", 0, 0, json.dumps([]), ""))
             
             
             row = info_cursor.execute("SELECT code_address, historical_code_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
@@ -200,15 +202,15 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
     info_read_cursor.execute("SELECT authorizer_address FROM authorizers")
     for row in info_read_cursor:
         authorizer_address = row[0]
-        tvl_cursor.execute("SELECT eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance FROM author_balances WHERE author_address = ?", (authorizer_address,))
+        tvl_cursor.execute("SELECT eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp FROM author_balances WHERE author_address = ?", (authorizer_address,))
         result = tvl_cursor.fetchone()
         if result is not None:
-            eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance = result
+            eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp = result
             if NAME != "bsc":
                 tvl_balance = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
             else:
                 tvl_balance = float(eth_balance) * float(BNB_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) / 10**12 + float(usdc_balance) / 10**12 + float(dai_balance)
-            info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ? WHERE authorizer_address = ?", (tvl_balance, authorizer_address))
+            info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ?, tvl_timestamp = ? WHERE authorizer_address = ?", (tvl_balance, timestamp, authorizer_address))
         
     info_conn.commit()
     info_conn.close()
