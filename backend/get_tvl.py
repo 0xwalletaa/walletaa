@@ -20,6 +20,7 @@ from eth_account import Account
 import rlp
 from eth_utils import keccak
 import argparse
+import os
 
 # 添加命令行参数解析
 parser = argparse.ArgumentParser(description='处理区块链交易数据')
@@ -49,6 +50,9 @@ web3s = [
 
 block_db_path = f'{NAME}_block.db'
 tvl_db_path = f'{NAME}_tvl.db'
+
+# another db
+info_db_path = f'../server/db/{NAME}.db'
 
 # 创建一个线程本地存储
 thread_local = threading.local()
@@ -162,8 +166,24 @@ def get_db_connection():
     return thread_local.db_connection
 
 def get_author_addresses():
-    """从mainnet_blocks数据库获取所有author地址"""
     author_addresses = set()
+    
+    """从info_db_path获取所有author地址"""
+    if os.path.exists(info_db_path):
+        conn = sqlite3.connect(info_db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT authorizer_address FROM authorizers")
+        for row in cursor:
+            if not is_data_fresh(row[0]):
+                author_addresses.add(row[0])
+            if len(author_addresses) >= LIMIT:
+                break
+        conn.close()
+        print(f"从info_db_path获取到 {len(author_addresses)} 个author地址")
+        print(author_addresses)
+        return list(author_addresses)
+    
+    """从mainnet_blocks数据库获取所有author地址"""
     
     try:
         # 连接到数据库
@@ -237,6 +257,8 @@ def get_address_balances(author_addresses):
 
 def is_data_fresh(author_address):
     """检查数据是否在过期时间内"""
+    if author_address == 'error':
+        return True
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
