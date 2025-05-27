@@ -28,6 +28,7 @@ parser.add_argument('--endpoints', nargs='+',  help='Web3 端点列表')
 parser.add_argument('--contract', required=True, help='合约地址')
 parser.add_argument('--num_threads', type=int, default=4, help='并行线程数')
 parser.add_argument('--data_expiry', type=int, default=864000, help='数据过期时间（秒）')
+parser.add_argument('--limit', type=int, default=10000, help='限制处理数量')
 
 args = parser.parse_args()
 
@@ -39,6 +40,8 @@ CONTRACT_ADDRESS = args.contract
 NUM_THREADS = args.num_threads
 # 数据过期时间（秒）
 DATA_EXPIRY = args.data_expiry
+# 限制处理数量
+LIMIT = args.limit
 
 web3s = [
     Web3(Web3.HTTPProvider(endpoint)) for endpoint in WEB3_ENPOINTS
@@ -169,10 +172,9 @@ def get_author_addresses():
         
         # 获取所有type4交易数据
         cursor.execute("SELECT tx_data FROM type4_transactions")
-        tx_data_list = cursor.fetchall()
         
         # 遍历所有交易数据
-        for (tx_data_str,) in tx_data_list:
+        for (tx_data_str,) in cursor:
             try:
                 tx_data = json.loads(tx_data_str)
                 
@@ -181,11 +183,14 @@ def get_author_addresses():
                     for auth in tx_data['authorizationList']:
                         try:
                             author = ecrecover(auth)
-                            if author:
+                            if author and not is_data_fresh(author.lower()):
                                 author_addresses.add(author.lower())
                         except Exception as e:
                             print(f"处理签名恢复时出错: {e}, 数据: {auth}")
                             continue
+                
+                if len(author_addresses) >= LIMIT:
+                    break
             except json.JSONDecodeError as e:
                 print(f"解析交易数据时出错: {e}")
                 continue
@@ -311,20 +316,13 @@ def main():
     
     # 获取所有author地址
     time_start = time.time()
-    author_addresses = get_author_addresses()
+    unfresh_author_addresses = get_author_addresses()
     time_end = time.time()  
-    print(f"获取到 {len(author_addresses)} 个author地址，用时 {time_end - time_start} 秒")
+    print(f"获取到 {len(unfresh_author_addresses)} 个author地址，用时 {time_end - time_start} 秒")
     
-    if not author_addresses:
+    if not unfresh_author_addresses:
         print("未找到author地址，退出程序")
         return
-    
-    unfresh_author_addresses = []
-    for address in author_addresses:
-        if not is_data_fresh(address):
-            unfresh_author_addresses.append(address)
-    
-    unfresh_author_addresses = unfresh_author_addresses[:10000]
     
     # 使用线程池并行获取余额
     print(f"开始更新 {len(unfresh_author_addresses)} 个地址的余额数据...")
