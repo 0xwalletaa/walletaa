@@ -57,6 +57,10 @@
     ]
   },
   {
+    "tag": "Proxy",
+    "functions": ["implementation()"]
+  },
+  {
     "tag": "UUPSUpgradeable",
     "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"]
   },
