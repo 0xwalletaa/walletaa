@@ -58,9 +58,9 @@ CONTRACT_ABI = [
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "target",
-                "type": "address"
+                "internalType": "address[]",
+                "name": "targets",
+                "type": "address[]"
             }
         ],
         "name": "get",
@@ -98,9 +98,9 @@ CONTRACT_ABI = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct BalanceQuery.TokenBalances",
+                "internalType": "struct BalanceQuery.TokenBalances[]",
                 "name": "",
-                "type": "tuple"
+                "type": "tuple[]"
             }
         ],
         "stateMutability": "view",
@@ -202,8 +202,8 @@ def get_author_addresses():
         print(f"获取author地址时出错: {e}")
         return []
 
-def get_address_balances(author_address):
-    """获取指定地址的所有代币余额"""
+def get_address_balances(author_addresses):
+    """批量获取指定地址列表的所有代币余额"""
     try:
         # 随机选择一个Web3节点
         web3 = random.choice(web3s)
@@ -211,22 +211,28 @@ def get_address_balances(author_address):
         # 创建合约实例
         contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
         
+        # 将地址转换为checksum格式
+        checksum_addresses = [Web3.to_checksum_address(addr) for addr in author_addresses]
+        
         # 调用合约获取所有代币余额
-        result = contract.functions.get(Web3.to_checksum_address(author_address)).call()
+        result = contract.functions.get(checksum_addresses).call()
         
         # 解析结果
-        balances = {
-            'eth_balance': str(web3.from_wei(result[0], 'ether')),
-            'weth_balance': str(web3.from_wei(result[1], 'ether')),
-            'wbtc_balance': str(web3.from_wei(result[2], 'ether')),
-            'usdt_balance': str(web3.from_wei(result[3], 'mwei')),
-            'usdc_balance': str(web3.from_wei(result[4], 'mwei')),
-            'dai_balance': str(web3.from_wei(result[5], 'ether'))
-        }
+        all_balances = {}
+        for i, address in enumerate(author_addresses):
+            balances = result[i]
+            all_balances[address] = {
+                'eth_balance': str(web3.from_wei(balances[0], 'ether')),
+                'weth_balance': str(web3.from_wei(balances[1], 'ether')),
+                'wbtc_balance': str(balances[2] / (10 ** 8)),  # WBTC使用8位小数
+                'usdt_balance': str(web3.from_wei(balances[3], 'mwei')),
+                'usdc_balance': str(web3.from_wei(balances[4], 'mwei')),
+                'dai_balance': str(web3.from_wei(balances[5], 'ether'))
+            }
         
-        return balances
+        return all_balances
     except Exception as e:
-        print(f"获取地址 {author_address} 余额时出错: {e}")
+        print(f"批量获取地址余额时出错: {e} from {web3.provider.endpoint_uri}")
         return None
 
 def is_data_fresh(author_address):
@@ -246,11 +252,11 @@ def is_data_fresh(author_address):
     
     return False
 
-def update_author_balance(author_address):
+def update_author_balance(author_addresses):
     """更新作者地址的余额信息"""
     try:
         # 获取所有代币余额
-        balances = get_address_balances(author_address)
+        balances = get_address_balances(author_addresses)
         
         if balances is not None:
             # 更新数据库
@@ -258,57 +264,54 @@ def update_author_balance(author_address):
             cursor = conn.cursor()
             current_time = int(time.time())
             
-            cursor.execute(
-                """
-                INSERT INTO author_balances (
-                    author_address, 
-                    eth_balance, 
-                    weth_balance,
-                    wbtc_balance,
-                    usdt_balance,
-                    usdc_balance,
-                    dai_balance,
-                    timestamp
-                ) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?) 
-                ON CONFLICT(author_address) 
-                DO UPDATE SET 
-                    eth_balance = ?,
-                    weth_balance = ?,
-                    wbtc_balance = ?,
-                    usdt_balance = ?,
-                    usdc_balance = ?,
-                    dai_balance = ?,
-                    timestamp = ?
-                """,
-                (
-                    author_address,
-                    balances['eth_balance'],
-                    balances['weth_balance'],
-                    balances['wbtc_balance'],
-                    balances['usdt_balance'],
-                    balances['usdc_balance'],
-                    balances['dai_balance'],
-                    current_time,
-                    balances['eth_balance'],
-                    balances['weth_balance'],
-                    balances['wbtc_balance'],
-                    balances['usdt_balance'],
-                    balances['usdc_balance'],
-                    balances['dai_balance'],
-                    current_time
+            for address, balance in balances.items():
+                cursor.execute(
+                    """
+                    INSERT INTO author_balances (
+                        author_address, 
+                        eth_balance, 
+                        weth_balance,
+                        wbtc_balance,
+                        usdt_balance,
+                        usdc_balance,
+                        dai_balance,
+                        timestamp
+                    ) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?) 
+                    ON CONFLICT(author_address) 
+                    DO UPDATE SET 
+                        eth_balance = ?,
+                        weth_balance = ?,
+                        wbtc_balance = ?,
+                        usdt_balance = ?,
+                        usdc_balance = ?,
+                        dai_balance = ?,
+                        timestamp = ?
+                    """,
+                    (
+                        address,
+                        balance['eth_balance'],
+                        balance['weth_balance'],
+                        balance['wbtc_balance'],
+                        balance['usdt_balance'],
+                        balance['usdc_balance'],
+                        balance['dai_balance'],
+                        current_time,
+                        balance['eth_balance'],
+                        balance['weth_balance'],
+                        balance['wbtc_balance'],
+                        balance['usdt_balance'],
+                        balance['usdc_balance'],
+                        balance['dai_balance'],
+                        current_time
+                    )
                 )
-            )
             conn.commit()
-            print(f"已更新地址 {author_address} 的余额:")
-            print(f"ETH: {balances['eth_balance']}")
-            print(f"WETH: {balances['weth_balance']}")
-            print(f"WBTC: {balances['wbtc_balance']}")
-            print(f"USDT: {balances['usdt_balance']}")
-            print(f"USDC: {balances['usdc_balance']}")
-            print(f"DAI: {balances['dai_balance']}")
+            print(f"已批量更新 {len(author_addresses)} 个地址的余额")
+            for address, balance in balances.items():
+                print(f"{address}: ETH={balance['eth_balance']}, WETH={balance['weth_balance']}, WBTC={balance['wbtc_balance']}, USDT={balance['usdt_balance']}, USDC={balance['usdc_balance']}, DAI={balance['dai_balance']}")
     except Exception as e:
-        print(f"更新地址 {author_address} 信息时出错: {e}")
+        print(f"更新地址 {', '.join(author_addresses)} 信息时出错: {e}")
 
 def main():
     # 初始化数据库连接（主线程）
@@ -329,11 +332,13 @@ def main():
     success_count = 0
     error_count = 0
     
+    unfresh_author_addresses_split_by_100 = [unfresh_author_addresses[i:i+100] for i in range(0, len(unfresh_author_addresses), 100)]
+    
     with ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
         futures = []
-        for address in unfresh_author_addresses:
+        for addresses in unfresh_author_addresses_split_by_100:
             futures.append(
-                executor.submit(update_author_balance, address)
+                executor.submit(update_author_balance, addresses)
             )
         
         # 等待所有任务完成
@@ -342,7 +347,7 @@ def main():
                 future.result()
                 success_count += 1
                 if success_count % 100 == 0:
-                    print(f"已处理 {success_count} 个地址...")
+                    print(f"已处理 {success_count} 批地址...")
             except Exception as e:
                 print(f"处理地址时出错: {e}")
                 error_count += 1
