@@ -337,7 +337,7 @@ const Welcome: React.FC = () => {
             defaultMessage: 'Receive ETH',
           })}
         >
-          {renderBooleanOrText(code.receiveETH)}
+          {renderWithExtra(code.receiveETH, code.receiveETHExtra)}
         </Descriptions.Item>
         <Descriptions.Item 
           label={intl.formatMessage({
