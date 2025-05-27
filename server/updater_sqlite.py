@@ -143,21 +143,21 @@ def update_info_by_block(info_db_path, block_db_path):
             info_cursor.execute("INSERT INTO authorizations (tx_hash, authorizer_address, code_address, relayer_address, date) VALUES (?, ?, ?, ?, ?)", (type4_tx['tx_hash'], authorization['authorizer_address'], authorization['code_address'], type4_tx['relayer_address'], date))
             
             info_cursor.execute("SELECT authorizer_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
-            if info_cursor.fetchone() is not None:
-                continue
-            else:
-                info_cursor.execute("INSERT INTO authorizers (authorizer_address, tvl_balance, last_nonce, last_chain_id, code_address, set_code_tx_count, unset_code_tx_count, historical_code_address, provider) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (authorization['authorizer_address'], 0, 0, 0, authorization['code_address'], 0, 0, "", ""))
+            if info_cursor.fetchone() is None:
+                info_cursor.execute("INSERT INTO authorizers (authorizer_address, tvl_balance, last_nonce, last_chain_id, code_address, set_code_tx_count, unset_code_tx_count, historical_code_address, provider) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (authorization['authorizer_address'], 0, 0, 0, "", 0, 0, json.dumps([]), ""))
+            
+            
+            row = info_cursor.execute("SELECT code_address, historical_code_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
+            current_code_address, current_historical_code_address_json = row.fetchone()
+            if authorization['code_address'] != current_code_address and current_code_address != "0x0000000000000000000000000000000000000000" and current_code_address != "":
+                current_historical_code_address = json.loads(current_historical_code_address_json)
+                current_historical_code_address.append(current_code_address)
+                info_cursor.execute("UPDATE authorizers SET historical_code_address = ? WHERE authorizer_address = ?", (json.dumps(current_historical_code_address), authorization['authorizer_address']))
+            
                 
             if authorization['code_address'] == "0x0000000000000000000000000000000000000000":
                 info_cursor.execute("UPDATE authorizers SET unset_code_tx_count = unset_code_tx_count + 1 WHERE authorizer_address = ?", (authorization['authorizer_address'],))
-                row = info_cursor.execute("SELECT code_address, historical_code_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
-                current_code_address, current_historical_code_address_json = row.fetchone()
-                if current_code_address != "0x0000000000000000000000000000000000000000":
-                    current_historical_code_address = json.loads(current_historical_code_address_json)
-                    current_historical_code_address.append(current_code_address)
-                    info_cursor.execute("UPDATE authorizers SET historical_code_address = ? WHERE authorizer_address = ?", (json.dumps(current_historical_code_address), authorization['authorizer_address']))
             else:
-                # TODO historical_code_address
                 info_cursor.execute("UPDATE authorizers SET set_code_tx_count = set_code_tx_count + 1 WHERE authorizer_address = ?", (authorization['authorizer_address'],))
             
             info_cursor.execute("UPDATE authorizers SET  last_nonce = ?, last_chain_id = ?, code_address = ? WHERE authorizer_address = ?", (authorization['nonce'], authorization['chain_id'], authorization['code_address'], authorization['authorizer_address']))
