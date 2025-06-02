@@ -12,11 +12,11 @@ NAME = os.environ.get("NAME")
 DATA_EXPIRY = 86400
 
 def create_db_if_not_exists(db_path):
-    """创建信息数据库和表结构"""
+    """Create information database and table structure"""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    # 创建transactions表
+    # Create transactions table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS transactions (
         tx_hash TEXT PRIMARY KEY,
@@ -34,7 +34,7 @@ def create_db_if_not_exists(db_path):
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_transactions_relayer ON transactions(relayer_address)')
     
     
-    # 创建authorizations表
+    # Create authorizations table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS authorizations (
         tx_hash TEXT,
@@ -53,7 +53,7 @@ def create_db_if_not_exists(db_path):
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_date_code ON authorizations(date, code_address)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizations_date_relayer ON authorizations(date, relayer_address)')
 
-    # 创建authorizers表
+    # Create authorizers table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS authorizers (
         authorizer_address TEXT PRIMARY KEY,
@@ -65,14 +65,15 @@ def create_db_if_not_exists(db_path):
         set_code_tx_count INTEGER,
         unset_code_tx_count INTEGER,
         historical_code_address TEXT,
-        provider TEXT
+        historical_code_address_count INTEGER
     )
     ''')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_tvl_balance ON authorizers(tvl_balance DESC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_tvl_timestamp ON authorizers(tvl_timestamp ASC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_code_address ON authorizers(code_address)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_authorizers_historical_code_address_count ON authorizers(historical_code_address_count DESC)')
     
-    # 创建codes表
+    # Create codes table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS codes (
         code_address TEXT PRIMARY KEY,
@@ -86,7 +87,7 @@ def create_db_if_not_exists(db_path):
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_tvl_balance ON codes(tvl_balance DESC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_authorizer_count ON codes(authorizer_count DESC)')
     
-    # 创建relayers表
+    # Create relayers table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS relayers (
         relayer_address TEXT PRIMARY KEY,
@@ -100,7 +101,7 @@ def create_db_if_not_exists(db_path):
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_relayers_authorization_fee ON relayers(authorization_fee DESC)')
     
 
-    # 创建daily表
+    # Create daily table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS daily_stats (
         date TEXT PRIMARY KEY,
@@ -126,8 +127,8 @@ def update_info_by_block(info_db_path, block_db_path):
     block_timestamp_cursor = block_conn.cursor()
     block_tx_cursor.execute("SELECT tx_hash, tx_data FROM type4_transactions ORDER BY block_number ASC")
     
-    # 逐行处理，避免一次性加载所有数据
-    for row in block_tx_cursor:  # 直接迭代cursor
+    # Process row by row to avoid loading all data at once
+    for row in block_tx_cursor:  # Iterate cursor directly
         tx_hash, tx_data_str = row
         
         tx_hash = "0x"+tx_hash
@@ -148,7 +149,7 @@ def update_info_by_block(info_db_path, block_db_path):
             
             info_cursor.execute("SELECT authorizer_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
             if info_cursor.fetchone() is None:
-                info_cursor.execute("INSERT INTO authorizers (authorizer_address, tvl_balance, tvl_timestamp, last_nonce, last_chain_id, code_address, set_code_tx_count, unset_code_tx_count, historical_code_address, provider) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (authorization['authorizer_address'], 0, 0, 0, 0, "", 0, 0, json.dumps([]), ""))
+                info_cursor.execute("INSERT INTO authorizers (authorizer_address, tvl_balance, tvl_timestamp, last_nonce, last_chain_id, code_address, set_code_tx_count, unset_code_tx_count, historical_code_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (authorization['authorizer_address'], 0, 0, 0, 0, "", 0, 0, json.dumps([])))
             
             
             row = info_cursor.execute("SELECT code_address, historical_code_address FROM authorizers WHERE authorizer_address = ?", (authorization['authorizer_address'],))
@@ -156,7 +157,7 @@ def update_info_by_block(info_db_path, block_db_path):
             if authorization['code_address'] != current_code_address and current_code_address != "0x0000000000000000000000000000000000000000" and current_code_address != "":
                 current_historical_code_address = json.loads(current_historical_code_address_json)
                 current_historical_code_address.append(current_code_address)
-                info_cursor.execute("UPDATE authorizers SET historical_code_address = ? WHERE authorizer_address = ?", (json.dumps(current_historical_code_address), authorization['authorizer_address']))
+                info_cursor.execute("UPDATE authorizers SET historical_code_address = ?, historical_code_address_count = ? WHERE authorizer_address = ?", (json.dumps(current_historical_code_address), len(current_historical_code_address), authorization['authorizer_address']))
             
                 
             if authorization['code_address'] == "0x0000000000000000000000000000000000000000":
@@ -199,7 +200,7 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
         except:
             time.sleep(1)
     end_time = time.time()
-    print(f"获取价格信息完成，耗时 {end_time - start_time} 秒")
+    print(f"Price information retrieval completed, took {end_time - start_time} seconds")
     
     info_read_cursor.execute("SELECT authorizer_address FROM authorizers WHERE tvl_timestamp < ?", (int(time.time()) - DATA_EXPIRY,))
     expired_count = 0
@@ -216,7 +217,7 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
                 tvl_balance = float(eth_balance) * float(BNB_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) / 10**12 + float(usdc_balance) / 10**12 + float(dai_balance)
             info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ?, tvl_timestamp = ? WHERE authorizer_address = ?", (tvl_balance, timestamp, authorizer_address))
 
-    print(f"过期数据数量：{expired_count}")
+    print(f"Expired data count: {expired_count}")
     info_conn.commit()
     info_conn.close()
     tvl_conn.close()
@@ -252,13 +253,12 @@ def update_info_by_code(info_db_path, code_db_path):
     for item in code_info:
         code_address = item['address'].lower()
         info_write_cursor.execute("UPDATE codes SET provider = ?, details = ? WHERE code_address = ?", (item['provider'], json.dumps(item), code_address))
-        info_write_cursor.execute("UPDATE authorizers SET provider = ? WHERE code_address = ?", (item['provider'], code_address))
     
     info_conn.commit()
     info_conn.close()
 
 
-def update_info_daily(info_db_path):
+def update_info_daily(info_db_path, from_latest=True):
     info_conn = sqlite3.connect(info_db_path)
     info_read_cursor = info_conn.cursor()
     info_write_cursor = info_conn.cursor()
@@ -266,13 +266,31 @@ def update_info_daily(info_db_path):
     cumulative_tx_count = 0
     cumulative_authorization_count = 0
     
-    info_read_cursor.execute("SELECT date, count(distinct tx_hash), count(distinct authorizer_address), count(distinct code_address), count(distinct relayer_address) FROM authorizations GROUP BY date")
-    for row in info_read_cursor:
-        date, tx_count, authorization_count, code_count, relayer_count = row
-        cumulative_tx_count += tx_count
-        cumulative_authorization_count += authorization_count
-        
-        info_write_cursor.execute("INSERT INTO daily_stats (date, tx_count, authorization_count, code_count, relayer_count, cumulative_transaction_count, cumulative_authorization_count) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(date) DO UPDATE SET tx_count = excluded.tx_count, authorization_count = excluded.authorization_count, code_count = excluded.code_count, relayer_count = excluded.relayer_count, cumulative_transaction_count = excluded.cumulative_transaction_count, cumulative_authorization_count = excluded.cumulative_authorization_count", (date, tx_count, authorization_count, code_count, relayer_count, cumulative_tx_count, cumulative_authorization_count))
+    if from_latest:
+        info_read_cursor.execute("SELECT date, cumulative_transaction_count, cumulative_authorization_count FROM daily_stats ORDER BY date DESC LIMIT 3")
+        rows = info_read_cursor.fetchall()
+        if len(rows) >= 3:
+            from_last_date = rows[2][0]
+            cumulative_tx_count = rows[2][1]
+            cumulative_authorization_count = rows[2][2]            
+            info_read_cursor.execute("SELECT date, count(distinct tx_hash), count(distinct authorizer_address), count(distinct code_address), count(distinct relayer_address) FROM authorizations WHERE date > ? GROUP BY date", (from_last_date,))            
+            for row in info_read_cursor:
+                date, tx_count, authorization_count, code_count, relayer_count = row
+                cumulative_tx_count += tx_count
+                cumulative_authorization_count += authorization_count
+                info_write_cursor.execute("INSERT INTO daily_stats (date, tx_count, authorization_count, code_count, relayer_count, cumulative_transaction_count, cumulative_authorization_count) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(date) DO UPDATE SET tx_count = excluded.tx_count, authorization_count = excluded.authorization_count, code_count = excluded.code_count, relayer_count = excluded.relayer_count, cumulative_transaction_count = excluded.cumulative_transaction_count, cumulative_authorization_count = excluded.cumulative_authorization_count", (date, tx_count, authorization_count, code_count, relayer_count, cumulative_tx_count, cumulative_authorization_count))
+            
+        else:
+            from_latest = False
+            
+            
+    if not from_latest:    
+        info_read_cursor.execute("SELECT date, count(distinct tx_hash), count(distinct authorizer_address), count(distinct code_address), count(distinct relayer_address) FROM authorizations GROUP BY date")
+        for row in info_read_cursor:
+            date, tx_count, authorization_count, code_count, relayer_count = row
+            cumulative_tx_count += tx_count
+            cumulative_authorization_count += authorization_count
+            info_write_cursor.execute("INSERT INTO daily_stats (date, tx_count, authorization_count, code_count, relayer_count, cumulative_transaction_count, cumulative_authorization_count) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(date) DO UPDATE SET tx_count = excluded.tx_count, authorization_count = excluded.authorization_count, code_count = excluded.code_count, relayer_count = excluded.relayer_count, cumulative_transaction_count = excluded.cumulative_transaction_count, cumulative_authorization_count = excluded.cumulative_authorization_count", (date, tx_count, authorization_count, code_count, relayer_count, cumulative_tx_count, cumulative_authorization_count))
     
     info_conn.commit()
     info_conn.close()
@@ -281,26 +299,31 @@ block_db_path = f'../backend/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
 code_db_path = f'../backend/{NAME}_code.db'
 
+try:
+    os.mkdir('db')
+except:
+    pass
+
 info_db_path = f'./db/{NAME}.db'
-print(f"开始处理 {NAME} 网络...")
+print(f"\nStarting to process {NAME} network...")
 
 create_db_if_not_exists(info_db_path)
 start_time = time.time()
 update_info_by_block(info_db_path, block_db_path)
 end_time = time.time()
-print(f"更新区块信息完成，耗时 {end_time - start_time} 秒")
+print(f"Block information update completed, took {end_time - start_time} seconds")
 
 start_time = time.time()
 update_info_by_tvl(info_db_path, tvl_db_path)
 end_time = time.time()
-print(f"更新TVL信息完成，耗时 {end_time - start_time} 秒")
+print(f"TVL information update completed, took {end_time - start_time} seconds")
 
 start_time = time.time()
 update_info_by_code(info_db_path, code_db_path)
 end_time = time.time()
-print(f"更新代码信息完成，耗时 {end_time - start_time} 秒")
+print(f"Code information update completed, took {end_time - start_time} seconds")
 
 start_time = time.time()
-update_info_daily(info_db_path)
+update_info_daily(info_db_path, from_latest=True)
 end_time = time.time()
-print(f"更新每日信息完成，耗时 {end_time - start_time} 秒")
+print(f"Daily information update completed, took {end_time - start_time} seconds")

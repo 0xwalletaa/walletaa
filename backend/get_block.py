@@ -12,12 +12,12 @@ import random
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 
-# 添加命令行参数解析
-parser = argparse.ArgumentParser(description='处理区块链交易数据')
-parser.add_argument('--name', help='区块链网络名称')
-parser.add_argument('--endpoints', nargs='+',  help='Web3 端点列表')
-parser.add_argument('--start_block', type=int, help='起始区块号')
-parser.add_argument('--num_threads', type=int, default=4, help='并行线程数')
+# Add command line argument parsing
+parser = argparse.ArgumentParser(description='Process blockchain transaction data')
+parser.add_argument('--name', help='Blockchain network name')
+parser.add_argument('--endpoints', nargs='+', help='List of Web3 endpoints')
+parser.add_argument('--start_block', type=int, help='Starting block number')
+parser.add_argument('--num_threads', type=int, default=4, help='Number of parallel threads')
 
 args = parser.parse_args()
 
@@ -32,7 +32,7 @@ web3s = [
     Web3(Web3.HTTPProvider(endpoint, request_kwargs={'timeout': 10})) for endpoint in WEB3_ENPOINTS
 ]
 
-# 创建一个线程本地存储
+# Create thread-local storage
 thread_local = threading.local()
 
 if NAME == 'bsc':
@@ -40,7 +40,7 @@ if NAME == 'bsc':
     for i in range(len(web3s)):
         web3s[i].middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
 
-# 辅助函数：处理HexBytes对象的JSON序列化
+# Helper function: handle JSON serialization of HexBytes objects
 def serialize_web3_tx(tx_dict):
     result = {}
     for key, value in tx_dict.items():
@@ -51,27 +51,27 @@ def serialize_web3_tx(tx_dict):
                           item.hex() if isinstance(item, HexBytes) else item 
                           for item in value]
         elif hasattr(value, 'items'):
-            # 处理任何类似字典的对象(包括AttributeDict)
+            # Handle any dictionary-like objects (including AttributeDict)
             result[key] = serialize_web3_tx(dict(value))
         else:
             result[key] = value
     return result
 
-# 获取线程本地的数据库连接
+# Get thread-local database connection
 def get_db_connection():
     if not hasattr(thread_local, "db_connection"):
         thread_local.db_connection = sqlite3.connect(block_db_path)
     return thread_local.db_connection
 
-# 初始化数据库
+# Initialize database
 def init_db():
     conn = sqlite3.connect(block_db_path)
     cursor = conn.cursor()
     
-    # 检查blocks表是否存在
+    # Check if blocks table exists
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='blocks'")
     if not cursor.fetchone():
-        # 创建区块表
+        # Create blocks table
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS blocks (
             block_number INTEGER PRIMARY KEY,
@@ -80,17 +80,17 @@ def init_db():
             timestamp INTEGER
         )
         ''')
-        print("创建blocks表")
+        print("Created blocks table")
         cursor.execute('''
         CREATE INDEX IF NOT EXISTS idx_blocks_block_number 
         ON blocks(block_number ASC);
         ''')
-        print("创建idx_blocks_block_number索引")
+        print("Created idx_blocks_block_number index")
     
-    # 检查type4_transactions表是否存在
+    # Check if type4_transactions table exists
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='type4_transactions'")
     if not cursor.fetchone():
-        # 创建交易表 (只存储type=4的交易)
+        # Create transaction table (only store type=4 transactions)
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS type4_transactions (
             tx_hash TEXT PRIMARY KEY,
@@ -99,31 +99,31 @@ def init_db():
             FOREIGN KEY (block_number) REFERENCES blocks(block_number)
         )
         ''')
-        print("创建type4_transactions表")
+        print("Created type4_transactions table")
         cursor.execute('''
         CREATE INDEX IF NOT EXISTS idx_type4_transactions_block_number 
         ON type4_transactions(block_number ASC);
         ''')
-        print("创建idx_type4_transactions_block_number索引")
+        print("Created idx_type4_transactions_block_number index")
     
     conn.commit()
     return conn
 
-# 检查区块是否已存在于数据库中
+# Check if block already exists in database
 def is_block_exists(conn, block_number):
     cursor = conn.cursor()
     cursor.execute("SELECT 1 FROM blocks WHERE block_number = ?", (block_number,))
     return cursor.fetchone() is not None
 
-# 处理并存储区块信息
+# Process and store block information
 def process_block(block_number):
     conn = get_db_connection()
     try:
-        # 获取完整区块信息
+        # Get complete block information
         block = random.choice(web3s).eth.get_block(block_number, full_transactions=True)
         transactions = block.transactions
         
-        # 计算type=4的交易数量
+        # Calculate number of type=4 transactions
         type4_count = 0
         type4_txs = []
         
@@ -132,18 +132,18 @@ def process_block(block_number):
             if tx_type == 4:
                 type4_count += 1
                 tx_hash = tx.hash.hex()
-                # 使用自定义函数处理HexBytes序列化问题
+                # Use custom function to handle HexBytes serialization issues
                 tx_data = json.dumps(serialize_web3_tx(dict(tx)))
                 type4_txs.append((tx_hash, block_number, tx_data))
         
-        # 存储区块信息
+        # Store block information
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO blocks (block_number, tx_count, type4_tx_count, timestamp) VALUES (?, ?, ?, ?)",
             (block_number, len(transactions), type4_count, block.timestamp)
         )
         
-        # 存储type=4的交易
+        # Store type=4 transactions
         if type4_txs:
             cursor.executemany(
                 "INSERT INTO type4_transactions (tx_hash, block_number, tx_data) VALUES (?, ?, ?)",
@@ -151,32 +151,32 @@ def process_block(block_number):
             )
         
         conn.commit()
-        print(f"区块 #{block_number} 已处理: 共 {len(transactions)} 笔交易，其中 {type4_count} 笔type=4交易")
+        print(f"Block #{block_number} processed: {len(transactions)} transactions total, {type4_count} type=4 transactions")
         return True
     
     except Exception as e:
-        print(f"处理区块 #{block_number} 时出错: {str(e)}")
+        print(f"Error processing block #{block_number}: {str(e)}")
         conn.rollback()
         return False
 
 def process_block_with_retry(block_number):
-    # 重试机制
+    # Retry mechanism
     max_retries = 3
     for retry in range(max_retries):
         if process_block(block_number):
             return True
         else:
-            print(f"重试处理区块 #{block_number}，第 {retry+1}/{max_retries} 次尝试")
+            print(f"Retrying block #{block_number}, attempt {retry+1}/{max_retries}")
     return False
 
 def main():
-    # 初始化数据库
+    # Initialize database
     conn = init_db()
     
     try:
-        # 获取最新区块号
+        # Get latest block number
         latest_block = random.choice(web3s).eth.block_number
-        print(f"当前最新区块: {latest_block}")
+        print(f"Current latest block: {latest_block}")
         
         blocks_needed = []
         for block_number in range(START_BLOCK, latest_block):
@@ -185,11 +185,11 @@ def main():
                 if len(blocks_needed) > 10000:
                     break
                 
-        print(f"需要处理的区块数: {len(blocks_needed)}")
+        print(f"Number of blocks to process: {len(blocks_needed)}")
         time.sleep(1)
 
-        # 使用线程池并行处理区块
-        print(f"开始使用 {NUM_THREADS} 个线程并行处理区块...")
+        # Use thread pool to process blocks in parallel
+        print(f"Starting to process blocks in parallel using {NUM_THREADS} threads...")
         success_count = 0
         error_count = 0
         
@@ -200,7 +200,7 @@ def main():
                     executor.submit(process_block_with_retry, block_number)
                 )
             
-            # 等待所有任务完成
+            # Wait for all tasks to complete
             for future in futures:
                 try:
                     result = future.result()
@@ -209,16 +209,20 @@ def main():
                     else:
                         error_count += 1
                     
-                    if (success_count + error_count) % 10 == 0:
-                        print(f"已处理 {success_count + error_count} 个区块, 成功: {success_count}, 失败: {error_count}")
+                    if (success_count + error_count) % 100 == 0:
+                        print(f"Processed {success_count + error_count} blocks...")
                 except Exception as e:
-                    print(f"处理区块时出错: {e}")
+                    print(f"Error processing block: {e}")
                     error_count += 1
         
-        print(f"\n处理完成! 成功: {success_count}, 失败: {error_count}")
-    
+        print(f"\nProcessing complete! Success: {success_count}, Failed: {error_count}")
+        
+    except Exception as e:
+        print(f"Program error: {e}")
     finally:
         conn.close()
+        
+    print("\nProgram finished")
 
 if __name__ == "__main__":
     main() 

@@ -14,53 +14,53 @@ NAME = os.environ.get("NAME")
 
 util.NAME = NAME
 
-# 配置日志
+# Configure logging
 log_dir = f"logs_{NAME}"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 log_file = os.path.join(log_dir, "server.log")
 
-# 创建日志处理器
+# Create log handler
 handler = RotatingFileHandler(log_file, maxBytes=10*1024*1024, backupCount=5)
 handler.setFormatter(logging.Formatter(
     '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
 ))
 handler.setLevel(logging.INFO)
 
-# 配置Flask应用日志
+# Configure Flask application logging
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # 添加CORS支持，允许所有域名访问
+CORS(app, resources={r"/*": {"origins": "*"}})  # Add CORS support, allow all domains to access
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
 
-# 数据库路径
+# Database path
 DB_PATH = f'./db/{NAME}.db'
 
 def get_db_connection():
-    """获取数据库连接"""
+    """Get database connection"""
     conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row  # 使返回结果可以像字典一样访问
+    conn.row_factory = sqlite3.Row  # Make returned results accessible like a dictionary
     return conn
 
-# 分页查询接口
+# Pagination query interface
 @app.route('/transactions', methods=['GET'])
 def get_transactions():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
-            if len(search_by) == 42:  # 地址
+            if len(search_by) == 42:  # address
                 query = 'SELECT * FROM transactions WHERE relayer_address = ? OR tx_hash in (SELECT tx_hash FROM authorizations WHERE authorizer_address = ? OR code_address = ?)'
                 params = [search_by.lower(), search_by.lower(), search_by.lower()]
-            elif len(search_by) == 66:  # 交易哈希
+            elif len(search_by) == 66:  # transaction hash
                 query = 'SELECT * FROM transactions WHERE tx_hash = ?'
                 params = [search_by]
             else:
@@ -70,26 +70,26 @@ def get_transactions():
             query = 'SELECT * FROM transactions'
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
             query += ' ORDER BY timestamp ASC'
         else:
             query += ' ORDER BY timestamp DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典并解析JSON字段
+        # Convert to dictionary and parse JSON fields
         transactions = []
         for row in rows:
             tx = dict(row)
@@ -97,7 +97,7 @@ def get_transactions():
             transactions.append(tx)
         
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -106,54 +106,72 @@ def get_transactions():
             'transactions': transactions
         })
     except Exception as e:
-        app.logger.error(f"获取交易数据时出错: {str(e)}")
+        app.logger.error(f"Error getting transaction data: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# authorizers分页查询接口
+# authorizers pagination query interface
 @app.route('/authorizers', methods=['GET'])
 def get_authorizers():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
+        order_by = request.args.get('order_by', 'tvl_balance')
+        
+        if order_by not in set(['tvl_balance', 'historical_code_address_count']):
+            order_by = 'tvl_balance'
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
             if len(search_by) == 42:
-                query = 'SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000" AND (authorizer_address = ? or code_address = ?)'
+                # 对于地址搜索，先过滤 authorizers 表，再 JOIN codes 表
+                query = '''SELECT a.*, c.provider 
+                          FROM (SELECT * FROM authorizers 
+                                WHERE code_address != "0x0000000000000000000000000000000000000000" 
+                                AND (authorizer_address = ? OR code_address = ?)) a 
+                          LEFT JOIN codes c ON a.code_address = c.code_address'''
                 params = [search_by.lower(), search_by.lower()]
             else:
-                query = 'SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000" AND provider LIKE ?'
+                # 对于 provider 搜索，先过滤 codes 表，再过滤 authorizers 表，再 JOIN codes 表
+                query = '''SELECT a.*, c.provider 
+                          FROM (SELECT * FROM authorizers 
+                                WHERE code_address != "0x0000000000000000000000000000000000000000" 
+                                AND (code_address in (SELECT code_address FROM codes WHERE provider LIKE ?))) a 
+                          LEFT JOIN codes c ON a.code_address = c.code_address'''
                 params = [f'%{search_by}%']
         else:
-            query = 'SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000"'
+            # 默认查询，先过滤 authorizers 表，再 JOIN codes 表
+            query = '''SELECT a.*, c.provider 
+                      FROM (SELECT * FROM authorizers 
+                            WHERE code_address != "0x0000000000000000000000000000000000000000") a 
+                      LEFT JOIN codes c ON a.code_address = c.code_address'''
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
-            query += ' ORDER BY tvl_balance ASC'
+            query += f' ORDER BY a.{order_by} ASC'
         else:
-            query += ' ORDER BY tvl_balance DESC'
+            query += f' ORDER BY a.{order_by} DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典并解析JSON字段
+        # Convert to dictionary and parse JSON fields
         authorizers = []
         for row in rows:
             auth = dict(row)
@@ -162,7 +180,7 @@ def get_authorizers():
         
         conn.close()
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -171,54 +189,69 @@ def get_authorizers():
             'authorizers': authorizers
         })
     except Exception as e:
-        app.logger.error(f"获取授权者数据时出错: {str(e)}")
+        app.logger.error(f"Error getting authorizer data: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# authorizers_with_zero分页查询接口
+# authorizers_with_zero pagination query interface
 @app.route('/authorizers_with_zero', methods=['GET'])
 def get_authorizers_with_zero():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
+        order_by = request.args.get('order_by', 'tvl_balance')
+        
+        if order_by not in set(['tvl_balance', 'historical_code_address_count']):
+            order_by = 'tvl_balance'
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
             if len(search_by) == 42:
-                query = 'SELECT * FROM authorizers WHERE authorizer_address = ? or code_address = ?'
+                # 对于地址搜索，先过滤 authorizers 表，再 JOIN codes 表
+                query = '''SELECT a.*, c.provider 
+                          FROM (SELECT * FROM authorizers 
+                                WHERE authorizer_address = ? OR code_address = ?) a 
+                          LEFT JOIN codes c ON a.code_address = c.code_address'''
                 params = [search_by.lower(), search_by.lower()]
             else:
-                query = 'SELECT * FROM authorizers WHERE provider LIKE ?'
+                # 对于 provider 搜索，先过滤 codes 表，再过滤 authorizers 表，再 JOIN codes 表
+                query = '''SELECT a.*, c.provider 
+                          FROM (SELECT * FROM authorizers 
+                                WHERE code_address in (SELECT code_address FROM codes WHERE provider LIKE ?)) a 
+                          LEFT JOIN codes c ON a.code_address = c.code_address'''
                 params = [f'%{search_by}%']
         else:
-            query = 'SELECT * FROM authorizers'
+            # 默认查询，先过滤 authorizers 表，再 JOIN codes 表
+            query = '''SELECT a.*, c.provider 
+                      FROM (SELECT * FROM authorizers) a 
+                      LEFT JOIN codes c ON a.code_address = c.code_address'''
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
-            query += ' ORDER BY tvl_balance ASC'
+            query += f' ORDER BY a.{order_by} ASC'
         else:
-            query += ' ORDER BY tvl_balance DESC'
+            query += f' ORDER BY a.{order_by} DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典并解析JSON字段
+        # Convert to dictionary and parse JSON fields
         authorizers = []
         for row in rows:
             auth = dict(row)
@@ -227,7 +260,7 @@ def get_authorizers_with_zero():
         
         conn.close()
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -236,23 +269,23 @@ def get_authorizers_with_zero():
             'authorizers': authorizers
         })
     except Exception as e:
-        app.logger.error(f"获取带零授权者数据时出错: {str(e)}")
+        app.logger.error(f"Error getting authorizer data (including zero): {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# codes_by_tvl_balance分页查询接口
+# codes_by_tvl_balance pagination query interface
 @app.route('/codes_by_tvl_balance', methods=['GET'])
 def get_codes_by_tvl_balance():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
             if len(search_by) == 42:
                 query = 'SELECT * FROM codes WHERE code_address = ?'
@@ -264,26 +297,26 @@ def get_codes_by_tvl_balance():
             query = 'SELECT * FROM codes'
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
             query += ' ORDER BY tvl_balance ASC'
         else:
             query += ' ORDER BY tvl_balance DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典并解析JSON字段
+        # Convert to dictionary and parse JSON fields
         codes = []
         for row in rows:
             code = dict(row)
@@ -293,7 +326,7 @@ def get_codes_by_tvl_balance():
         
         conn.close()
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -302,23 +335,23 @@ def get_codes_by_tvl_balance():
             'codes': codes
         })
     except Exception as e:
-        app.logger.error(f"获取以TVL余额排序的代码数据时出错: {str(e)}")
+        app.logger.error(f"Error getting codes by TVL balance: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# codes_by_authorizer_count分页查询接口
+# codes_by_authorizer_count pagination query interface
 @app.route('/codes_by_authorizer_count', methods=['GET'])
 def get_codes_by_authorizer_count():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
             if len(search_by) == 42:
                 query = 'SELECT * FROM codes WHERE code_address = ?'
@@ -330,26 +363,26 @@ def get_codes_by_authorizer_count():
             query = 'SELECT * FROM codes'
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
             query += ' ORDER BY authorizer_count ASC'
         else:
             query += ' ORDER BY authorizer_count DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典并解析JSON字段
+        # Convert to dictionary and parse JSON fields
         codes = []
         for row in rows:
             code = dict(row)
@@ -359,7 +392,7 @@ def get_codes_by_authorizer_count():
         
         conn.close()
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -368,23 +401,23 @@ def get_codes_by_authorizer_count():
             'codes': codes
         })
     except Exception as e:
-        app.logger.error(f"获取以授权者数量排序的代码数据时出错: {str(e)}")
+        app.logger.error(f"Error getting codes by authorizer count: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# relayers_by_tx_count分页查询接口
+# relayers_by_tx_count pagination query interface
 @app.route('/relayers_by_tx_count', methods=['GET'])
 def get_relayers_by_tx_count():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
             query = 'SELECT * FROM relayers WHERE relayer_address = ?'
             params = [search_by.lower()]
@@ -392,31 +425,31 @@ def get_relayers_by_tx_count():
             query = 'SELECT * FROM relayers'
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
             query += ' ORDER BY tx_count ASC'
         else:
             query += ' ORDER BY tx_count DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典
+        # Convert to dictionary
         relayers = [dict(row) for row in rows]
         
         conn.close()
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -425,23 +458,23 @@ def get_relayers_by_tx_count():
             'relayers': relayers
         })
     except Exception as e:
-        app.logger.error(f"获取以交易数量排序的中继者数据时出错: {str(e)}")
+        app.logger.error(f"Error getting relayers by tx count: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# relayers_by_authorization_count分页查询接口
+# relayers_by_authorization_count pagination query interface
 @app.route('/relayers_by_authorization_count', methods=['GET'])
 def get_relayers_by_authorization_count():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
             query = 'SELECT * FROM relayers WHERE relayer_address = ?'
             params = [search_by.lower()]
@@ -449,31 +482,31 @@ def get_relayers_by_authorization_count():
             query = 'SELECT * FROM relayers'
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
             query += ' ORDER BY authorization_count ASC'
         else:
             query += ' ORDER BY authorization_count DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典
+        # Convert to dictionary
         relayers = [dict(row) for row in rows]
         
         conn.close()
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -482,23 +515,23 @@ def get_relayers_by_authorization_count():
             'relayers': relayers
         })
     except Exception as e:
-        app.logger.error(f"获取以授权数量排序的中继者数据时出错: {str(e)}")
+        app.logger.error(f"Error getting relayers by authorization count: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# relayers_by_authorization_fee分页查询接口
+# relayers_by_authorization_fee pagination query interface
 @app.route('/relayers_by_authorization_fee', methods=['GET'])
 def get_relayers_by_authorization_fee():
     try:
-        # 获取分页参数，默认第1页，每页10条
+        # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 10))
-        order = request.args.get('order', 'desc')  # 获取排序参数，默认为倒序
-        search_by = request.args.get('search_by', '')  # 获取过滤search_by参数
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 构建查询
+        # Build query
         if search_by != '':
             query = 'SELECT * FROM relayers WHERE relayer_address = ?'
             params = [search_by.lower()]
@@ -506,31 +539,31 @@ def get_relayers_by_authorization_fee():
             query = 'SELECT * FROM relayers'
             params = []
         
-        # 添加排序
+        # Add sorting
         if order.lower() == 'asc':
             query += ' ORDER BY authorization_fee ASC'
         else:
             query += ' ORDER BY authorization_fee DESC'
         
-        # 获取总数
+        # Get total count
         count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
         cursor.execute(count_query, params)
         total = cursor.fetchone()[0]
         
-        # 添加分页
+        # Add pagination
         query += ' LIMIT ? OFFSET ?'
         params.extend([page_size, (page - 1) * page_size])
         
-        # 执行查询
+        # Execute query
         cursor.execute(query, params)
         rows = cursor.fetchall()
         
-        # 转换为字典
+        # Convert to dictionary
         relayers = [dict(row) for row in rows]
         
         conn.close()
         
-        # 返回结果
+        # Return results
         return jsonify({
             'total': total,
             'page': page,
@@ -539,17 +572,17 @@ def get_relayers_by_authorization_fee():
             'relayers': relayers
         })
     except Exception as e:
-        app.logger.error(f"获取以授权费用排序的中继者数据时出错: {str(e)}")
+        app.logger.error(f"Error getting relayers by authorization fee: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# overview查询接口
+# overview query interface
 @app.route('/overview', methods=['GET'])
 def get_overview():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 获取基本统计信息
+        # Get basic statistical information
         cursor.execute('SELECT COUNT(*) as tx_count FROM transactions')
         tx_count = cursor.fetchone()['tx_count']
         
@@ -562,7 +595,7 @@ def get_overview():
         cursor.execute('SELECT COUNT(*) as relayer_count FROM relayers')
         relayer_count = cursor.fetchone()['relayer_count']
         
-        # 获取每日统计数据
+        # Get daily statistical data
         cursor.execute('SELECT * FROM daily_stats ORDER BY date')
         daily_stats = cursor.fetchall()
         
@@ -582,7 +615,7 @@ def get_overview():
             daily_code_count[date] = row['code_count']
             daily_relayer_count[date] = row['relayer_count']
         
-        # 获取top10数据
+        # Get top10 data
         cursor.execute('SELECT * FROM codes ORDER BY authorizer_count DESC LIMIT 10')
         top10_codes_rows = cursor.fetchall()
         top10_codes = []
@@ -625,13 +658,13 @@ def get_overview():
             'overview': overview
         })
     except Exception as e:
-        app.logger.error(f"获取overview数据时出错: {str(e)}")
+        app.logger.error(f"Error getting overview data: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    # 开发环境使用
+    # Development environment usage
     app.run(host='0.0.0.0', port=3000, debug=False)
 else:
-    # 生产环境入口点
-    # 使用Gunicorn或uWSGI运行时，这里是WSGI入口点
-    app.logger.info(f"{NAME}应用已启动，准备接受请求") 
+    # Production environment entry point
+    # When using Gunicorn or uWSGI, this is the WSGI entry point
+    app.logger.info(f"{NAME} application has started, ready to accept requests") 

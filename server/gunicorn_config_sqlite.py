@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Gunicorn配置文件
-适用于生产环境部署
+Gunicorn configuration file
+For production environment deployment
 """
 
 import multiprocessing
@@ -15,53 +15,53 @@ import argparse
 PORT = os.environ.get("PORT")
 NAME = os.environ.get("NAME")
 
-# 绑定的IP和端口
+# Bind IP and port
 bind = f"0.0.0.0:{PORT}"
 
 log_dir = f"logs_{NAME}"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
-# 工作模式
+# Working mode
 worker_class = "sync"
 
-# 并发工作进程数，通常设置为 (2 x $num_cores) + 1
-# 也可以根据内存需求适当调整
+# Number of concurrent worker processes, usually set to (2 x $num_cores) + 1
+# Can also be adjusted according to memory requirements
 workers = 2 #  multiprocessing.cpu_count() * 2 + 1
 
-# 每个工作进程的线程数
+# Number of threads per worker process
 threads = 2
 
-# 最大客户端并发数
+# Maximum client concurrency
 worker_connections = 1000
 
-# 超时时间（秒）
+# Timeout (seconds)
 timeout = 60
 
-# 最大请求数，超过后工作进程会重启
+# Maximum number of requests, worker process will restart after exceeding
 max_requests = 2000
 max_requests_jitter = 200
 
-# 预加载应用以减少启动时间
+# Preload application to reduce startup time
 preload_app = True
 
-# 后台运行
+# Run in background
 daemon = False
 
-# 访问日志
+# Access log
 accesslog = f"{log_dir}/gunicorn_access.log"
 access_log_format = '%({X-Real-IP}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
-# 错误日志
+# Error log
 errorlog = f"{log_dir}/gunicorn_error.log"
 loglevel = "info"
 
-# 进程ID文件
+# Process ID file
 pidfile = f"{log_dir}/gunicorn.pid"
 
-# 启动前和关闭后的钩子函数
+# Hook functions before startup and after shutdown
 def on_starting(server):
-    server.log.info("Gunicorn服务器正在启动...")
+    server.log.info("Gunicorn server is starting...")
 
 def on_exit(server):
-    server.log.info("Gunicorn服务器正在关闭...")
+    server.log.info("Gunicorn server is shutting down...")

@@ -20,21 +20,21 @@ def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
         address_bytes = to_bytes(hexstr=address_)
         nonce = to_bytes(hexstr=nonce_)
 
-        # RLP 编码 [chain_id, address, nonce]
+        # RLP encode [chain_id, address, nonce]
         encoded_data = rlp.encode([chain_id, address_bytes, nonce])
 
-        # 构造 EIP-7702 消息：0x05 || rlp(...)
+        # Construct EIP-7702 message: 0x05 || rlp(...)
         message_bytes = b'\x05' + encoded_data
-        # 计算 Keccak-256 哈希
+        # Calculate Keccak-256 hash
         message_hash = keccak(message_bytes)
 
-        # 将签名组件转换为标准格式
+        # Convert signature components to standard format
         r_bytes = HexBytes(r_)
         s_bytes = HexBytes(s_)
         # yParity (0 or 1) is used directly
         y_parity = int(y_parity_, 16)
 
-        # 创建vrs元组
+        # Create vrs tuple
         vrs = (y_parity, r_bytes, s_bytes)
         recovered_address = Account()._recover_hash(message_hash, vrs=vrs)
     except Exception as e:
@@ -95,13 +95,13 @@ def parse_type4_tx_data(tx_data_str_):
 def get_all_type4_txs():
     conn = sqlite3.connect(f'../backend/{NAME}_block.db')
     cursor = conn.cursor()
-    # 获取所有type4交易数据
+    # Get all type4 transaction data
     cursor.execute("SELECT tx_hash, tx_data FROM type4_transactions")
     rows = cursor.fetchall()
     
     type4_txs = []
     
-    # 遍历所有交易数据
+    # Iterate through all transaction data
     for (tx_hash, tx_data_str) in rows:
         type4_tx = parse_type4_tx_data(tx_data_str)
         type4_txs.append(type4_tx)
@@ -147,7 +147,7 @@ def get_authorizer_info(txs, code_infos, include_zero=False):
 
     conn = sqlite3.connect(f'../backend/{NAME}_tvl.db')
     cursor = conn.cursor()
-    # 查询所有地址和余额
+    # Query all addresses and balances
     
     while True:
         try:
@@ -411,7 +411,7 @@ def get_code_function_info():
     rows = cursor.fetchall()
     
     ret = {}
-    # 遍历所有数据
+    # Iterate through all data
     for (code_address, code) in rows:
         functions = parse_functions(code)
         tags = []
