@@ -628,7 +628,16 @@ def get_overview():
         cursor.execute('SELECT * FROM relayers ORDER BY tx_count DESC LIMIT 10')
         top10_relayers = [dict(row) for row in cursor.fetchall()]
         
-        cursor.execute('SELECT * FROM authorizers WHERE code_address != "0x0000000000000000000000000000000000000000" ORDER BY tvl_balance DESC LIMIT 10')
+        cursor.execute('''
+            SELECT a.*, c.provider 
+            FROM (
+                SELECT * FROM authorizers 
+                WHERE code_address != "0x0000000000000000000000000000000000000000" 
+                ORDER BY tvl_balance DESC 
+                LIMIT 10
+            ) a 
+            LEFT JOIN codes c ON a.code_address = c.code_address
+        ''')
         top10_authorizers_rows = cursor.fetchall()
         top10_authorizers = []
         for row in top10_authorizers_rows:
