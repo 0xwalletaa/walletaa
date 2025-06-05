@@ -109,11 +109,13 @@ def init_db():
     conn.commit()
     return conn
 
-# Check if block already exists in database
-def is_block_exists(conn, block_number):
+
+# Get all existing block numbers from database
+def get_existing_blocks(conn):
     cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM blocks WHERE block_number = ?", (block_number,))
-    return cursor.fetchone() is not None
+    cursor.execute("SELECT block_number FROM blocks")
+    existing_blocks = set(row[0] for row in cursor.fetchall())
+    return existing_blocks
 
 # Process and store block information
 def process_block(block_number):
@@ -178,9 +180,13 @@ def main():
         latest_block = random.choice(web3s).eth.block_number
         print(f"Current latest block: {latest_block}")
         
+        # Get all existing block numbers at once
+        existing_blocks = get_existing_blocks(conn)
+        print(f"Found {len(existing_blocks)} existing blocks in database")
+        
         blocks_needed = []
         for block_number in range(START_BLOCK, latest_block):
-            if not is_block_exists(conn, block_number):
+            if block_number not in existing_blocks:
                 blocks_needed.append(block_number)
                 if len(blocks_needed) > 10000:
                     break
