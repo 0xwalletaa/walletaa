@@ -76,10 +76,10 @@ def get_code_addresses():
         
         # Get all type4 transaction data
         cursor.execute("SELECT tx_data FROM type4_transactions")
-        tx_data_list = cursor.fetchall()
         
         # Iterate through all transaction data
-        for (tx_data_str,) in tx_data_list:
+        for row in cursor:
+            tx_data_str = row[0]
             try:
                 tx_data = json.loads(tx_data_str)
                 
