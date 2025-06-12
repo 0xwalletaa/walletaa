@@ -56,6 +56,11 @@ const ChainSelect: React.FC = () => {
     { value: 'op', label: intl.formatMessage({ id: 'component.chainSelect.op', defaultMessage: 'Optimism' }) },
     { value: 'sepolia', label: intl.formatMessage({ id: 'component.chainSelect.sepolia', defaultMessage: 'Sepolia' }) },
     { value: 'bsc', label: intl.formatMessage({ id: 'component.chainSelect.bsc', defaultMessage: 'BSC' }) },
+    { value: 'bera', label: intl.formatMessage({ id: 'component.chainSelect.bera', defaultMessage: 'Bera' }) },
+    { value: 'gnosis', label: intl.formatMessage({ id: 'component.chainSelect.gnosis', defaultMessage: 'Gnosis' }) },
+    { value: 'scroll', label: intl.formatMessage({ id: 'component.chainSelect.scroll', defaultMessage: 'Scroll' }) },
+    { value: 'uni', label: intl.formatMessage({ id: 'component.chainSelect.uni', defaultMessage: 'Uni' }) },
+    { value: 'ink', label: intl.formatMessage({ id: 'component.chainSelect.ink', defaultMessage: 'Ink' }) },
   ];
 
   // 移动端渲染下拉框
