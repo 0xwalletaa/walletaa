@@ -24,4 +24,5 @@ logs_*
 server/test.sh
 backend/db.zip
 backend/test*.sh
+backend/check.sh
 *.zip

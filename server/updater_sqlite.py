@@ -196,6 +196,8 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
             
             if NAME == "bsc":
                 BNB_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BNBUSDT",timeout=10).json()['price']
+            if NAME == "bera":
+                BERA_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BERAUSDT",timeout=10).json()['price']
             break
         except:
             time.sleep(1)
@@ -211,10 +213,14 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
         result = tvl_cursor.fetchone()
         if result is not None:
             eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp = result
-            if NAME != "bsc":
-                tvl_balance = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
-            else:
+            if NAME == "bsc":
                 tvl_balance = float(eth_balance) * float(BNB_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) / 10**12 + float(usdc_balance) / 10**12 + float(dai_balance)
+            elif NAME == "bera":
+                tvl_balance = float(eth_balance) * float(BERA_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
+            elif NAME == "gnosis":
+                tvl_balance = float(eth_balance) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
+            else:
+                tvl_balance = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
             info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ?, tvl_timestamp = ? WHERE authorizer_address = ?", (tvl_balance, timestamp, authorizer_address))
 
     print(f"Expired data count: {expired_count}")

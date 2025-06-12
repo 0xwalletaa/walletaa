@@ -35,7 +35,7 @@ web3s = [
 # Create thread-local storage
 thread_local = threading.local()
 
-if NAME == 'bsc':
+if NAME == 'bsc' or NAME == 'scroll':
     from web3.middleware import ExtraDataToPOAMiddleware
     for i in range(len(web3s)):
         web3s[i].middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
