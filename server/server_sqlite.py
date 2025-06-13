@@ -57,7 +57,7 @@ def get_transactions():
         
         # Build query
         if search_by != '':
-            if len(search_by) == 42:  # address
+            if len(search_by) == 42 or search_by == "error":  # address
                 query = 'SELECT * FROM transactions WHERE relayer_address = ? OR tx_hash in (SELECT tx_hash FROM authorizations WHERE authorizer_address = ? OR code_address = ?)'
                 params = [search_by.lower(), search_by.lower(), search_by.lower()]
             elif len(search_by) == 66:  # transaction hash
@@ -128,7 +128,7 @@ def get_authorizers():
         
         # Build query
         if search_by != '':
-            if len(search_by) == 42:
+            if len(search_by) == 42 or search_by == "error":
                 # 对于地址搜索，先过滤 authorizers 表，再 JOIN codes 表
                 query = '''SELECT a.*, c.provider 
                           FROM (SELECT * FROM authorizers 
@@ -211,7 +211,7 @@ def get_authorizers_with_zero():
         
         # Build query
         if search_by != '':
-            if len(search_by) == 42:
+            if len(search_by) == 42 or search_by == "error":
                 # 对于地址搜索，先过滤 authorizers 表，再 JOIN codes 表
                 query = '''SELECT a.*, c.provider 
                           FROM (SELECT * FROM authorizers 
