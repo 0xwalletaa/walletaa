@@ -1,5 +1,5 @@
 // 定义支持的链类型
-export type ChainType = 'mainnet' | 'sepolia' | 'op' | 'base' | 'bsc';
+export type ChainType = 'mainnet' | 'sepolia' | 'op' | 'base' | 'bsc' | 'bera' | 'uni' | 'gnosis' | 'scroll' | 'ink';
 
 // 默认链
 export const DEFAULT_CHAIN: ChainType = 'mainnet';
@@ -37,6 +37,31 @@ export const CHAIN_CONFIGS: Record<ChainType, ChainConfig> = {
     BASE_URL: '/api-bsc',
     EXPLORER_URL: 'https://bscscan.com',
     CHAIN_ID: 56,
+  },
+  bera: {
+    BASE_URL: '/api-bera',
+    EXPLORER_URL: 'https://berascan.com',
+    CHAIN_ID: 80094,
+  },
+  uni: {
+    BASE_URL: '/api-uni',
+    EXPLORER_URL: 'https://uniscan.xyz',
+    CHAIN_ID: 130,
+  },
+  gnosis: {
+    BASE_URL: '/api-gnosis',
+    EXPLORER_URL: 'https://gnosisscan.io',
+    CHAIN_ID: 100,
+  },
+  scroll: {
+    BASE_URL: '/api-scroll',
+    EXPLORER_URL: 'https://scrollscan.com/',
+    CHAIN_ID: 534352,
+  },
+  ink: {
+    BASE_URL: '/api-ink',
+    EXPLORER_URL: 'https://explorer.inkonchain.com',
+    CHAIN_ID: 57073,
   },
 };
 

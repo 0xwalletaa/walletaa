@@ -383,7 +383,7 @@ def get_overview(txs, authorizers, codes, relayers, code_infos):
 def parse_functions(code):
     disassembled = disassemble_hex(code)
     arr = disassembled.split("\n")
-    # print(arr)
+    print(arr)
     functions = []
     for i in range(len(arr)):
         if arr[i].startswith("PUSH4"):
@@ -407,7 +407,7 @@ for tag in TAG_INFO:
 def get_code_function_info():
     conn = sqlite3.connect(f'../backend/{NAME}_code.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT code_address, code FROM codes") # WHERE code_address = '0x0c338ca25585035142a9a0a1eeeba267256f281f'")
+    cursor.execute("SELECT code_address, code FROM codes WHERE code_address = '0x89383882fc2d0cd4d7952a3267a3b6dae967e704'")
     rows = cursor.fetchall()
     
     ret = {}
@@ -426,7 +426,9 @@ def get_code_function_info():
     conn.close()
     return ret
 
-# NAME = "mainnet"
+NAME = "mainnet"
+get_code_function_info()
+
 # authorizer_info = get_authorizer_info(get_all_type4_txs(), get_code_infos())
 # for i in authorizer_info[0:10]:
 #     print(i["authorizer_address"], i["tvl_balance"])
