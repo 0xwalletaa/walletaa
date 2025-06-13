@@ -383,7 +383,7 @@ def get_overview(txs, authorizers, codes, relayers, code_infos):
 def parse_functions(code):
     disassembled = disassemble_hex(code)
     arr = disassembled.split("\n")
-    print(arr)
+    # print(arr)
     functions = []
     for i in range(len(arr)):
         if arr[i].startswith("PUSH4"):
