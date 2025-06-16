@@ -645,6 +645,19 @@ def get_overview():
             auth['historical_code_address'] = json.loads(auth['historical_code_address']) if auth['historical_code_address'] else []
             top10_authorizers.append(auth)
         
+        cursor.execute('SELECT * FROM tvl')
+        tvl_balance = cursor.fetchone()
+        
+        tvls = {
+            'total_tvl_balance': tvl_balance['total_tvl_balance'],
+            'eth_tvl_balance': tvl_balance['eth_tvl_balance'], 
+            'weth_tvl_balance': tvl_balance['weth_tvl_balance'], 
+            'wbtc_tvl_balance': tvl_balance['wbtc_tvl_balance'], 
+            'usdt_tvl_balance': tvl_balance['usdt_tvl_balance'], 
+            'usdc_tvl_balance': tvl_balance['usdc_tvl_balance'], 
+            'dai_tvl_balance': tvl_balance['dai_tvl_balance']
+        }
+        
         overview = {
             'tx_count': tx_count,
             'authorizer_count': authorizer_count,
@@ -659,6 +672,7 @@ def get_overview():
             'top10_codes': top10_codes,
             'top10_relayers': top10_relayers,
             'top10_authorizers': top10_authorizers,
+            'tvls': tvls
         }
         
         conn.close()

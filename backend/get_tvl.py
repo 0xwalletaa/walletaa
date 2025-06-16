@@ -29,7 +29,7 @@ parser.add_argument('--endpoints', nargs='+', help='List of Web3 endpoints')
 parser.add_argument('--contract', required=True, help='Contract address')
 parser.add_argument('--num_threads', type=int, default=4, help='Number of parallel threads')
 parser.add_argument('--data_expiry', type=int, default=86400, help='Data expiry time (seconds)')
-parser.add_argument('--limit', type=int, default=10000, help='Processing limit')
+parser.add_argument('--limit', type=int, default=500000, help='Processing limit')
 
 args = parser.parse_args()
 

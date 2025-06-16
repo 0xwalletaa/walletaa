@@ -27,5 +27,5 @@ https://mainnet.unichain.org \
 https://unichain.api.onfinality.io/public \
 --num_threads 5
 
-# sleep 60
+sleep 60
 done

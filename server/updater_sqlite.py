@@ -101,6 +101,23 @@ def create_db_if_not_exists(db_path):
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_relayers_authorization_fee ON relayers(authorization_fee DESC)')
     
 
+    # # Create tvl table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS tvl (
+        total_tvl_balance REAL,
+        eth_tvl_balance REAL,
+        weth_tvl_balance REAL,
+        wbtc_tvl_balance REAL,
+        usdt_tvl_balance REAL,
+        usdc_tvl_balance REAL,
+        dai_tvl_balance REAL
+    )
+    ''')
+    cursor.execute("select count(*) from tvl")
+    row = cursor.fetchone()
+    if row[0] == 0:
+        cursor.execute("INSERT INTO tvl (total_tvl_balance, eth_tvl_balance, weth_tvl_balance, wbtc_tvl_balance, usdt_tvl_balance, usdc_tvl_balance, dai_tvl_balance) VALUES (0, 0, 0, 0, 0, 0, 0)")
+
     # Create daily table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS daily_stats (
@@ -167,6 +184,8 @@ def update_info_by_block(info_db_path, block_db_path):
                 
             if authorization['nonce'] > 2147483647:
                 authorization['nonce'] = None
+            if authorization['chain_id'] > 2147483647:
+                authorization['chain_id'] = None
                 
             info_cursor.execute("UPDATE authorizers SET  last_nonce = ?, last_chain_id = ?, code_address = ? WHERE authorizer_address = ?", (authorization['nonce'], authorization['chain_id'], authorization['code_address'], authorization['authorizer_address']))
 
@@ -227,6 +246,44 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
             info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ?, tvl_timestamp = ? WHERE authorizer_address = ?", (tvl_balance, timestamp, authorizer_address))
 
     print(f"Expired data count: {expired_count}")
+    
+    tvl_cursor.execute("SELECT sum(eth_balance), sum(weth_balance), sum(wbtc_balance), sum(usdt_balance), sum(usdc_balance), sum(dai_balance) FROM author_balances")
+    result = tvl_cursor.fetchone()
+    if result is not None:
+        eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance = result
+        
+        eth_tvl_balance = float(eth_balance) * float(ETH_PRICE)
+        weth_tvl_balance = float(weth_balance) * float(ETH_PRICE)
+        wbtc_tvl_balance = float(wbtc_balance) * float(BTC_PRICE)
+        usdt_tvl_balance = float(usdt_balance)
+        usdc_tvl_balance = float(usdc_balance)
+        dai_tvl_balance = float(dai_balance)
+        
+        if NAME == "bsc":
+            eth_tvl_balance = float(eth_balance) * float(BNB_PRICE)
+            usdt_tvl_balance = float(usdt_balance) / 10**12
+            usdc_tvl_balance = float(usdc_balance) / 10**12
+        if NAME == "bera":
+            eth_tvl_balance = float(eth_balance) * float(BERA_PRICE)
+        if NAME == "gnosis":
+            eth_tvl_balance = float(eth_balance)    
+            
+        total_tvl_balance = eth_tvl_balance + weth_tvl_balance + wbtc_tvl_balance + usdt_tvl_balance + usdc_tvl_balance + dai_tvl_balance
+        
+        info_write_cursor.execute("UPDATE tvl SET total_tvl_balance = ?, eth_tvl_balance = ?, weth_tvl_balance = ?, wbtc_tvl_balance = ?, usdt_tvl_balance = ?, usdc_tvl_balance = ?, dai_tvl_balance = ?", (
+            total_tvl_balance,
+            eth_tvl_balance, 
+            weth_tvl_balance, 
+            wbtc_tvl_balance, 
+            usdt_tvl_balance, 
+            usdc_tvl_balance, 
+            dai_tvl_balance
+        ))
+        
+        print(f"Total TVL balance: {total_tvl_balance}")
+        print(eth_tvl_balance, weth_tvl_balance, wbtc_tvl_balance, usdt_tvl_balance, usdc_tvl_balance, dai_tvl_balance)
+
+    
     info_conn.commit()
     info_conn.close()
     tvl_conn.close()

@@ -18,5 +18,5 @@ https://rpc-qnd.inkonchain.com \
 https://rpc-gel.inkonchain.com \
 --num_threads 3
 
-# sleep 60
+sleep 60
 done
