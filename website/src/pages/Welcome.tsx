@@ -2,10 +2,10 @@ import { InfoCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Card, Col, Row, Table, Tooltip, Tag, Button, Modal, Descriptions, Typography, Space } from 'antd';
-import { Area, Column } from '@ant-design/plots';
+import { Area, Column, Pie } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
-import { getOverview, Overview, CodeInfoItem } from '@/services/api';
+import { getOverview, Overview, CodeInfoItem, TVLData } from '@/services/api';
 import { getChainConfig, getUrlWithChain } from '@/services/config';
 import tagColorMap from '@/utils/tagColorMap';
 import { history } from '@umijs/max';
@@ -190,6 +190,20 @@ const Welcome: React.FC = () => {
       x: date,
       y: count,
     }));
+  };
+
+  // 准备TVL饼状图数据
+  const getTVLPieData = () => {
+    if (!overview || !overview.tvls) return [];
+    const tvls = overview.tvls;
+    return [
+      { type: 'ETH', value: tvls.eth_tvl_balance },
+      { type: 'WETH', value: tvls.weth_tvl_balance },
+      { type: 'WBTC', value: tvls.wbtc_tvl_balance },
+      { type: 'USDT', value: tvls.usdt_tvl_balance },
+      { type: 'USDC', value: tvls.usdc_tvl_balance },
+      { type: 'DAI', value: tvls.dai_tvl_balance },
+    ].filter(item => item.value > 0); // 过滤掉值为0的项
   };
 
   // 渲染代码详情内容
@@ -563,7 +577,7 @@ const Welcome: React.FC = () => {
       >
         <div style={{ padding: '24px 24px 0 24px' }}>
           <Row gutter={24}>
-            <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+            <Col xl={8} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
               <div style={{ position: 'relative' }}>
                 <h4 style={{ marginBottom: 20 }}>{intl.formatMessage({ id: 'pages.welcome.cumulativeTxs' })}</h4>
                 <Area
@@ -590,7 +604,7 @@ const Welcome: React.FC = () => {
                 />
               </div>
             </Col>
-            <Col xl={12} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+            <Col xl={8} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
               <div style={{ position: 'relative' }}>
                 <h4 style={{ marginBottom: 20 }}>{intl.formatMessage({ id: 'pages.welcome.cumulativeAuths' })}</h4>
                 <Area
@@ -613,6 +627,38 @@ const Welcome: React.FC = () => {
                   tooltip={{
                     name: intl.formatMessage({ id: 'pages.welcome.cumulativeAuths' }),
                     channel: 'y',
+                  }}
+                />
+              </div>
+            </Col>
+            <Col xl={8} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+              <div style={{ position: 'relative' }}>
+                <h4 style={{ marginBottom: 20 }}>
+                  Total TVL: ${overview?.tvls ? numeral(overview.tvls.total_tvl_balance).format('0,0.00') : '0'}
+                </h4>
+                <Pie
+                  data={getTVLPieData()}
+                  angleField="value"
+                  colorField="type"
+                  radius={0.8}
+                  height={200}
+                  label={{
+                    type: 'inner',
+                    offset: '-30%',
+                    content: ({ percent }: any) => `${(percent * 100).toFixed(1)}%`,
+                    style: {
+                      fontSize: 12,
+                      textAlign: 'center',
+                    },
+                  }}
+                  legend={{
+                    position: 'bottom',
+                    layout: 'horizontal',
+                  }}
+                  tooltip={{
+                    formatter: (datum: any) => {
+                      return { name: datum.type, value: numeral(datum.value).format('0,0.00') };
+                    },
                   }}
                 />
               </div>

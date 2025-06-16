@@ -176,4 +176,6 @@ export default {
   'pages.relayers.search.placeholder': 'Enter relayer address',
   'pages.relayers.search.button': 'Search',
   'pages.welcome.viewAll': 'View All',
+  'pages.welcome.tvlComposition': 'TVL Composition',
+  'pages.welcome.total': 'Total',
 };

@@ -4,6 +4,7 @@ import { getChainConfig } from './config';
 // 定义API基础地址 - 动态获取
 export const BASE_URL = () => {
   const config = getChainConfig();
+  return `https://walletaa.com${config.BASE_URL}`;
   const isDev = process.env.NODE_ENV === 'development';
   return `https://${isDev ? 'dev.' : ''}walletaa.com${config.BASE_URL}`;
 };
@@ -100,6 +101,17 @@ export interface CodeInfoItem {
   [key: string]: any; // 允许其他可能的属性
 }
 
+// 定义TVL数据类型
+export interface TVLData {
+  total_tvl_balance: number;
+  eth_tvl_balance: number;
+  weth_tvl_balance: number;
+  wbtc_tvl_balance: number;
+  usdt_tvl_balance: number;
+  usdc_tvl_balance: number;
+  dai_tvl_balance: number;
+}
+
 // 定义Overview数据类型
 export interface Overview {
   tx_count: number;
@@ -132,6 +144,7 @@ export interface Overview {
     provider?: string;
   }>;
   code_infos?: CodeInfoItem[];
+  tvls?: TVLData;
 }
 
 // 获取交易列表接口
