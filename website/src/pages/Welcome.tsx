@@ -6,7 +6,7 @@ import { Area, Column, Pie } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
 import { getOverview, Overview, CodeInfoItem, TVLData } from '@/services/api';
-import { getChainConfig, getUrlWithChain } from '@/services/config';
+import { getChainConfig, getCurrentChain, getUrlWithChain } from '@/services/config';
 import tagColorMap from '@/utils/tagColorMap';
 import { history } from '@umijs/max';
 
@@ -196,6 +196,34 @@ const Welcome: React.FC = () => {
   const getTVLPieData = () => {
     if (!overview || !overview.tvls) return [];
     const tvls = overview.tvls;
+    if (getCurrentChain() === 'bsc') {
+      return [
+        { type: 'BNB', value: tvls.eth_tvl_balance },
+        { type: 'WETH', value: tvls.weth_tvl_balance },
+        { type: 'WBTC', value: tvls.wbtc_tvl_balance },
+        { type: 'USDT', value: tvls.usdt_tvl_balance },
+        { type: 'USDC', value: tvls.usdc_tvl_balance },
+        { type: 'DAI', value: tvls.dai_tvl_balance },
+      ].filter(item => item.value > 0); // 过滤掉值为0的项
+    } else if (getCurrentChain() === 'bera') {
+      return [
+        { type: 'BERA', value: tvls.eth_tvl_balance },
+        { type: 'WETH', value: tvls.weth_tvl_balance },
+        { type: 'WBTC', value: tvls.wbtc_tvl_balance },
+        { type: 'USDT', value: tvls.usdt_tvl_balance },
+        { type: 'USDC', value: tvls.usdc_tvl_balance },
+        { type: 'DAI', value: tvls.dai_tvl_balance },
+      ].filter(item => item.value > 0); // 过滤掉值为0的项
+    } else if (getCurrentChain() === 'gnosis') {
+      return [
+        { type: 'XDAI', value: tvls.eth_tvl_balance },
+        { type: 'WETH', value: tvls.weth_tvl_balance },
+        { type: 'WBTC', value: tvls.wbtc_tvl_balance },
+        { type: 'USDT', value: tvls.usdt_tvl_balance },
+        { type: 'USDC', value: tvls.usdc_tvl_balance },
+        { type: 'DAI', value: tvls.dai_tvl_balance },
+      ].filter(item => item.value > 0); // 过滤掉值为0的项
+    } else {
     return [
       { type: 'ETH', value: tvls.eth_tvl_balance },
       { type: 'WETH', value: tvls.weth_tvl_balance },
@@ -203,7 +231,8 @@ const Welcome: React.FC = () => {
       { type: 'USDT', value: tvls.usdt_tvl_balance },
       { type: 'USDC', value: tvls.usdc_tvl_balance },
       { type: 'DAI', value: tvls.dai_tvl_balance },
-    ].filter(item => item.value > 0); // 过滤掉值为0的项
+      ].filter(item => item.value > 0); // 过滤掉值为0的项
+    }
   };
 
   // 渲染代码详情内容
@@ -658,9 +687,14 @@ const Welcome: React.FC = () => {
                     },
                   }}
                   tooltip={{
-                    formatter: (datum: any) => {
-                      return { name: datum.type, value: numeral(datum.value).format('0,0.00') };
+                    title: (datum, index, data, column) => {
+                      console.log(datum, index, data, column);
+                      return {
+                        value: datum.type,
+                        custom: "..."
+                      }
                     },
+                    items: [{ name: 'TVL', channel: 'y', valueFormatter: '$.2f' }],
                   }}
                 />
               </div>
