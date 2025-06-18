@@ -20,6 +20,7 @@ from eth_account import Account
 import rlp
 from eth_utils import keccak
 import argparse
+import os
 
 # Add command line argument parsing
 parser = argparse.ArgumentParser(description='Process blockchain transaction data')
@@ -46,6 +47,9 @@ web3s = [
 block_db_path = f'{NAME}_block.db'
 code_db_path = f'{NAME}_code.db'
 
+# another db
+info_db_path = f'../server/db/{NAME}.db'
+
 # Create thread-local storage
 thread_local = threading.local()
 
@@ -66,9 +70,21 @@ def get_db_connection():
     return thread_local.db_connection
 
 def get_code_addresses():
-    """Get all code addresses from mainnet_blocks database"""
     code_addresses = set()
     
+    """Get all code addresses from info_db_path"""
+    if os.path.exists(info_db_path):
+        conn = sqlite3.connect(info_db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT distinct code_address FROM authorizations")
+        for row in cursor:
+            if row[0] != 'error':
+                code_addresses.add(row[0])
+        conn.close()
+        print(f"Got {len(code_addresses)} code addresses from info_db_path")
+        return list(code_addresses)
+
+    """Get all code addresses from mainnet_blocks database"""
     try:
         # Connect to database
         conn = sqlite3.connect(block_db_path)
