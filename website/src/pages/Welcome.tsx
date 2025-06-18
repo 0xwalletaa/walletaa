@@ -681,8 +681,10 @@ const Welcome: React.FC = () => {
                     },
                   }}
                   legend={{
-                    position: 'bottom',
-                    layout: 'horizontal',
+                    color: {
+                      position: 'left',
+                      layout: 'vertical',
+                    },
                   }}
                   tooltip={{
                     title: (datum, index, data, column) => {
