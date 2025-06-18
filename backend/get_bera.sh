@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name bera --endpoints \
 https://berachain.drpc.org \
 https://berachain.blockpi.network/v1/rpc/public \
@@ -21,5 +21,5 @@ https://rpc.berachain.com \
 https://rpc.berachain-apis.com \
 --num_threads 4
 
-sleep 60
-done
+# sleep 60
+# done

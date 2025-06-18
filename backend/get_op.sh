@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name op --endpoints \
 https://api.zan.top/opt-mainnet \
 https://gateway.tenderly.co/public/optimism \
@@ -45,5 +45,5 @@ https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
 --num_threads 5
 
-sleep 60
-done
+# sleep 60
+# done

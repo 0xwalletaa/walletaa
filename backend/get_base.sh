@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name base --endpoints \
 https://base.llamarpc.com \
 https://base.api.onfinality.io/public \
@@ -52,5 +52,5 @@ https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
 --num_threads 5
 
-sleep 60
-done
+# sleep 60
+# done

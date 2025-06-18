@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name bsc --endpoints \
 https://api.zan.top/bsc-mainnet \
 https://bsc-mainnet.public.blastapi.io \
@@ -42,5 +42,5 @@ https://bsc.rpc.blxrbdn.com \
 https://bsc.blockrazor.xyz \
 --num_threads 5
 
-sleep 60
-done
+# sleep 60
+# done

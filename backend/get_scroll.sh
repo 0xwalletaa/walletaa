@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name scroll --endpoints \
 https://scroll.drpc.org \
 https://rpc.scroll.io \
@@ -33,5 +33,5 @@ https://scroll.api.onfinality.io/public \
 https://scroll-rpc.publicnode.com \
 --num_threads 5
 
-sleep 60
-done
+# sleep 60
+# done

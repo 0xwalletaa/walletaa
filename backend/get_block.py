@@ -153,11 +153,11 @@ def process_block(block_number):
             )
         
         conn.commit()
-        print(f"Block #{block_number} processed: {len(transactions)} transactions total, {type4_count} type=4 transactions")
+        print(f"Block #{block_number}: {len(transactions)} txs, {type4_count} type4")
         return True
     
     except Exception as e:
-        print(f"Error processing block #{block_number}: {str(e)}")
+        print(f"Block #{block_number} error: {str(e)}")
         conn.rollback()
         return False
 

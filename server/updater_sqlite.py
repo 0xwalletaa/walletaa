@@ -224,7 +224,7 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
         except:
             time.sleep(1)
     end_time = time.time()
-    print(f"Price information retrieval completed, took {end_time - start_time} seconds")
+    print(f"Price update: {end_time - start_time} seconds")
     
     info_read_cursor.execute("SELECT authorizer_address FROM authorizers WHERE tvl_timestamp < ?", (int(time.time()) - DATA_EXPIRY,))
     expired_count = 0
@@ -280,8 +280,8 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
             dai_tvl_balance
         ))
         
-        print(f"Total TVL balance: {total_tvl_balance}")
-        print(eth_tvl_balance, weth_tvl_balance, wbtc_tvl_balance, usdt_tvl_balance, usdc_tvl_balance, dai_tvl_balance)
+        # print(f"Total TVL balance: {total_tvl_balance}")
+        # print(eth_tvl_balance, weth_tvl_balance, wbtc_tvl_balance, usdt_tvl_balance, usdc_tvl_balance, dai_tvl_balance)
 
     
     info_conn.commit()
@@ -377,19 +377,19 @@ create_db_if_not_exists(info_db_path)
 start_time = time.time()
 update_info_by_block(info_db_path, block_db_path)
 end_time = time.time()
-print(f"Block information update completed, took {end_time - start_time} seconds")
+print(f"Block update: {end_time - start_time} seconds")
 
 start_time = time.time()
 update_info_by_tvl(info_db_path, tvl_db_path)
 end_time = time.time()
-print(f"TVL information update completed, took {end_time - start_time} seconds")
+print(f"TVL update: {end_time - start_time} seconds")
 
 start_time = time.time()
 update_info_by_code(info_db_path, code_db_path)
 end_time = time.time()
-print(f"Code information update completed, took {end_time - start_time} seconds")
+print(f"Code update: {end_time - start_time} seconds")
 
 start_time = time.time()
 update_info_daily(info_db_path, from_latest=True)
 end_time = time.time()
-print(f"Daily information update completed, took {end_time - start_time} seconds")
+print(f"Daily update: {end_time - start_time} seconds")

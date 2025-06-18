@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name uni --endpoints \
 https://unichain-rpc.publicnode.com \
 https://rpc.therpc.io/unichain \
@@ -27,5 +27,5 @@ https://mainnet.unichain.org \
 https://unichain.api.onfinality.io/public \
 --num_threads 5
 
-sleep 60
-done
+# sleep 60
+# done

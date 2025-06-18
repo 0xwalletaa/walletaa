@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name ink --endpoints \
 https://ink.drpc.org \
 https://rpc-qnd.inkonchain.com \
@@ -18,5 +18,5 @@ https://rpc-qnd.inkonchain.com \
 https://rpc-gel.inkonchain.com \
 --num_threads 3
 
-sleep 60
-done
+# sleep 60
+# done

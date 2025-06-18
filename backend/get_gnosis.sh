@@ -1,4 +1,4 @@
-while true; do
+# while true; do
 python3 get_block.py --name gnosis --endpoints \
 https://gnosis.oat.farm \
 https://gnosis-pokt.nodies.app \
@@ -39,5 +39,5 @@ https://rpc.gnosischain.com \
 https://rpc.gnosis.gateway.fm \
 --num_threads 5
 
-sleep 60
-done
+# sleep 60
+# done
