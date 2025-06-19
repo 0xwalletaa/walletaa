@@ -1,4 +1,6 @@
 while true; do
+    export NAME=arb
+    python3 updater_sqlite.py
     export NAME=mainnet
     python3 updater_sqlite.py
     export NAME=sepolia

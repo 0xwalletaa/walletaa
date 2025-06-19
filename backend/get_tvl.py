@@ -209,8 +209,7 @@ def get_author_addresses():
                             print(f"Error processing signature recovery: {e}, data: {auth}")
                             continue
                 
-                if len(author_addresses) >= LIMIT:
-                    break
+                print(len(author_addresses), LIMIT)
             except json.JSONDecodeError as e:
                 print(f"Error parsing transaction data: {e}")
                 continue
