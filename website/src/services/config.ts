@@ -1,5 +1,5 @@
 // 定义支持的链类型
-export type ChainType = 'mainnet' | 'sepolia' | 'op' | 'base' | 'bsc' | 'bera' | 'uni' | 'gnosis' | 'scroll' | 'ink';
+export type ChainType = 'mainnet' | 'sepolia' | 'arb' | 'op' | 'base' | 'bsc' | 'bera' | 'uni' | 'gnosis' | 'scroll' | 'ink';
 
 // 默认链
 export const DEFAULT_CHAIN: ChainType = 'mainnet';
@@ -22,6 +22,11 @@ export const CHAIN_CONFIGS: Record<ChainType, ChainConfig> = {
     BASE_URL: '/api-sepolia',
     EXPLORER_URL: 'https://sepolia.etherscan.io',
     CHAIN_ID: 11155111,
+  },
+  arb: {
+    BASE_URL: '/api-arb',
+    EXPLORER_URL: 'https://arbiscan.io',
+    CHAIN_ID: 42161,
   },
   op: {
     BASE_URL: '/api-op',
