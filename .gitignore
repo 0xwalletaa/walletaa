@@ -26,3 +26,4 @@ backend/db.zip
 backend/test*.sh
 backend/check.sh
 *.zip
+*loop.log
