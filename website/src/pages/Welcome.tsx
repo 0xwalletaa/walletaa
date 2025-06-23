@@ -778,7 +778,17 @@ const Welcome: React.FC = () => {
                   dataIndex: 'tvl_balance',
                   key: 'tvl_balance',
                   align: 'right',
-                  render: (text: number) => numeral(text).format('0,0.00'),
+                  render: (text: number) => {
+                    if (typeof text === 'number') {
+                      // 对于极小的数字（小于0.01），使用科学计数法显示
+                      if (Math.abs(text) < 0.01 && text !== 0) {
+                        return text.toExponential(2);
+                      }
+                      // 对于正常范围的数字，使用千分位格式
+                      return numeral(text).format('0,0.00');
+                    }
+                    return text;
+                  },
                 },
                 {
                   title: intl.formatMessage({ id: 'pages.codes.details', defaultMessage: 'Details' }),
@@ -884,7 +894,17 @@ const Welcome: React.FC = () => {
                   dataIndex: 'tvl_balance',
                   key: 'tvl_balance',
                   align: 'right',
-                  render: (text: number) => numeral(text).format('0,0.00'),
+                  render: (text: number) => {
+                    if (typeof text === 'number') {
+                      // 对于极小的数字（小于0.01），使用科学计数法显示
+                      if (Math.abs(text) < 0.01 && text !== 0) {
+                        return text.toExponential(2);
+                      }
+                      // 对于正常范围的数字，使用千分位格式
+                      return numeral(text).format('0,0.00');
+                    }
+                    return text;
+                  },
                 },
               ]}
               dataSource={overview ? overview.top10_authorizers : []}
@@ -948,7 +968,17 @@ const Welcome: React.FC = () => {
                   title: intl.formatMessage({ id: 'pages.welcome.authorizationFee' }),
                   dataIndex: 'authorization_fee',
                   key: 'authorization_fee',
-                  render: (text: number) => numeral(text).format('0,0.00'),
+                  render: (text: number) => {
+                    if (typeof text === 'number') {
+                      // 对于极小的数字（小于0.01），使用科学计数法显示
+                      if (Math.abs(text) < 0.01 && text !== 0) {
+                        return text.toExponential(2);
+                      }
+                      // 对于正常范围的数字，使用千分位格式
+                      return numeral(text).format('0,0.00');
+                    }
+                    return text;
+                  },
                 },
               ]}
               dataSource={overview ? overview.top10_relayers : []}

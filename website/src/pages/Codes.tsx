@@ -152,6 +152,11 @@ const Codes: React.FC = () => {
       align: 'right',
       render: (dom: any) => {
         if (typeof dom === 'number') {
+          // 对于极小的数字（小于0.01），使用科学计数法显示
+          if (Math.abs(dom) < 0.01 && dom !== 0) {
+            return dom.toExponential(2);
+          }
+          // 对于正常范围的数字，使用千分位格式
           return numeral(dom).format('0,0.00');
         }
         return dom;

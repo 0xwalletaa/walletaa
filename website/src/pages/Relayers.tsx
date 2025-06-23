@@ -9,6 +9,7 @@ import { LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getRelayersByTxCount, getRelayersByAuthorizationCount, getRelayersByAuthorizationFee, RelayerItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
+import numeral from 'numeral';
 
 const Relayers: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -119,6 +120,17 @@ const Relayers: React.FC = () => {
       sorter: true,
       sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'authorization_fee' ? 'descend' : undefined,
+      render: (dom: any) => {
+        if (typeof dom === 'number') {
+          // 对于极小的数字（小于0.01），使用科学计数法显示
+          if (Math.abs(dom) < 0.01 && dom !== 0) {
+            return dom.toExponential(2);
+          }
+          // 对于正常范围的数字，使用千分位格式
+          return numeral(dom).format('0,0.00');
+        }
+        return dom;
+      },
     },
   ];
 

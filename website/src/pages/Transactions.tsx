@@ -10,6 +10,7 @@ import { Modal, Tag, Tooltip, Input, Button, Card, Row, Col } from 'antd';
 import React, { useRef, useState, useEffect } from 'react';
 import { getTransactions, TransactionItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
+import numeral from 'numeral';
 
 const Transactions: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
@@ -149,6 +150,17 @@ const Transactions: React.FC = () => {
         defaultMessage: 'Authorization Fee (ETH)',
       }),
       dataIndex: 'authorization_fee',
+      render: (dom: any) => {
+        if (typeof dom === 'number') {
+          // 对于极小的数字（小于0.01），使用科学计数法显示
+          if (Math.abs(dom) < 0.01 && dom !== 0) {
+            return dom.toExponential(2);
+          }
+          // 对于正常范围的数字，使用千分位格式
+          return numeral(dom).format('0,0.00');
+        }
+        return dom;
+      },
     },
     {
       title: intl.formatMessage({
