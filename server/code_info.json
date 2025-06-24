@@ -31,7 +31,7 @@
   {
     "address": "0x4428a93B478fa76A5BD9c7641F54EC6373855433",
     "name": "",
-    "provider": "Crdial",
+    "provider": "",
     "code": "closed-source",
     "repo": "",
     "contractAccountStandard": "ERC-4337",
