@@ -1,4 +1,4 @@
-import { GithubOutlined } from '@ant-design/icons';
+import { GithubOutlined, TwitterOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
 import React from 'react';
 
@@ -10,21 +10,23 @@ const Footer: React.FC = () => {
       }}
       links={[
         {
-          key: 'WalletAA',
-          title: 'WalletAA',
-          href: 'https://walletaa.com',
-          blankTarget: true,
-        },
-        {
           key: 'github',
-          title: <GithubOutlined />,
-          href: 'https://github.com/0xwalletaa/',
+          title: (
+            <>
+              <GithubOutlined /> Github
+            </>
+          ),
+          href: 'https://github.com/0xwalletaa/walletaa',
           blankTarget: true,
         },
         {
-          key: '0xWalletAA',
-          title: '0xWalletAA',
-          href: 'https://github.com/0xwalletaa/',
+          key: 'twitter',
+          title: (
+            <>
+              <TwitterOutlined /> Twitter
+            </>
+          ),
+          href: 'https://twitter.com/wallet_aa',
           blankTarget: true,
         },
       ]}
