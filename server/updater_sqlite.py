@@ -142,17 +142,21 @@ def update_info_by_block(info_db_path, block_db_path):
     block_conn = sqlite3.connect(block_db_path)
     block_tx_cursor = block_conn.cursor()
     block_timestamp_cursor = block_conn.cursor()
-    block_tx_cursor.execute("SELECT tx_hash, tx_data FROM type4_transactions ORDER BY block_number ASC")
+    block_tx_cursor.execute("SELECT block_number, tx_hash, tx_data FROM type4_transactions ORDER BY block_number ASC")
     
+    wrong_block_number = 0
     # Process row by row to avoid loading all data at once
     for row in block_tx_cursor:  # Iterate cursor directly
-        tx_hash, tx_data_str = row
+        block_number, tx_hash, tx_data_str = row
         
         tx_hash = "0x"+tx_hash
         info_cursor.execute("SELECT tx_hash FROM transactions WHERE tx_hash = ?", (tx_hash,))
         if info_cursor.fetchone() is not None:
             continue
-                     
+        if "authorizationList" not in tx_data_str:
+            wrong_block_number = block_number
+            break
+
         type4_tx = util.parse_type4_tx_data(tx_data_str)
         
         block_timestamp_cursor.execute("SELECT timestamp FROM blocks WHERE block_number = ?", (type4_tx['block_number'],))
@@ -197,6 +201,12 @@ def update_info_by_block(info_db_path, block_db_path):
             info_cursor.execute("INSERT INTO relayers (relayer_address, tx_count, authorization_count, authorization_fee) VALUES (?, ?, ?, ?)", (type4_tx['relayer_address'] , 1, len(type4_tx['authorization_list']),  type4_tx['authorization_fee']))
             
         info_conn.commit()
+
+
+    if wrong_block_number > 0:
+        print(f"Wrong block number: {wrong_block_number}")
+        block_tx_cursor.execute("DELETE FROM type4_transactions WHERE block_number = ?", (wrong_block_number,))
+        block_conn.commit()
 
     info_conn.close()
     block_conn.close()
