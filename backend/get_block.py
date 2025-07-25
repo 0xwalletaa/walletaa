@@ -190,6 +190,8 @@ def main():
                 blocks_needed.append(block_number)
                 if len(blocks_needed) > 10000:
                     break
+        
+        del existing_blocks
                 
         print(f"Number of blocks to process: {len(blocks_needed)}")
         time.sleep(1)
@@ -222,6 +224,8 @@ def main():
                     error_count += 1
         
         print(f"\nProcessing complete! Success: {success_count}, Failed: {error_count}")
+        if len(blocks_needed) < 10000:
+            time.sleep(60)
         
     except Exception as e:
         print(f"Program error: {e}")

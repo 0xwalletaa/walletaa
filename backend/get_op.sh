@@ -8,7 +8,6 @@ https://optimism-rpc.publicnode.com \
 https://optimism.drpc.org \
 https://0xrpc.io/op \
 https://optimism.lava.build \
-https://optimism.blockpi.network/v1/rpc/public \
 https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
@@ -24,7 +23,6 @@ https://optimism-rpc.publicnode.com \
 https://optimism.drpc.org \
 https://0xrpc.io/op \
 https://optimism.lava.build \
-https://optimism.blockpi.network/v1/rpc/public \
 https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
@@ -39,7 +37,6 @@ https://optimism-rpc.publicnode.com \
 https://optimism.drpc.org \
 https://0xrpc.io/op \
 https://optimism.lava.build \
-https://optimism.blockpi.network/v1/rpc/public \
 https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
