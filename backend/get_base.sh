@@ -46,5 +46,5 @@ https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
 --num_threads 5
 
-# sleep 60
+sleep 120
 # done

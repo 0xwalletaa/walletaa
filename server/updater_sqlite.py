@@ -237,6 +237,7 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
     end_time = time.time()
     print(f"Price update: {end_time - start_time} seconds")
     
+    start_time = time.time()
     info_read_cursor.execute("SELECT authorizer_address FROM authorizers WHERE tvl_timestamp < ?", (int(time.time()) - DATA_EXPIRY,))
     expired_count = 0
     for row in info_read_cursor:
@@ -256,8 +257,10 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
                 tvl_balance = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
             info_write_cursor.execute("UPDATE authorizers SET tvl_balance = ?, tvl_timestamp = ? WHERE authorizer_address = ?", (tvl_balance, timestamp, authorizer_address))
 
-    print(f"Expired data count: {expired_count}")
+    end_time = time.time()
+    print(f"TVL [expired]: {end_time - start_time} seconds, data count: {expired_count}")
     
+    start_time = time.time()
     tvl_cursor.execute("SELECT sum(eth_balance), sum(weth_balance), sum(wbtc_balance), sum(usdt_balance), sum(usdc_balance), sum(dai_balance) FROM author_balances")
     result = tvl_cursor.fetchone()
     if result is not None:
@@ -294,6 +297,9 @@ def update_info_by_tvl(info_db_path, tvl_db_path):
         # print(f"Total TVL balance: {total_tvl_balance}")
         # print(eth_tvl_balance, weth_tvl_balance, wbtc_tvl_balance, usdt_tvl_balance, usdc_tvl_balance, dai_tvl_balance)
 
+    end_time = time.time()
+    print(f"TVL [sum]: {end_time - start_time} seconds")
+    
     
     info_conn.commit()
     info_conn.close()
