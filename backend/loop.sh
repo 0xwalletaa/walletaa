@@ -7,6 +7,7 @@ cd ../server
 export NAME=$1
 start_time=$(date +%s)
 python3 updater_sqlite.py
+python3 cache_overview.py
 end_time=$(date +%s)
 echo "$1 update: $((end_time - start_time)) seconds" >> loop.log
 cd -

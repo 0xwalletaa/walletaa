@@ -578,6 +578,13 @@ def get_relayers_by_authorization_fee():
 # overview query interface
 @app.route('/overview', methods=['GET'])
 def get_overview():
+    cached_overview_path = f'/dev/shm/{NAME}_overview.json'
+    if os.path.exists(cached_overview_path):
+        overview = json.loads(open(cached_overview_path).read())
+        return jsonify({
+            'overview': overview
+        })
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
