@@ -177,4 +177,10 @@ export default {
   'pages.welcome.viewAll': '查看全部',
   'pages.welcome.tvlComposition': 'TVL 组成',
   'pages.welcome.total': '总计',
+  'pages.comparison.title': '对比',
+  'pages.comparison.txCountTitle': '交易数量对比',
+  'pages.comparison.authorizerCountTitle': '授权者数量对比',
+  'pages.comparison.codeCountTitle': '代码数量对比',
+  'pages.comparison.relayerCountTitle': '中继者数量对比',
+  'pages.comparison.tvlTitle': '总TVL对比',
 };

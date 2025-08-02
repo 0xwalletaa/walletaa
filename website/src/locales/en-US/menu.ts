@@ -4,6 +4,7 @@ export default {
   'menu.authorizers': 'Authorizers',
   'menu.codes': 'Codes',
   'menu.relayers': 'Relayers',
+  'menu.comparison': 'Comparison',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.admin': 'Admin',

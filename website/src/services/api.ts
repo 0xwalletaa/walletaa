@@ -147,6 +147,17 @@ export interface Overview {
   tvls?: TVLData;
 }
 
+// 定义Comparison数据类型
+export interface ComparisonData {
+  [chainName: string]: {
+    tx_count: number;
+    authorizer_count: number;
+    code_count: number;
+    relayer_count: number;
+    tvls: TVLData;
+  };
+}
+
 // 获取交易列表接口
 export async function getTransactions(params: {
   page?: number;
@@ -265,6 +276,13 @@ export async function getRelayersByAuthorizationFee(params: {
 // 获取overview数据
 export async function getOverview() {
   return request(`${BASE_URL()}/overview`, {
+    method: 'GET',
+  });
+}
+
+// 获取comparison数据
+export async function getComparison(): Promise<ComparisonData> {
+  return request(`${BASE_URL()}/comparison`, {
     method: 'GET',
   });
 } 

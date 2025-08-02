@@ -178,4 +178,10 @@ export default {
   'pages.welcome.viewAll': 'View All',
   'pages.welcome.tvlComposition': 'TVL Composition',
   'pages.welcome.total': 'Total',
+  'pages.comparison.title': 'Comparison',
+  'pages.comparison.txCountTitle': 'Transaction Count Comparison',
+  'pages.comparison.authorizerCountTitle': 'Authorizer Count Comparison',
+  'pages.comparison.codeCountTitle': 'Code Count Comparison',
+  'pages.comparison.relayerCountTitle': 'Relayer Count Comparison',
+  'pages.comparison.tvlTitle': 'Total TVL Comparison',
 };

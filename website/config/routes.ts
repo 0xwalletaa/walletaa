@@ -42,6 +42,12 @@ export default [
     component: './Relayers',
   },
   {
+    name: 'comparison',
+    icon: 'pieChart',
+    path: '/comparison',
+    component: './Comparison',
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },
