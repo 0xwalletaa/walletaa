@@ -11,6 +11,24 @@ const Comparison: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [comparisonData, setComparisonData] = useState<ComparisonData | null>(null);
 
+  // 链名映射：短链名 -> 全名
+  const getChainFullName = (chainName: string): string => {
+    const chainNameMap: Record<string, string> = {
+      'mainnet': intl.formatMessage({ id: 'component.chainSelect.mainnet', defaultMessage: 'Mainnet' }),
+      'base': intl.formatMessage({ id: 'component.chainSelect.base', defaultMessage: 'Base' }),
+      'arb': intl.formatMessage({ id: 'component.chainSelect.arb', defaultMessage: 'Arbitrum' }),
+      'op': intl.formatMessage({ id: 'component.chainSelect.op', defaultMessage: 'Optimism' }),
+      'sepolia': intl.formatMessage({ id: 'component.chainSelect.sepolia', defaultMessage: 'Sepolia' }),
+      'bsc': intl.formatMessage({ id: 'component.chainSelect.bsc', defaultMessage: 'BSC' }),
+      'bera': intl.formatMessage({ id: 'component.chainSelect.bera', defaultMessage: 'Bera' }),
+      'gnosis': intl.formatMessage({ id: 'component.chainSelect.gnosis', defaultMessage: 'Gnosis' }),
+      'scroll': intl.formatMessage({ id: 'component.chainSelect.scroll', defaultMessage: 'Scroll' }),
+      'uni': intl.formatMessage({ id: 'component.chainSelect.uni', defaultMessage: 'Uni' }),
+      'ink': intl.formatMessage({ id: 'component.chainSelect.ink', defaultMessage: 'Ink' }),
+    };
+    return chainNameMap[chainName] || chainName;
+  };
+
   useEffect(() => {
     getComparison()
       .then(data => {
@@ -27,7 +45,7 @@ const Comparison: React.FC = () => {
   const getTxCountPieData = () => {
     if (!comparisonData) return [];
     return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: chainName,
+      type: getChainFullName(chainName),
       value: data.tx_count,
     })).filter(item => item.value > 0);
   };
@@ -36,7 +54,7 @@ const Comparison: React.FC = () => {
   const getAuthorizerCountPieData = () => {
     if (!comparisonData) return [];
     return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: chainName,
+      type: getChainFullName(chainName),
       value: data.authorizer_count,
     })).filter(item => item.value > 0);
   };
@@ -45,7 +63,7 @@ const Comparison: React.FC = () => {
   const getCodeCountPieData = () => {
     if (!comparisonData) return [];
     return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: chainName,
+      type: getChainFullName(chainName),
       value: data.code_count,
     })).filter(item => item.value > 0);
   };
@@ -54,7 +72,7 @@ const Comparison: React.FC = () => {
   const getRelayerCountPieData = () => {
     if (!comparisonData) return [];
     return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: chainName,
+      type: getChainFullName(chainName),
       value: data.relayer_count,
     })).filter(item => item.value > 0);
   };
@@ -63,7 +81,7 @@ const Comparison: React.FC = () => {
   const getTotalTVLPieData = () => {
     if (!comparisonData) return [];
     return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: chainName,
+      type: getChainFullName(chainName),
       value: data.tvls.total_tvl_balance,
     })).filter(item => item.value > 0);
   };
@@ -91,7 +109,14 @@ const Comparison: React.FC = () => {
       },
     },
     tooltip: {
-      items: [{ name: title, channel: 'y', valueFormatter: (value: number) => numeral(value).format(valueFormatter) }],
+      title: (datum: any) => datum.type,
+      items: [
+        { 
+          name: title, 
+          channel: 'y', 
+          valueFormatter: (value: number) => numeral(value).format(valueFormatter)
+        }
+      ],
     },
   });
 
