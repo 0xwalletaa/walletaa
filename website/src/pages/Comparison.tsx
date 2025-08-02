@@ -104,6 +104,11 @@ const Comparison: React.FC = () => {
       .filter(item => item.value > 0);
   };
 
+  // 计算总和的辅助函数
+  const calculateTotal = (data: any[]) => {
+    return data.reduce((sum, item) => sum + item.value, 0);
+  };
+
   // 通用饼状图配置
   const getPieConfig = (data: any[], title: string, valueFormatter: string = '0,0') => ({
     data,
@@ -148,6 +153,14 @@ const Comparison: React.FC = () => {
             loading={loading}
             style={{ height: '100%' }}
           >
+            <div style={{ marginBottom: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: '18px', color: 'rgba(0,0,0,.65)', marginBottom: 8 }}>
+                Total TVL
+              </div>
+              <div style={{ fontSize: '30px', lineHeight: '38px', color: 'rgba(0,0,0,.85)', marginBottom: 4 }}>
+                ${numeral(calculateTotal(getTotalTVLPieData())).format('0,0.00')}
+              </div>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <div style={{ width: '60%', maxWidth: '600px' }}>
                 <Pie {...getPieConfig(getTotalTVLPieData(), 'TVL', '$0,0.00')} />
@@ -163,6 +176,14 @@ const Comparison: React.FC = () => {
             loading={loading}
             style={{ height: '100%' }}
           >
+            <div style={{ marginBottom: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: '18px', color: 'rgba(0,0,0,.65)', marginBottom: 8 }}>
+                Total Transaction Count
+              </div>
+              <div style={{ fontSize: '30px', lineHeight: '38px', color: 'rgba(0,0,0,.85)', marginBottom: 4 }}>
+                {numeral(calculateTotal(getTxCountPieData())).format('0,0')}
+              </div>
+            </div>
             <Pie {...getPieConfig(getTxCountPieData(), 'Transactions')} />
           </Card>
         </Col>
@@ -174,6 +195,14 @@ const Comparison: React.FC = () => {
             loading={loading}
             style={{ height: '100%' }}
           >
+            <div style={{ marginBottom: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: '18px', color: 'rgba(0,0,0,.65)', marginBottom: 8 }}>
+                Total Authorizer Count
+              </div>
+              <div style={{ fontSize: '30px', lineHeight: '38px', color: 'rgba(0,0,0,.85)', marginBottom: 4 }}>
+                {numeral(calculateTotal(getAuthorizerCountPieData())).format('0,0')}
+              </div>
+            </div>
             <Pie {...getPieConfig(getAuthorizerCountPieData(), 'Authorizers')} />
           </Card>
         </Col>
@@ -185,6 +214,14 @@ const Comparison: React.FC = () => {
             loading={loading}
             style={{ height: '100%' }}
           >
+            <div style={{ marginBottom: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: '18px', color: 'rgba(0,0,0,.65)', marginBottom: 8 }}>
+                Total Code Count
+              </div>
+              <div style={{ fontSize: '30px', lineHeight: '38px', color: 'rgba(0,0,0,.85)', marginBottom: 4 }}>
+                {numeral(calculateTotal(getCodeCountPieData())).format('0,0')}
+              </div>
+            </div>
             <Pie {...getPieConfig(getCodeCountPieData(), 'Codes')} />
           </Card>
         </Col>
@@ -196,6 +233,14 @@ const Comparison: React.FC = () => {
             loading={loading}
             style={{ height: '100%' }}
           >
+            <div style={{ marginBottom: 20, textAlign: 'center' }}>
+              <div style={{ fontSize: '18px', color: 'rgba(0,0,0,.65)', marginBottom: 8 }}>
+                Total Relayer Count
+              </div>
+              <div style={{ fontSize: '30px', lineHeight: '38px', color: 'rgba(0,0,0,.85)', marginBottom: 4 }}>
+                {numeral(calculateTotal(getRelayerCountPieData())).format('0,0')}
+              </div>
+            </div>
             <Pie {...getPieConfig(getRelayerCountPieData(), 'Relayers')} />
           </Card>
         </Col>
