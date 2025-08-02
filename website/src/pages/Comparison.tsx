@@ -140,7 +140,9 @@ const Comparison: React.FC = () => {
     legend: {
       color: {
         position: 'bottom',
-        layout: 'horizontal',
+        layout: {
+          justifyContent: 'center',
+        },
       },
     },
     tooltip: {
@@ -173,11 +175,7 @@ const Comparison: React.FC = () => {
                 ${numeral(calculateTotal(getTotalTVLPieData())).format('0,0.00')}
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: '60%', maxWidth: '600px' }}>
-                <Pie {...getPieConfig(getTotalTVLPieData(), 'TVL', '$0,0.00')} />
-              </div>
-            </div>
+            <Pie {...getPieConfig(getTotalTVLPieData(), 'TVL', '$0,0.00')} />
           </Card>
         </Col>
         
