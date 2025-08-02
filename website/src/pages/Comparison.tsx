@@ -165,7 +165,7 @@ const Comparison: React.FC = () => {
       items: [
         { 
           name: title, 
-          channel: 'y', 
+          field: 'value',
           valueFormatter: (value: number) => numeral(value).format(valueFormatter)
         }
       ],
