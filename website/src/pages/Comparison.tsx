@@ -11,6 +11,9 @@ const Comparison: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [comparisonData, setComparisonData] = useState<ComparisonData | null>(null);
 
+  // 定义链的显示顺序
+  const chainOrder = ['mainnet', 'base', 'arb', 'op', 'sepolia', 'bsc', 'bera', 'gnosis', 'scroll', 'uni', 'ink'];
+
   // 链名映射：短链名 -> 全名
   const getChainFullName = (chainName: string): string => {
     const chainNameMap: Record<string, string> = {
@@ -44,48 +47,61 @@ const Comparison: React.FC = () => {
   // 准备交易数量饼状图数据
   const getTxCountPieData = () => {
     if (!comparisonData) return [];
-    return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: getChainFullName(chainName),
-      value: data.tx_count,
-    })).filter(item => item.value > 0);
+    return chainOrder
+      .filter(chainName => comparisonData[chainName])
+      .map(chainName => ({
+        type: getChainFullName(chainName),
+        value: comparisonData[chainName].tx_count,
+      }))
+      .filter(item => item.value > 0);
   };
 
   // 准备授权者数量饼状图数据
   const getAuthorizerCountPieData = () => {
     if (!comparisonData) return [];
-    return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: getChainFullName(chainName),
-      value: data.authorizer_count,
-    })).filter(item => item.value > 0);
+    return chainOrder
+      .filter(chainName => comparisonData[chainName])
+      .map(chainName => ({
+        type: getChainFullName(chainName),
+        value: comparisonData[chainName].authorizer_count,
+      }))
+      .filter(item => item.value > 0);
   };
 
   // 准备代码数量饼状图数据
   const getCodeCountPieData = () => {
     if (!comparisonData) return [];
-    return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: getChainFullName(chainName),
-      value: data.code_count,
-    })).filter(item => item.value > 0);
+    return chainOrder
+      .filter(chainName => comparisonData[chainName])
+      .map(chainName => ({
+        type: getChainFullName(chainName),
+        value: comparisonData[chainName].code_count,
+      }))
+      .filter(item => item.value > 0);
   };
 
   // 准备中继者数量饼状图数据
   const getRelayerCountPieData = () => {
     if (!comparisonData) return [];
-    return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: getChainFullName(chainName),
-      value: data.relayer_count,
-    })).filter(item => item.value > 0);
+    return chainOrder
+      .filter(chainName => comparisonData[chainName])
+      .map(chainName => ({
+        type: getChainFullName(chainName),
+        value: comparisonData[chainName].relayer_count,
+      }))
+      .filter(item => item.value > 0);
   };
 
   // 准备TVL饼状图数据
   const getTotalTVLPieData = () => {
     if (!comparisonData) return [];
-    return Object.entries(comparisonData)
-      .filter(([chainName]) => chainName !== 'sepolia') // 排除Sepolia链
-      .map(([chainName, data]) => ({
+    return chainOrder
+      .filter(chainName => comparisonData[chainName] && chainName !== 'sepolia') // 排除Sepolia链
+      .map(chainName => ({
         type: getChainFullName(chainName),
-        value: data.tvls.total_tvl_balance,
-      })).filter(item => item.value > 0);
+        value: comparisonData[chainName].tvls.total_tvl_balance,
+      }))
+      .filter(item => item.value > 0);
   };
 
   // 通用饼状图配置
