@@ -9,6 +9,7 @@ from flask_cors import CORS
 import random
 import json
 import sqlite3
+import glob
 
 NAME = os.environ.get("NAME")
 
@@ -690,6 +691,48 @@ def get_overview():
     except Exception as e:
         app.logger.error(f"Error getting overview data: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+# comparison query interface
+@app.route('/comparison', methods=['GET'])
+def get_comparison():
+    try:
+        # 查找 /dev/shm/ 目录下所有的 *overview.json 文件
+        overview_files = glob.glob('/dev/shm/*overview.json')
+        
+        ret = {}
+        
+        for file_path in overview_files:
+            try:
+                # 从文件名提取链的名字（去掉路径和 _overview.json 后缀）
+                filename = os.path.basename(file_path)
+                chain_name = filename.replace('_overview.json', '')
+                
+                # 读取 JSON 文件
+                with open(file_path, 'r') as f:
+                    overview_data = json.load(f)
+                
+                # 提取需要的字段
+                info = {
+                    'tx_count': overview_data.get('tx_count'),
+                    'authorizer_count': overview_data.get('authorizer_count'),
+                    'code_count': overview_data.get('code_count'),
+                    'relayer_count': overview_data.get('relayer_count'),
+                    'tvls': overview_data.get('tvls')
+                }
+                
+                # 按照链名存储
+                ret[chain_name] = info
+                
+            except Exception as e:
+                app.logger.error(f"Error processing file {file_path}: {str(e)}")
+                continue
+        
+        return jsonify(ret)
+        
+    except Exception as e:
+        app.logger.error(f"Error getting comparison data: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     # Development environment usage
