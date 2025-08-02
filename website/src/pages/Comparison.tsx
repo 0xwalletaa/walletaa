@@ -98,7 +98,7 @@ const Comparison: React.FC = () => {
   const getTotalTVLPieData = () => {
     if (!comparisonData) return [];
     return chainOrder
-      .filter(chainName => comparisonData[chainName] && chainName !== 'sepolia') // 排除Sepolia链
+      .filter(chainName => comparisonData[chainName])
       .map(chainName => ({
         type: getChainFullName(chainName),
         value: comparisonData[chainName].tvls.total_tvl_balance,
@@ -135,7 +135,6 @@ const Comparison: React.FC = () => {
         if (d.type === currentChainFullName) {
           return 'spider';
         }
-        return 'none';
       },
     },
     legend: {
