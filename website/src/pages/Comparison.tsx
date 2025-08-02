@@ -5,11 +5,13 @@ import { Pie } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState } from 'react';
 import { getComparison, ComparisonData } from '@/services/api';
+import { getCurrentChain } from '@/services/config';
 
 const Comparison: React.FC = () => {
   const intl = useIntl();
   const [loading, setLoading] = useState(true);
   const [comparisonData, setComparisonData] = useState<ComparisonData | null>(null);
+  const currentChain = getCurrentChain();
 
   // 定义链的显示顺序
   const chainOrder = ['mainnet', 'base', 'arb', 'op', 'sepolia', 'bsc', 'bera', 'gnosis', 'scroll', 'uni', 'ink'];
@@ -117,12 +119,23 @@ const Comparison: React.FC = () => {
     radius: 0.8,
     height: 300,
     label: {
-      type: 'inner',
-      offset: '-30%',
-      content: ({ percent }: any) => `${(percent * 100).toFixed(1)}%`,
-      style: {
-        fontSize: 12,
-        textAlign: 'center',
+      text: (d: any) => {
+        // 获取当前链的全名
+        const currentChainFullName = getChainFullName(currentChain);
+        // 只对当前链显示label
+        if (d.type === currentChainFullName) {
+          return `${d.type}\n${numeral(d.value).format(valueFormatter)}`;
+        }
+        return '';
+      },
+      position: (d: any) => {
+        // 获取当前链的全名
+        const currentChainFullName = getChainFullName(currentChain);
+        // 只对当前链显示label
+        if (d.type === currentChainFullName) {
+          return 'spider';
+        }
+        return 'none';
       },
     },
     legend: {
