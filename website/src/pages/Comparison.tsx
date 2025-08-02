@@ -123,6 +123,21 @@ const Comparison: React.FC = () => {
   return (
     <PageContainer title={intl.formatMessage({ id: 'pages.comparison.title', defaultMessage: 'Chain Comparison' })}>
       <Row gutter={[24, 24]}>
+        <Col xl={24} lg={24} md={24} sm={24} xs={24}>
+          <Card
+            bordered={false}
+            title={intl.formatMessage({ id: 'pages.comparison.tvlTitle', defaultMessage: 'Total TVL Comparison' })}
+            loading={loading}
+            style={{ height: '100%' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ width: '60%', maxWidth: '600px' }}>
+                <Pie {...getPieConfig(getTotalTVLPieData(), 'TVL', '$0,0.00')} />
+              </div>
+            </div>
+          </Card>
+        </Col>
+        
         <Col xl={12} lg={12} md={24} sm={24} xs={24}>
           <Card
             bordered={false}
@@ -167,20 +182,6 @@ const Comparison: React.FC = () => {
           </Card>
         </Col>
 
-        <Col xl={24} lg={24} md={24} sm={24} xs={24}>
-          <Card
-            bordered={false}
-            title={intl.formatMessage({ id: 'pages.comparison.tvlTitle', defaultMessage: 'Total TVL Comparison' })}
-            loading={loading}
-            style={{ height: '100%' }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: '60%', maxWidth: '600px' }}>
-                <Pie {...getPieConfig(getTotalTVLPieData(), 'TVL', '$0,0.00')} />
-              </div>
-            </div>
-          </Card>
-        </Col>
       </Row>
     </PageContainer>
   );
