@@ -706,6 +706,8 @@ def get_comparison():
                 # 从文件名提取链的名字（去掉路径和 _overview.json 后缀）
                 filename = os.path.basename(file_path)
                 chain_name = filename.replace('_overview.json', '')
+                if chain_name == "sepolia":
+                    continue
                 
                 # 读取 JSON 文件
                 with open(file_path, 'r') as f:
