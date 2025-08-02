@@ -80,10 +80,12 @@ const Comparison: React.FC = () => {
   // 准备TVL饼状图数据
   const getTotalTVLPieData = () => {
     if (!comparisonData) return [];
-    return Object.entries(comparisonData).map(([chainName, data]) => ({
-      type: getChainFullName(chainName),
-      value: data.tvls.total_tvl_balance,
-    })).filter(item => item.value > 0);
+    return Object.entries(comparisonData)
+      .filter(([chainName]) => chainName !== 'sepolia') // 排除Sepolia链
+      .map(([chainName, data]) => ({
+        type: getChainFullName(chainName),
+        value: data.tvls.total_tvl_balance,
+      })).filter(item => item.value > 0);
   };
 
   // 通用饼状图配置
