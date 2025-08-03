@@ -776,14 +776,13 @@ const Welcome: React.FC = () => {
                             tagInfoMap[tag] ? (
                               <span>
                                 {tagInfoMap[tag].description}
-                                <br />
                                 <a 
                                   href={tagInfoMap[tag].link} 
                                   target="_blank" 
                                   rel="noopener noreferrer" 
-                                  style={{ marginTop: 4, color: 'white', display: 'inline-block' }}
+                                  style={{ marginLeft: 8, color: 'white' }}
                                 >
-                                  <LinkOutlined /> 查看详情
+                                  <LinkOutlined />
                                 </a>
                               </span>
                             ) : tag
