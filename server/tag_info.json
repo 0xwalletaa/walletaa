@@ -3,36 +3,26 @@
     "tag": "ERC-4337",
     "functions": [
       "validateUserOp((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes),bytes32,uint256)"
-    ],
-    "description": "ERC-4337 allows users to interact with smart contracts using a lightweight account interface instead of a traditional wallet. This standard is designed to improve security and usability by providing a more flexible and efficient way to interact with smart contracts.",
-    "link": "https://eips.ethereum.org/EIPS/eip-4337"
+    ]
   },
   {
     "tag": "ERC-7579 Moduler",
-    "functions": ["installModule(uint256,address,bytes)"],
-    "description": "ERC-7579 allows developers to create smart contracts that can be extended with new functionality by installing modules. This standard is designed to improve security and usability by providing a more flexible and efficient way to interact with smart contracts.",
-    "link": "https://eips.ethereum.org/EIPS/eip-7579"
+    "functions": ["installModule(uint256,address,bytes)"]
   },
   {
     "tag": "ERC-6900 Moduler",
-    "functions": ["getExecutionData(bytes4)"],
-    "description": "ERC-6900",
-    "link": "https://eips.ethereum.org/EIPS/eip-6900"
+    "functions": ["getExecutionData(bytes4)"]
   },
   {
     "tag": "ERC-7821 Execution",
-    "functions": ["execute(bytes32,bytes)"],
-    "description": "ERC-7821",
-    "link": "https://eips.ethereum.org/EIPS/eip-7821"
+    "functions": ["execute(bytes32,bytes)"]
   },
   {
     "tag": "ERC-6900 Execution",
     "functions": [
       "executeBatch((address,uint256,bytes)[])",
       "execute(address,uint256,bytes)"
-    ],
-    "description": "ERC-6900",
-    "link": "https://eips.ethereum.org/EIPS/eip-6900"
+    ]
   },
   {
     "tag": "Batch",
@@ -40,33 +30,23 @@
       "executeBatch((address,uint256,bytes)[])",
       "execute(bytes32,bytes)",
       "executeFromSelf((address,uint256,bytes)[])"
-    ],
-    "description": "Batch execution",
-    "link": "https://eips.ethereum.org/"
+    ]
   },
   {
     "tag": "ERC-7914",
-    "functions": ["transferFromNative(address,address,uint256)"],
-    "description": "ERC-7914",
-    "link": "https://eips.ethereum.org/EIPS/eip-7914"
+    "functions": ["transferFromNative(address,address,uint256)"]
   },
   {
     "tag": "ERC-1271",
-    "functions": ["isValidSignature(bytes32,bytes)"],
-    "description": "ERC-1271",
-    "link": "https://eips.ethereum.org/EIPS/eip-1271"
+    "functions": ["isValidSignature(bytes32,bytes)"]
   },
   {
     "tag": "ERC-721 Receiver",
-    "functions": ["onERC721Received(address,address,uint256,bytes)"],
-    "description": "ERC-721 Receiver",
-    "link": "https://eips.ethereum.org/EIPS/eip-721"
+    "functions": ["onERC721Received(address,address,uint256,bytes)"]
   },
   {
     "tag": "ERC-1155 Receiver",
-    "functions": ["onERC1155Received(address,address,uint256,uint256,bytes)"],
-    "description": "ERC-1155 Receiver",
-    "link": "https://eips.ethereum.org/EIPS/eip-1155"
+    "functions": ["onERC1155Received(address,address,uint256,uint256,bytes)"]
   },
   {
     "tag": "ERC-1967 Proxy",
@@ -74,56 +54,38 @@
       "getImplementation()",
       "upgradeToAndCall(address,bytes)",
       "upgradeTo(address)"
-    ],
-    "description": "ERC-1967 Proxy",
-    "link": "https://eips.ethereum.org/EIPS/eip-1967"
+    ]
   },
   {
     "tag": "Proxy",
-    "functions": ["implementation()"],
-    "description": "Proxy",
-    "link": "https://eips.ethereum.org/"
+    "functions": ["implementation()"]
   },
   {
     "tag": "UUPSUpgradeable",
-    "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"],
-    "description": "UUPSUpgradeable",
-    "link": "https://eips.ethereum.org/"
+    "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"]
   },
   {
     "tag": "ERC-165",
-    "functions": ["supportsInterface(bytes4)"],
-    "description": "ERC-165",
-    "link": "https://eips.ethereum.org/EIPS/eip-165"
+    "functions": ["supportsInterface(bytes4)"]
   },
   {
     "tag": "ERC-7779",
-    "functions": ["accountStorageBases()"],
-    "description": "ERC-7779",
-    "link": "https://eips.ethereum.org/EIPS/eip-7779"
+    "functions": ["accountStorageBases()"]
   },
   {
     "tag": "ERC-7579 Executor",
-    "functions": ["executeFromExecutor(bytes32,bytes)"],
-    "description": "ERC-7579 Executor",
-    "link": "https://eips.ethereum.org/EIPS/eip-7579"
+    "functions": ["executeFromExecutor(bytes32,bytes)"]
   },
   {
     "tag": "ERC-7710 Delegation",
-    "functions": ["redeemDelegations(bytes[],bytes32[],bytes[])"],
-    "description": "ERC-7710 Delegation",
-    "link": "https://eips.ethereum.org/EIPS/eip-7710"
+    "functions": ["redeemDelegations(bytes[],bytes32[],bytes[])"]
   },
   {
     "tag": "ERC-6551",
-    "functions": ["token()", "state()"],
-    "description": "ERC-6551",
-    "link": "https://eips.ethereum.org/EIPS/eip-6551"
+    "functions": ["token()", "state()"]
   },
   {
     "tag": "Proto Account",
-    "functions": ["pay(uint256,bytes32,bytes32,bytes)", "initializePREP(bytes)"],
-    "description": "Proto Account",
-    "link": "https://eips.ethereum.org/"
+    "functions": ["pay(uint256,bytes32,bytes32,bytes)", "initializePREP(bytes)"]
   }
 ]

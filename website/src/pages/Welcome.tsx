@@ -7,7 +7,7 @@ import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
 import { getOverview, Overview, CodeInfoItem, TVLData } from '@/services/api';
 import { getChainConfig, getCurrentChain, getUrlWithChain } from '@/services/config';
-import tagColorMap from '@/utils/tagColorMap';
+import tagInfoMap from '@/utils/tagInfoMap';
 import { history } from '@umijs/max';
 
 // 定义ChartCard组件的属性类型
@@ -770,7 +770,7 @@ const Welcome: React.FC = () => {
                   render: (tags: string[]) => (
                     <Space wrap>
                       {tags && tags.map((tag: string) => (
-                        <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+                        <Tag color={tagInfoMap[tag]?.color || 'default'} key={tag}>
                           {tag}
                         </Tag>
                       ))}

@@ -9,11 +9,11 @@ import { LinkOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/ic
 import React, { useRef, useState, useEffect } from 'react';
 import { getCodesByTvlBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
-import tagColorMap from '@/utils/tagColorMap';
+import tagInfoMap from '@/utils/tagInfoMap';
 import numeral from 'numeral';
 
 // 标签颜色映射
-// 删除本地定义的tagColorMap
+// 已更新为使用 tagInfoMap
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -171,7 +171,7 @@ const Codes: React.FC = () => {
       render: (_, record) => (
         <Space wrap>
           {record.tags && record.tags.map((tag: string) => (
-            <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+            <Tag color={tagInfoMap[tag]?.color || 'default'} key={tag}>
               {tag}
             </Tag>
           ))}
@@ -493,7 +493,7 @@ const Codes: React.FC = () => {
         >
           <Space wrap>
             {code.tags && code.tags.map((tag: string) => (
-              <Tag color={tagColorMap[tag] || 'default'} key={tag}>
+              <Tag color={tagInfoMap[tag]?.color || 'default'} key={tag}>
                 {tag}
               </Tag>
             ))}
