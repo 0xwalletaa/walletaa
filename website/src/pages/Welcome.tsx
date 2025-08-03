@@ -770,9 +770,29 @@ const Welcome: React.FC = () => {
                   render: (tags: string[]) => (
                     <Space wrap>
                       {tags && tags.map((tag: string) => (
-                        <Tag color={tagInfoMap[tag]?.color || 'default'} key={tag}>
-                          {tag}
-                        </Tag>
+                        <Tooltip
+                          key={tag}
+                          title={
+                            tagInfoMap[tag] ? (
+                              <span>
+                                {tagInfoMap[tag].description}
+                                <br />
+                                <a 
+                                  href={tagInfoMap[tag].link} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  style={{ marginTop: 4, color: 'white', display: 'inline-block' }}
+                                >
+                                  <LinkOutlined /> 查看详情
+                                </a>
+                              </span>
+                            ) : tag
+                          }
+                        >
+                          <Tag color={tagInfoMap[tag]?.color || 'default'}>
+                            {tag}
+                          </Tag>
+                        </Tooltip>
                       ))}
                     </Space>
                   ),
