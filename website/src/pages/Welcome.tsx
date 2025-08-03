@@ -533,6 +533,10 @@ const Welcome: React.FC = () => {
               height={46}
               data={getDailyTxCountData()}
               scale={{ x: { paddingInner: 0.4 } }}
+              tooltip={{
+                name: intl.formatMessage({ id: 'pages.welcome.transactions' }),
+                field: 'y',
+              }}
             />
           </ChartCard>
         </Col>
@@ -553,6 +557,10 @@ const Welcome: React.FC = () => {
               height={46}
               data={getDailyAuthCountData()}
               scale={{ x: { paddingInner: 0.4 } }}
+              tooltip={{
+                name: intl.formatMessage({ id: 'pages.welcome.authorizers' }),
+                field: 'y',
+              }}
             />
           </ChartCard>
         </Col>
@@ -573,6 +581,10 @@ const Welcome: React.FC = () => {
               height={46}
               data={getDailyCodeCountData()}
               scale={{ x: { paddingInner: 0.4 } }}
+              tooltip={{
+                name: intl.formatMessage({ id: 'pages.welcome.codes' }),
+                field: 'y',
+              }}
             />
           </ChartCard>
         </Col>
@@ -593,6 +605,10 @@ const Welcome: React.FC = () => {
               height={46}
               data={getDailyRelayerCountData()}
               scale={{ x: { paddingInner: 0.4 } }}
+              tooltip={{
+                name: intl.formatMessage({ id: 'pages.welcome.relayers' }),
+                field: 'y',
+              }}
             />
           </ChartCard>
         </Col>
@@ -628,7 +644,7 @@ const Welcome: React.FC = () => {
                   }}
                   tooltip={{
                     name: intl.formatMessage({ id: 'pages.welcome.cumulativeTxs' }),
-                    channel: 'y',
+                    field: 'y',
                   }}
                 />
               </div>
@@ -655,7 +671,7 @@ const Welcome: React.FC = () => {
                   }}
                   tooltip={{
                     name: intl.formatMessage({ id: 'pages.welcome.cumulativeAuths' }),
-                    channel: 'y',
+                    field: 'y',
                   }}
                 />
               </div>
@@ -694,7 +710,7 @@ const Welcome: React.FC = () => {
                         custom: "..."
                       }
                     },
-                    items: [{ name: 'TVL', channel: 'y', valueFormatter: '$.2f' }],
+                    items: [{ name: 'TVL', field: 'value', valueFormatter: '$.2f' }],
                   }}
                 />
               </div>

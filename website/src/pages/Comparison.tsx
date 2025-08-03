@@ -11,6 +11,7 @@ const Comparison: React.FC = () => {
   const intl = useIntl();
   const [loading, setLoading] = useState(true);
   const [comparisonData, setComparisonData] = useState<ComparisonData | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const currentChain = getCurrentChain();
 
   // 定义链的显示顺序
@@ -33,6 +34,20 @@ const Comparison: React.FC = () => {
     };
     return chainNameMap[chainName] || chainName;
   };
+
+  // 检测屏幕大小
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   useEffect(() => {
     getComparison()
@@ -116,7 +131,7 @@ const Comparison: React.FC = () => {
     data,
     angleField: 'value',
     colorField: 'type',
-    radius: 0.8,
+    radius: isMobile ? 0.4 : 0.8, // 手机模式下饼图缩小一半
     height: 300,
     label: {
       text: (d: any) => {
@@ -140,7 +155,9 @@ const Comparison: React.FC = () => {
     legend: {
       color: {
         position: 'bottom',
-        layout: 'horizontal',
+        layout: {
+          justifyContent: 'center',
+        },
       },
     },
     tooltip: {
@@ -148,7 +165,7 @@ const Comparison: React.FC = () => {
       items: [
         { 
           name: title, 
-          channel: 'y', 
+          field: 'value',
           valueFormatter: (value: number) => numeral(value).format(valueFormatter)
         }
       ],
@@ -173,11 +190,7 @@ const Comparison: React.FC = () => {
                 ${numeral(calculateTotal(getTotalTVLPieData())).format('0,0.00')}
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: '60%', maxWidth: '600px' }}>
-                <Pie {...getPieConfig(getTotalTVLPieData(), 'TVL', '$0,0.00')} />
-              </div>
-            </div>
+            <Pie {...getPieConfig(getTotalTVLPieData(), 'TVL', '$0,0.00')} />
           </Card>
         </Col>
         
