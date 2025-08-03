@@ -3,26 +3,31 @@
     "tag": "ERC-4337",
     "functions": [
       "validateUserOp((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes),bytes32,uint256)"
-    ]
+    ],
+    "description": "ERC-4337 allows users to interact with smart contracts using a lightweight account interface instead of a traditional wallet. This standard is designed to improve security and usability by providing a more flexible and efficient way to interact with smart contracts."
   },
   {
     "tag": "ERC-7579 Moduler",
-    "functions": ["installModule(uint256,address,bytes)"]
+    "functions": ["installModule(uint256,address,bytes)"],
+    "description": "ERC-7579 allows developers to create smart contracts that can be extended with new functionality by installing modules. This standard is designed to improve security and usability by providing a more flexible and efficient way to interact with smart contracts."
   },
   {
     "tag": "ERC-6900 Moduler",
-    "functions": ["getExecutionData(bytes4)"]
+    "functions": ["getExecutionData(bytes4)"],
+    "description": "ERC-6900"
   },
   {
     "tag": "ERC-7821 Execution",
-    "functions": ["execute(bytes32,bytes)"]
+    "functions": ["execute(bytes32,bytes)"],
+    "description": "ERC-7821"
   },
   {
     "tag": "ERC-6900 Execution",
     "functions": [
       "executeBatch((address,uint256,bytes)[])",
       "execute(address,uint256,bytes)"
-    ]
+    ],
+    "description": "ERC-6900"
   },
   {
     "tag": "Batch",
@@ -30,23 +35,28 @@
       "executeBatch((address,uint256,bytes)[])",
       "execute(bytes32,bytes)",
       "executeFromSelf((address,uint256,bytes)[])"
-    ]
+    ],
+    "description": "Batch execution"
   },
   {
     "tag": "ERC-7914",
-    "functions": ["transferFromNative(address,address,uint256)"]
+    "functions": ["transferFromNative(address,address,uint256)"],
+    "description": "ERC-7914"
   },
   {
     "tag": "ERC-1271",
-    "functions": ["isValidSignature(bytes32,bytes)"]
+    "functions": ["isValidSignature(bytes32,bytes)"],
+    "description": "ERC-1271"
   },
   {
     "tag": "ERC-721 Receiver",
-    "functions": ["onERC721Received(address,address,uint256,bytes)"]
+    "functions": ["onERC721Received(address,address,uint256,bytes)"],
+    "description": "ERC-721 Receiver"
   },
   {
     "tag": "ERC-1155 Receiver",
-    "functions": ["onERC1155Received(address,address,uint256,uint256,bytes)"]
+    "functions": ["onERC1155Received(address,address,uint256,uint256,bytes)"],
+    "description": "ERC-1155 Receiver"
   },
   {
     "tag": "ERC-1967 Proxy",
@@ -54,38 +64,47 @@
       "getImplementation()",
       "upgradeToAndCall(address,bytes)",
       "upgradeTo(address)"
-    ]
+    ],
+    "description": "ERC-1967 Proxy"
   },
   {
     "tag": "Proxy",
-    "functions": ["implementation()"]
+    "functions": ["implementation()"],
+    "description": "Proxy"
   },
   {
     "tag": "UUPSUpgradeable",
-    "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"]
+    "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"],
+    "description": "UUPSUpgradeable"
   },
   {
     "tag": "ERC-165",
-    "functions": ["supportsInterface(bytes4)"]
+    "functions": ["supportsInterface(bytes4)"],
+    "description": "ERC-165"
   },
   {
     "tag": "ERC-7779",
-    "functions": ["accountStorageBases()"]
+    "functions": ["accountStorageBases()"],
+    "description": "ERC-7779"
   },
   {
     "tag": "ERC-7579 Executor",
-    "functions": ["executeFromExecutor(bytes32,bytes)"]
+    "functions": ["executeFromExecutor(bytes32,bytes)"],
+    "description": "ERC-7579 Executor"
   },
   {
     "tag": "ERC-7710 Delegation",
-    "functions": ["redeemDelegations(bytes[],bytes32[],bytes[])"]
+    "functions": ["redeemDelegations(bytes[],bytes32[],bytes[])"],
+    "description": "ERC-7710 Delegation"
   },
   {
     "tag": "ERC-6551",
-    "functions": ["token()", "state()"]
+    "functions": ["token()", "state()"],
+    "description": "ERC-6551"
   },
   {
     "tag": "Proto Account",
-    "functions": ["pay(uint256,bytes32,bytes32,bytes)", "initializePREP(bytes)"]
+    "functions": ["pay(uint256,bytes32,bytes32,bytes)", "initializePREP(bytes)"],
+    "description": "Proto Account"
   }
 ]
