@@ -205,6 +205,7 @@ export async function getCodesByTvlBalance(params: {
   page_size?: number;
   order?: string;
   search_by?: string;
+  tags_by?: string;
 }) {
   return request(`${BASE_URL()}/codes_by_tvl_balance`, {
     method: 'GET',
@@ -218,6 +219,7 @@ export async function getCodesByAuthorizerCount(params: {
   page_size?: number;
   order?: string;
   search_by?: string;
+  tags_by?: string;
 }) {
   return request(`${BASE_URL()}/codes_by_authorizer_count`, {
     method: 'GET',

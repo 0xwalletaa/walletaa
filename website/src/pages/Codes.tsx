@@ -4,12 +4,13 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
-import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography, Input, Card, Row, Col } from 'antd';
+import { Tag, Tooltip, Button, Modal, Descriptions, Space, Typography, Input, Card, Row, Col, Form } from 'antd';
 import { LinkOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
 import { getCodesByTvlBalance, getCodesByAuthorizerCount, CodeItem, CodeInfoItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 import tagInfoMap from '@/utils/tagInfoMap';
+import { StandardFormRow, TagSelect } from '@/components';
 import numeral from 'numeral';
 
 // 标签颜色映射
@@ -17,12 +18,15 @@ import numeral from 'numeral';
 
 const Codes: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const [form] = Form.useForm();
   const [sortApi, setSortApi] = useState<'tvl_balance' | 'authorizer_count'>('tvl_balance');
   const [codeInfos, setCodeInfos] = useState<CodeInfoItem[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentCode, setCurrentCode] = useState<CodeInfoItem | null>(null);
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchByParam, setSearchByParam] = useState<string>('');
+  const [selectedTags, setSelectedTags] = useState<(string | number)[]>([]);
+  const [tagsParam, setTagsParam] = useState<string>('');
   const { EXPLORER_URL } = getChainConfig();
   const location = useLocation();
 
@@ -33,26 +37,49 @@ const Codes: React.FC = () => {
   const intl = useIntl();
   const { Text, Link } = Typography;
 
-  // 从URL参数中获取search_by
+  // 从URL参数中获取search_by和tags_by
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const searchBy = params.get('search_by');
+    const tagsBy = params.get('tags_by');
+    
     if (searchBy) {
       setSearchValue(searchBy);
       setSearchByParam(searchBy);
     }
-  }, [location.search]);
+    
+    if (tagsBy) {
+      const tags = tagsBy.split(',').filter(tag => tag.trim());
+      setSelectedTags(tags);
+      setTagsParam(tagsBy);
+    }
+    
+    // 更新表单值
+    form.setFieldsValue({
+      search: searchBy || '',
+      tags: tagsBy ? tagsBy.split(',').filter(tag => tag.trim()) : []
+    });
+  }, [location.search, form]);
 
-  // 处理搜索操作
-  const handleSearch = () => {
-    setSearchByParam(searchValue);
+  // 处理表单提交
+  const handleFormSubmit = (values: any) => {
+    const { search, tags } = values;
+    
+    setSearchByParam(search || '');
+    setTagsParam(tags && tags.length > 0 ? tags.join(',') : '');
     
     // 更新URL参数
     const params = new URLSearchParams(location.search);
-    if (searchValue) {
-      params.set('search_by', searchValue);
+    if (search) {
+      params.set('search_by', search);
     } else {
       params.delete('search_by');
+    }
+    
+    if (tags && tags.length > 0) {
+      params.set('tags_by', tags.join(','));
+    } else {
+      params.delete('tags_by');
     }
     
     // 构建新的URL
@@ -67,6 +94,40 @@ const Codes: React.FC = () => {
     if (actionRef.current) {
       actionRef.current.reload(true);
     }
+  };
+
+  // 处理搜索框输入变化
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    
+    // 如果搜索框有内容，清空标签选择
+    if (value.trim()) {
+      setSelectedTags([]);
+      form.setFieldValue('tags', []);
+    }
+  };
+
+  // 处理搜索操作（保持兼容性）
+  const handleSearch = () => {
+    const values = form.getFieldsValue();
+    handleFormSubmit({ ...values, search: searchValue });
+  };
+
+  // 处理标签选择变化
+  const handleTagsChange = (tags: (string | number)[]) => {
+    setSelectedTags(tags);
+    form.setFieldValue('tags', tags);
+    
+    // 如果选择了标签，清空搜索框
+    if (tags.length > 0) {
+      setSearchValue('');
+      form.setFieldValue('search', '');
+    }
+    
+    // 自动提交表单
+    const values = form.getFieldsValue();
+    handleFormSubmit({ ...values, tags, search: tags.length > 0 ? '' : values.search });
   };
 
   const formatAddress = (address: string) => {
@@ -544,31 +605,86 @@ const Codes: React.FC = () => {
   return (
     <PageContainer>
       <Card style={{ marginBottom: 16 }}>
-        <Row gutter={16}>
-          <Col flex="auto">
-            <Input
-              placeholder={intl.formatMessage({
-                id: 'pages.codes.search.placeholder',
-                defaultMessage: '输入代码地址或提供者名称',
-              })}
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onPressEnter={handleSearch}
-            />
-          </Col>
-          <Col>
-            <Button 
-              type="primary" 
-              icon={<SearchOutlined />} 
-              onClick={handleSearch}
-            >
-              {intl.formatMessage({
-                id: 'pages.codes.search.button',
-                defaultMessage: '搜索',
-              })}
-            </Button>
-          </Col>
-        </Row>
+        <Form
+          form={form}
+          layout="inline"
+          onFinish={handleFormSubmit}
+          initialValues={{
+            search: '',
+            tags: []
+          }}
+        >
+          <StandardFormRow 
+            title={intl.formatMessage({
+              id: 'pages.codes.search.title',
+              defaultMessage: '搜索',
+            })} 
+            block 
+            style={{ paddingBottom: 11 }}
+          >
+            <Row gutter={16} style={{ width: '100%' }}>
+              <Col flex="auto">
+                <Form.Item name="search" style={{ marginBottom: 0 }}>
+                  <Input
+                    placeholder={intl.formatMessage({
+                      id: 'pages.codes.search.placeholder',
+                      defaultMessage: '输入代码地址或提供者名称',
+                    })}
+                    value={searchValue}
+                    onChange={handleSearchInputChange}
+                    onPressEnter={handleSearch}
+                  />
+                </Form.Item>
+              </Col>
+              <Col>
+                <Button 
+                  type="primary" 
+                  icon={<SearchOutlined />} 
+                  onClick={handleSearch}
+                >
+                  {intl.formatMessage({
+                    id: 'pages.codes.search.button',
+                    defaultMessage: '搜索',
+                  })}
+                </Button>
+              </Col>
+            </Row>
+          </StandardFormRow>
+          
+          <StandardFormRow 
+            title={intl.formatMessage({
+              id: 'pages.codes.tags.title',
+              defaultMessage: '标签',
+            })} 
+            block 
+            last
+          >
+            <Form.Item name="tags" style={{ marginBottom: 0 }}>
+              <TagSelect 
+                expandable
+                hideCheckAll={true}
+                value={selectedTags}
+                onChange={handleTagsChange}
+                actionsText={{
+                  expandText: intl.formatMessage({
+                    id: 'pages.codes.tags.expand',
+                    defaultMessage: '展开',
+                  }),
+                  collapseText: intl.formatMessage({
+                    id: 'pages.codes.tags.collapse',
+                    defaultMessage: '收起',
+                  }),
+                }}
+              >
+                {Object.keys(tagInfoMap).map((tag) => (
+                  <TagSelect.Option value={tag} key={tag}>
+                    {tag}
+                  </TagSelect.Option>
+                ))}
+              </TagSelect>
+            </Form.Item>
+          </StandardFormRow>
+        </Form>
       </Card>
       
       <ProTable<CodeItem>
@@ -609,6 +725,7 @@ const Codes: React.FC = () => {
               page_size: pageSize,
               order: orderParam,
               search_by: searchByParam.toLowerCase(),
+              tags_by: tagsParam,
               ...rest,
             });
           } else {
@@ -617,6 +734,7 @@ const Codes: React.FC = () => {
               page_size: pageSize,
               order: orderParam,
               search_by: searchByParam.toLowerCase(),
+              tags_by: tagsParam,
               ...rest,
             });
           }

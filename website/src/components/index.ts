@@ -9,5 +9,7 @@ import Footer from './Footer';
 import { SelectLang } from './RightContent';
 import ChainLink from './ChainLink';
 import ChainSelect from './ChainSelect';
+import StandardFormRow from './StandardFormRow';
+import TagSelect from './TagSelect';
 
-export { Footer, SelectLang, ChainLink, ChainSelect };
+export { Footer, SelectLang, ChainLink, ChainSelect, StandardFormRow, TagSelect };
