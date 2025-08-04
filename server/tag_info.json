@@ -61,7 +61,7 @@
     "functions": ["implementation()"]
   },
   {
-    "tag": "UUPSUpgradeable",
+    "tag": "ERC-1822 UUPS",
     "functions": ["upgradeToAndCall(address,bytes)", "upgradeTo(address)"]
   },
   {
