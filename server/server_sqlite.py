@@ -282,6 +282,7 @@ def get_codes_by_tvl_balance():
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
+        tags_by = request.args.get('tags_by', '')  # Get filter tags_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -294,6 +295,11 @@ def get_codes_by_tvl_balance():
             else:
                 query = 'SELECT * FROM codes WHERE provider LIKE ? or tags LIKE ?'
                 params = [f'%{search_by}%', f'%{search_by}%']
+        elif tags_by != '':
+            tags = tags_by.split(',')            
+            tag_conditions = ' AND '.join(['tags LIKE ?' for _ in tags])
+            query = f'SELECT * FROM codes WHERE {tag_conditions}'
+            params = [f'%{tag}%' for tag in tags]
         else:
             query = 'SELECT * FROM codes'
             params = []
@@ -348,6 +354,7 @@ def get_codes_by_authorizer_count():
         page_size = int(request.args.get('page_size', 10))
         order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
+        tags_by = request.args.get('tags_by', '')  # Get filter tags_by parameter
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -360,6 +367,11 @@ def get_codes_by_authorizer_count():
             else:
                 query = 'SELECT * FROM codes WHERE provider LIKE ? or tags LIKE ?'
                 params = [f'%{search_by}%', f'%{search_by}%']
+        elif tags_by != '':
+            tags = tags_by.split(',')            
+            tag_conditions = ' AND '.join(['tags LIKE ?' for _ in tags])
+            query = f'SELECT * FROM codes WHERE {tag_conditions}'
+            params = [f'%{tag}%' for tag in tags]
         else:
             query = 'SELECT * FROM codes'
             params = []
