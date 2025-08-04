@@ -69,7 +69,7 @@ const tagInfoMap: Record<string, TagInfo> = {
     link: ''
   },
   'ERC-1822 UUPS': {
-    color: 'pink',
+    color: 'red',
     description: 'Universal Upgradeable Proxy Standard (UUPS)',
     link: 'https://eips.ethereum.org/EIPS/eip-1822'
   },
