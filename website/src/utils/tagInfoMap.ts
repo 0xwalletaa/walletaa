@@ -35,7 +35,7 @@ const tagInfoMap: Record<string, TagInfo> = {
   },
   'Batch': {
     color: 'green',
-    description: 'Batch Execution',
+    description: 'Execute a sequence of operations in one atomic transaction.',
     link: ''
   },
   'ERC-7914': {
@@ -85,7 +85,7 @@ const tagInfoMap: Record<string, TagInfo> = {
   },
   'ERC-7579 Executor': {
     color: 'geekblue',
-    description: 'ERC-7579 Executor',
+    description: 'Interfaces for executing transactions on behalf of the smart account',
     link: 'https://eips.ethereum.org/EIPS/eip-7579'
   },
   'ERC-7710 Delegation': {
