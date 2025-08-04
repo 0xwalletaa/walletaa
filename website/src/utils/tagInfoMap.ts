@@ -45,7 +45,7 @@ const tagInfoMap: Record<string, TagInfo> = {
   },
   'ERC-1271': {
     color: 'cyan',
-    description: 'ERC-1271',
+    description: 'Standard way to verify a signature when the account is a smart contract',
     link: 'https://eips.ethereum.org/EIPS/eip-1271'
   },
   'ERC-721 Receiver': {
