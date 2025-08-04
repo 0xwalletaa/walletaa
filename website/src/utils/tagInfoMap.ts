@@ -10,33 +10,38 @@ interface TagInfo {
 const tagInfoMap: Record<string, TagInfo> = {
   'ERC-4337': {
     color: 'blue',
-    description: 'ERC-4337 allows users to interact with smart contracts using a lightweight account interface instead of a traditional wallet. This standard is designed to improve security and usability by providing a more flexible and efficient way to interact with smart contracts.',
+    description: 'An account abstraction proposal which completely avoids consensus-layer protocol changes, instead relying on higher-layer infrastructure',
     link: 'https://eips.ethereum.org/EIPS/eip-4337'
   },
   'ERC-7579 Moduler': {
     color: 'purple',
-    description: 'ERC-7579 allows developers to create smart contracts that can be extended with new functionality by installing modules. This standard is designed to improve security and usability by providing a more flexible and efficient way to interact with smart contracts.',
+    description: 'Modular smart account interfaces and behavior for interoperability with minimal restrictions for accounts and modules',
     link: 'https://eips.ethereum.org/EIPS/eip-7579'
   },
   'ERC-6900 Moduler': {
     color: 'purple',
-    description: 'ERC-6900',
+    description: 'Interfaces for smart contract accounts and modules, optionally supporting upgradability and introspection',
     link: 'https://eips.ethereum.org/EIPS/eip-6900'
   },
-  'ERC-7821 Batch': {
+  'ERC-7821 Execution': {
     color: 'green',
-    description: 'ERC-7821',
+    description: 'A minimal batch executor interface for delegations',
     link: 'https://eips.ethereum.org/EIPS/eip-7821'
+  },
+  'ERC-6900 Execution': {
+    color: 'green',
+    description: 'Execution interfaces of ERC-6900',
+    link: 'https://eips.ethereum.org/EIPS/eip-6900'
   },
   'Batch': {
     color: 'green',
-    description: 'Batch execution',
-    link: 'https://eips.ethereum.org/'
+    description: 'Batch Execution',
+    link: ''
   },
   'ERC-7914': {
     color: 'orange',
-    description: 'ERC-7914',
-    link: 'https://eips.ethereum.org/EIPS/eip-7914'
+    description: 'An Interface for Transfer From Native',
+    link: 'https://docs.uniswap.org/contracts/smart-wallet/advanced-usage/erc-7914'
   },
   'ERC-1271': {
     color: 'cyan',
@@ -45,73 +50,58 @@ const tagInfoMap: Record<string, TagInfo> = {
   },
   'ERC-721 Receiver': {
     color: 'magenta',
-    description: 'ERC-721 Receiver',
+    description: 'Handle the Receipt of an ERC-721 NFT',
     link: 'https://eips.ethereum.org/EIPS/eip-721'
   },
   'ERC-1155 Receiver': {
     color: 'magenta',
-    description: 'ERC-1155 Receiver',
+    description: 'Handle the Receipt of an ERC-1155 NFT',
     link: 'https://eips.ethereum.org/EIPS/eip-1155'
   },
-  'ERC-1967': {
+  'ERC-1967 Proxy': {
     color: 'red',
-    description: 'ERC-1967',
+    description: 'A consistent location where proxies store the address of the logic contract they delegate to, as well as other proxy-specific information.',
     link: 'https://eips.ethereum.org/EIPS/eip-1967'
   },
   'Proxy': {
-    color: 'gold',
-    description: 'Proxy',
-    link: 'https://eips.ethereum.org/'
+    color: 'red',
+    description: 'A Bytecode Redirect Implementation',
+    link: ''
+  },
+  'ERC-1822 UUPS': {
+    color: 'pink',
+    description: 'Universal Upgradeable Proxy Standard (UUPS)',
+    link: 'https://eips.ethereum.org/EIPS/eip-1822'
   },
   'ERC-165': {
     color: 'lime',
-    description: 'ERC-165',
+    description: 'Standard Interface Detection',
     link: 'https://eips.ethereum.org/EIPS/eip-165'
   },
   'ERC-7779': {
     color: 'volcano',
-    description: 'ERC-7779',
+    description: 'Interface for delegated externally owned accounts to enable better redelegation between wallets.',
     link: 'https://eips.ethereum.org/EIPS/eip-7779'
   },
-  'ERC-7821 Execution': {
-    color: 'green',
-    description: 'ERC-7821',
-    link: 'https://eips.ethereum.org/EIPS/eip-7821'
-  },
-  'ERC-1967 Proxy': {
-    color: 'red',
-    description: 'ERC-1967 Proxy',
-    link: 'https://eips.ethereum.org/EIPS/eip-1967'
-  },
-  'UUPSUpgradeable': {
-    color: 'pink',
-    description: 'UUPSUpgradeable',
-    link: 'https://eips.ethereum.org/'
-  },
   'ERC-7579 Executor': {
-    color: 'purple',
+    color: 'geekblue',
     description: 'ERC-7579 Executor',
     link: 'https://eips.ethereum.org/EIPS/eip-7579'
   },
   'ERC-7710 Delegation': {
     color: 'geekblue',
-    description: 'ERC-7710 Delegation',
+    description: 'Interfaces for consistently delegating capabilities to other contracts or EOAs.',
     link: 'https://eips.ethereum.org/EIPS/eip-7710'
-  },
-  'ERC-6900 Execution': {
-    color: 'green',
-    description: 'ERC-6900',
-    link: 'https://eips.ethereum.org/EIPS/eip-6900'
   },
   'ERC-6551': {
     color: 'blue',
-    description: 'ERC-6551',
+    description: 'An interface and registry for smart contract accounts owned by non-fungible tokens',
     link: 'https://eips.ethereum.org/EIPS/eip-6551'
   },
   'Proto Account': {
-    color: 'green',
-    description: 'Proto Account',
-    link: 'https://eips.ethereum.org/'
+    color: 'blue',
+    description: 'All-in-one EIP-7702 powered account contract, coupled with Porto',
+    link: 'https://github.com/ithacaxyz/account/tree/main'
   }
 };
 
