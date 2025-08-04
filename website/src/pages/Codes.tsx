@@ -622,8 +622,8 @@ const Codes: React.FC = () => {
             block 
             style={{ paddingBottom: 11 }}
           >
-            <Row gutter={16} style={{ width: '100%' }}>
-              <Col flex="auto">
+            <Row gutter={8} style={{ width: '100%' }}>
+              <Col xs={18} sm={20} md={21} lg={22} xl={22}>
                 <Form.Item name="search" style={{ marginBottom: 0 }}>
                   <Input
                     placeholder={intl.formatMessage({
@@ -636,17 +636,13 @@ const Codes: React.FC = () => {
                   />
                 </Form.Item>
               </Col>
-              <Col>
+              <Col xs={6} sm={4} md={3} lg={2} xl={2}>
                 <Button 
                   type="primary" 
                   icon={<SearchOutlined />} 
                   onClick={handleSearch}
-                >
-                  {intl.formatMessage({
-                    id: 'pages.codes.search.button',
-                    defaultMessage: '搜索',
-                  })}
-                </Button>
+                  style={{ width: '100%' }}
+                />
               </Col>
             </Row>
           </StandardFormRow>
