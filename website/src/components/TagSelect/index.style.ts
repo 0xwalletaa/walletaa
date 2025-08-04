@@ -23,7 +23,7 @@ const useStyles = createStyles(({ token }) => {
       'span.anticon': { fontSize: '12px' },
     },
     expanded: {
-      maxHeight: '200px',
+      maxHeight: '100vh',
       transition: 'all 0.3s',
     },
     hasExpandTag: {
