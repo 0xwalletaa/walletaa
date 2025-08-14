@@ -59,6 +59,7 @@
   {
     "address": "0x89046d34E70A65ACAb2152C26a0C8e493b5ba629",
     "name": "AdvancedCrimeEnjoyor2",
+    "category": "Crime",
     "provider": "Crime Sweeper",
     "code": "https://etherscan.deth.net/address/0x89046d34E70A65ACAb2152C26a0C8e493b5ba629",
     "repo": "",
@@ -86,6 +87,7 @@
   {
     "address": "0x08f5e230d412F0cd475B03b9Acb51d1562f730F9",
     "name": "CrimeEnjoyor",
+    "category": "Crime",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/0x08f5e230d412F0cd475B03b9Acb51d1562f730F9",
     "repo": "",
@@ -143,6 +145,7 @@
   {
     "address": "0x6B7879a5d747E30a3ADb37A9e41c046928FCE933",
     "name": "CrimeEnjoyor2",
+    "category": "Crime",
     "provider": "Crime Sweeper",
     "code": "https://etherscan.deth.net/address/0x6b7879a5d747e30a3adb37a9e41c046928fce933",
     "repo": "",
@@ -893,6 +896,7 @@
   {
     "address": "0xD2e28229F6f2c235e57De2EbC727025A1D0530FB",
     "name": "Biz",
+    "category": "Wallet",
     "provider": "Trust Wallet",
     "code": "https://vscode.blockscan.com/ethereum/0xD2e28229F6f2c235e57De2EbC727025A1D0530FB",
     "repo": "",
@@ -1468,6 +1472,7 @@
   {
     "address": "0x80296FF8D1ED46f8e3C7992664D13B833504c2Bb",
     "name": "WalletCore",
+    "category": "Wallet",
     "provider": "OKX",
     "code": "https://vscode.blockscan.com/ethereum/0x80296ff8d1ed46f8e3c7992664d13b833504c2bb",
     "repo": "https://github.com/okx/wallet-core",
@@ -1825,6 +1830,7 @@
   {
     "address": "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
     "name": "EIP7702StatelessDeleGator",
+    "category": "Wallet",
     "provider": "Metamask",
     "code": "https://vscode.blockscan.com/ethereum/0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
     "repo": "https://github.com/MetaMask/delegation-framework/tree/main/src/EIP7702",
