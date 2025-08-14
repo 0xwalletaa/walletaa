@@ -327,6 +327,7 @@ def get_codes_by_tvl_balance():
         codes = []
         for row in rows:
             code = dict(row)
+            code['category'] = code['category'] if code['category'] else ""
             code['tags'] = json.loads(code['tags']) if code['tags'] else []
             code['details'] = json.loads(code['details']) if code['details'] else None
             codes.append(code)
@@ -399,6 +400,7 @@ def get_codes_by_authorizer_count():
         codes = []
         for row in rows:
             code = dict(row)
+            code['category'] = code['category'] if code['category'] else ""
             code['tags'] = json.loads(code['tags']) if code['tags'] else []
             code['details'] = json.loads(code['details']) if code['details'] else None
             codes.append(code)
@@ -641,6 +643,7 @@ def get_overview():
         top10_codes = []
         for row in top10_codes_rows:
             code = dict(row)
+            code['category'] = code['category'] if code['category'] else ""
             code['tags'] = json.loads(code['tags']) if code['tags'] else []
             code['details'] = json.loads(code['details']) if code['details'] else None
             top10_codes.append(code)
