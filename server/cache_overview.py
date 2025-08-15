@@ -58,6 +58,7 @@ for row in top10_codes_rows:
     code = dict(row)
     code['tags'] = json.loads(code['tags']) if code['tags'] else []
     code['details'] = json.loads(code['details']) if code['details'] else None
+    code['type'] = code['details']['type'] if code['details'] and 'type' in code['details'] else ""
     top10_codes.append(code)
 
 cursor.execute('SELECT * FROM relayers ORDER BY tx_count DESC LIMIT 10')
