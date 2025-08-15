@@ -756,6 +756,14 @@ const Welcome: React.FC = () => {
                   ),
                 },
                 {
+                  title: intl.formatMessage({ id: 'pages.welcome.type', defaultMessage: 'Type' }),
+                  dataIndex: 'type',
+                  key: 'type',
+                  render: (text: string) => (
+                    text ? <Tag color="cyan">{text}</Tag> : null
+                  ),
+                },
+                {
                   title: intl.formatMessage({ id: 'pages.welcome.provider', defaultMessage: 'Provider' }),
                   dataIndex: 'provider',
                   key: 'provider',

@@ -2,7 +2,7 @@
   {
     "address": "0xe4e49868aDF7118960C7d038964C21f62E615AFE",
     "name": "",
-    "category": "DeFi",
+    "type": "DeFi",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -31,7 +31,7 @@
   {
     "address": "0xBe833F50270aE41411AcC2B1dF81d610C9044d31",
     "name": "",
-    "category": "DeFi",
+    "type": "DeFi",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -61,7 +61,7 @@
   {
     "address": "0x89046d34E70A65ACAb2152C26a0C8e493b5ba629",
     "name": "AdvancedCrimeEnjoyor2",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://etherscan.deth.net/address/0x89046d34E70A65ACAb2152C26a0C8e493b5ba629",
     "repo": "",
@@ -89,7 +89,7 @@
   {
     "address": "0x08f5e230d412F0cd475B03b9Acb51d1562f730F9",
     "name": "CrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/0x08f5e230d412F0cd475B03b9Acb51d1562f730F9",
     "repo": "",
@@ -118,7 +118,7 @@
   {
     "address": "0x831e3DbDc5B8a95b8a33b6D2ecb439B631A95215",
     "name": "",
-    "category": "DeFi",
+    "type": "DeFi",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -148,7 +148,7 @@
   {
     "address": "0x6B7879a5d747E30a3ADb37A9e41c046928FCE933",
     "name": "CrimeEnjoyor2",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://etherscan.deth.net/address/0x6b7879a5d747e30a3adb37a9e41c046928fce933",
     "repo": "",
@@ -177,7 +177,7 @@
   {
     "address": "0xcc0c946EecF01A4Bc76Bc333Ea74CEb04756f17b",
     "name": "TokenPocketSimple7702Account",
-    "category": "AA",
+    "type": "AA",
     "provider": "TokenPocket",
     "code": "https://vscode.blockscan.com/ethereum/0xcc0c946eecf01a4bc76bc333ea74ceb04756f17b",
     "repo": "",
@@ -205,7 +205,7 @@
   {
     "address": "0xcEa43594f38316F0e01c161D8DaBDe0a07a1F512",
     "name": "DfnsSmartAccount",
-    "category": "AA",
+    "type": "AA",
     "provider": "Dfns",
     "code": "https://vscode.blockscan.com/ethereum/0xcea43594f38316f0e01c161d8dabde0a07a1f512",
     "repo": "https://github.com/dfns/dfns-smart-account",
@@ -233,7 +233,7 @@
   {
     "address": "0x17c11FDdADac2b341F2455aFe988fec4c3ba26e3",
     "name": "Pectra",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "Luganodes",
     "code": "https://vscode.blockscan.com/ethereum/0x17c11fddadac2b341f2455afe988fec4c3ba26e3",
     "repo": "https://github.com/Luganodes/Pectra-Batch-Contract",
@@ -263,7 +263,7 @@
   {
     "address": "0x4428a93B478fa76A5BD9c7641F54EC6373855433",
     "name": "",
-    "category": "AA",
+    "type": "AA",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -291,7 +291,7 @@
   {
     "address": "0x7F7F0dCbe8add58145B2785aFea40950891b44C8",
     "name": "",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "",
     "repo": "",
@@ -320,7 +320,7 @@
   {
     "address": "0x7785a22facd31db653ba4928f1d5b81d093f0b2f",
     "name": "BasicSmartAccount",
-    "category": "AA",
+    "type": "AA",
     "provider": "Cordial",
     "code": "https://vscode.blockscan.com/ethereum/0x7785a22facd31db653ba4928f1d5b81d093f0b2f",
     "repo": "https://github.com/cordialsys/crosschain/blob/9fd8fef4f0f3d488c309aceffa793d228def347f/chain/evm/node/src/BasicSmartAccount.sol#L5",
@@ -349,7 +349,7 @@
   {
     "address": "0x0000000000000000000000000000000000000000",
     "name": "",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "Revocation",
     "code": "",
     "repo": "",
@@ -378,7 +378,7 @@
   {
     "address": "0xB6785B782571980b3Ddb5d40659f4861fF15AA02",
     "name": "AdvancedCrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://etherscan.deth.net/address/0xB6785B782571980b3Ddb5d40659f4861fF15AA02",
     "repo": "",
@@ -408,7 +408,7 @@
   {
     "address": "0x0d11fee52609d6bddc818ef58721ecb51dae5308",
     "name": "",
-    "category": "Executor",
+    "type": "Executor",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -438,7 +438,7 @@
   {
     "address": "0x5bda98554446e4a582687e81d3c4419fcd6ba6b8",
     "name": "",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -467,7 +467,7 @@
   {
     "address": "0x9FEeB3bF3601cDe70e439fcDc703609d58C5d278",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "hadriencroubois.eth",
     "code": "",
     "repo": "",
@@ -496,7 +496,7 @@
   {
     "address": "0x000000009B1D0aF20D8C6d0A44e162d11F9b8f00",
     "name": "Calibur v1_0_0",
-    "category": "AA",
+    "type": "AA",
     "provider": "Uniswap",
     "code": "https://vscode.blockscan.com/ethereum/0x000000009B1D0aF20D8C6d0A44e162d11F9b8f00",
     "repo": "https://github.com/Uniswap/calibur/releases/tag/v1.0.0",
@@ -530,7 +530,7 @@
   {
     "address": "0x3cbad1e3b9049ecdb9588fb48dd61d80faf41bd5",
     "name": "Calibur v1_0_0_staging",
-    "category": "AA",
+    "type": "AA",
     "provider": "Uniswap",
     "code": "https://vscode.blockscan.com/ethereum/0x3cbad1e3b9049ecdb9588fb48dd61d80faf41bd5",
     "repo": "https://github.com/Uniswap/calibur/releases/tag/v1.0.0",
@@ -564,7 +564,7 @@
   {
     "address": "0xa1b0277a9e51f465e3c0a463addf74a2425c1d60",
     "name": "",
-    "category": "MEV",
+    "type": "MEV",
     "provider": "MEV Searcher",
     "code": "closed-source",
     "repo": "",
@@ -592,7 +592,7 @@
   {
     "address": "0x930FcC37d6042c79211EE18A02857Cb1Fd7F0D0b",
     "name": "",
-    "category": "Executor",
+    "type": "Executor",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -622,7 +622,7 @@
   {
     "address": "0x1f07336d35c9a70ed086f6aa3c4c0bd1266e6f63",
     "name": "",
-    "category": "Executor",
+    "type": "Executor",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -652,7 +652,7 @@
   {
     "address": "0x6F7c7b0129AFD6172dd36891B7048c6CF2D29c7f",
     "name": "HardcodedCrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/M_6f7c7b0129afd6172dd36891b7048c6cf2d29c7f",
     "repo": "",
@@ -681,7 +681,7 @@
   {
     "address": "0xA03fC3C62d26253B3eC3076CB871aFa3B5fa60ab",
     "name": "CrimeEnjoyor2",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://etherscan.deth.net/address/0xA03fC3C62d26253B3eC3076CB871aFa3B5fa60ab",
     "repo": "",
@@ -710,7 +710,7 @@
   {
     "address": "0x710FAd1041f0eE79916Bb1A6AdEF662303bb8b6E",
     "name": "CrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/0x710FAd1041f0eE79916Bb1A6AdEF662303bb8b6E",
     "repo": "",
@@ -739,7 +739,7 @@
   {
     "address": "0xe38e81a06ada5c4515a1fc8266ae470da63c00b4",
     "name": "CrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/0xe38e81a06ada5c4515a1fc8266ae470da63c00b4",
     "repo": "",
@@ -768,7 +768,7 @@
   {
     "address": "0x89383882Fc2D0Cd4d7952a3267A3b6dAE967E704",
     "name": "CrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/0x89383882Fc2D0Cd4d7952a3267A3b6dAE967E704",
     "repo": "",
@@ -797,7 +797,7 @@
   {
     "address": "0x68Ae6C736Ae31bBAb8D8b712cDc1f552e7De7351",
     "name": "CrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/0x68Ae6C736Ae31bBAb8D8b712cDc1f552e7De7351",
     "repo": "",
@@ -826,7 +826,7 @@
   {
     "address": "0xb847F107513522Af770ee0AaD8dA0319e6da32b3",
     "name": "CrimeEnjoyor",
-    "category": "Sweeper",
+    "type": "Sweeper",
     "provider": "Crime Sweeper",
     "code": "https://vscode.blockscan.com/ethereum/0xb847F107513522Af770ee0AaD8dA0319e6da32b3",
     "repo": "",
@@ -855,7 +855,7 @@
   {
     "address": "0x69007702764179f14F51cdce752f4f775d74E139",
     "name": "SemiModularAccount7702",
-    "category": "AA",
+    "type": "AA",
     "provider": "Alchemy",
     "code": "https://vscode.blockscan.com/ethereum/0x69007702764179f14f51cdce752f4f775d74e139",
     "repo": "https://github.com/alchemyplatform/modular-account/blob/develop/src/account/SemiModularAccount7702.sol",
@@ -894,7 +894,7 @@
   {
     "address": "0x1f07336D35c9a70ED086F6aA3C4c0Bd1266E6f63",
     "name": "",
-    "category": "Executor",
+    "type": "Executor",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -924,7 +924,7 @@
   {
     "address": "0xD2e28229F6f2c235e57De2EbC727025A1D0530FB",
     "name": "Biz",
-    "category": "Wallet",
+    "type": "Wallet",
     "provider": "Trust Wallet",
     "code": "https://vscode.blockscan.com/ethereum/0xD2e28229F6f2c235e57De2EbC727025A1D0530FB",
     "repo": "",
@@ -953,7 +953,7 @@
   {
     "address": "0x958260e10E1c760b85C944082a7b942fECc9025e",
     "name": "Biz",
-    "category": "AA",
+    "type": "AA",
     "provider": "Trust Wallet",
     "code": "https://vscode.blockscan.com/ethereum/0x958260e10E1c760b85C944082a7b942fECc9025e",
     "repo": "",
@@ -982,7 +982,7 @@
   {
     "address": "0xca11bde05977b3631167028862be2a173976ca11",
     "name": "Multicall3",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "Multicall3",
     "code": "https://vscode.blockscan.com/ethereum/0xca11bde05977b3631167028862be2a173976ca11",
     "repo": "https://github.com/mds1/multicall3",
@@ -1010,7 +1010,7 @@
   {
     "address": "0x1Ec51ea2582B3B49967fc7b7036dC21Ac0a6Bc54",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1038,7 +1038,7 @@
   {
     "address": "0x2d9F81eD95F7161d7B44Ba5d711E9F0946F53C3A",
     "name": "",
-    "category": "MEV",
+    "type": "MEV",
     "provider": "MEV Searcher",
     "code": "closed-source",
     "repo": "",
@@ -1066,7 +1066,7 @@
   {
     "address": "0x0c338ca25585035142A9a0a1EEebA267256f281f",
     "name": "MinimalDelegation",
-    "category": "AA",
+    "type": "AA",
     "provider": "Uniswap",
     "code": "https://vscode.blockscan.com/ethereum/0x227380efd3392ec33cf148ade5e0a89d33121814",
     "repo": "https://github.com/Uniswap/calibur/releases/tag/v0.2.1-audit.2",
@@ -1100,7 +1100,7 @@
   {
     "address": "0x458f5a9f47A01beA5d7A32662660559D9eD3312c",
     "name": "Calibur",
-    "category": "AA",
+    "type": "AA",
     "provider": "Uniswap",
     "code": "https://vscode.blockscan.com/ethereum/0x458f5a9f47a01bea5d7a32662660559d9ed3312c",
     "repo": "https://github.com/Uniswap/calibur/releases/tag/v0.3.0-audit.2",
@@ -1134,7 +1134,7 @@
   {
     "address": "0x71c9aB0c20A65727089d2d2b3EdA37B9BEb41173",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1162,7 +1162,7 @@
   {
     "address": "0x25684dC148e5c7Ad8e8D7cd5078cE431DF9B7B4a",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1192,7 +1192,7 @@
   {
     "address": "0x8BB9E00Abd81C5532f6040f5eFA7eEb6b92697f7",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1221,7 +1221,7 @@
   {
     "address": "0xba2432aC4533E09492EFea59A10450893e56A8E4",
     "name": "",
-    "category": "DeFi",
+    "type": "DeFi",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1250,7 +1250,7 @@
   {
     "address": "0xbcf8C26540CEd6c5Fc68c385281cFdddaFe36cA5",
     "name": "",
-    "category": "Proxy",
+    "type": "Proxy",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1278,7 +1278,7 @@
   {
     "address": "0x50bA4A14bDEFF1712dF5BD2E50f51989F58af6e5",
     "name": "",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1308,7 +1308,7 @@
   {
     "address": "0x0B50b2854B262a5193596Bb8aa9AEd3d630B39c1",
     "name": "",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1338,7 +1338,7 @@
   {
     "address": "0xd6CEDDe84be40893d153Be9d467CD6aD37875b28",
     "name": "Kernel",
-    "category": "AA",
+    "type": "AA",
     "provider": "Zerodev",
     "code": "closed-source",
     "repo": "https://github.com/zerodevapp/kernel/tree/v3.3",
@@ -1374,7 +1374,7 @@
   {
     "address": "0x0000000000000000000000000000000000000001",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "",
     "repo": "",
@@ -1402,7 +1402,7 @@
   {
     "address": "0xcc582e0251daBC0450fA40623731dc13b70483FD",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "",
     "repo": "",
@@ -1430,7 +1430,7 @@
   {
     "address": "0xEd2Eb19fc84d432e50C3C4Ab14fde6e8cb3539C7",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1459,7 +1459,7 @@
   {
     "address": "0xcda3577ca7ef65f6B7201E9BD80375f5628D15F7",
     "name": "",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "WhiteBIT",
     "code": "closed-source",
     "repo": "",
@@ -1489,7 +1489,7 @@
   {
     "address": "0x80296FF8D1ED46f8e3C7992664D13B833504c2Bb",
     "name": "WalletCore",
-    "category": "Wallet",
+    "type": "Wallet",
     "provider": "OKX",
     "code": "https://vscode.blockscan.com/ethereum/0x80296ff8d1ed46f8e3c7992664d13b833504c2bb",
     "repo": "https://github.com/okx/wallet-core",
@@ -1517,7 +1517,7 @@
   {
     "address": "0x5A7FC11397E9a8AD41BF10bf13F22B0a63f96f6d",
     "name": "AmbireAccount7702",
-    "category": "AA",
+    "type": "AA",
     "provider": "Ambire",
     "code": "https://vscode.blockscan.com/ethereum/0x5a7fc11397e9a8ad41bf10bf13f22b0a63f96f6d",
     "repo": "",
@@ -1547,7 +1547,7 @@
   {
     "address": "0xe6Cae83BdE06E4c305530e199D7217f42808555B",
     "name": "Simple7702Account",
-    "category": "AA",
+    "type": "AA",
     "provider": "eth-infinitism",
     "code": "https://vscode.blockscan.com/ethereum/0xe6cae83bde06e4c305530e199d7217f42808555b",
     "repo": "https://github.com/eth-infinitism/account-abstraction/blob/v0.8.0/contracts/accounts/Simple7702Account.sol",
@@ -1575,7 +1575,7 @@
   {
     "address": "0x0000Fb7702036ff9f76044a501ac1aA74cbab16b",
     "name": "UniversalGaslessDelegate",
-    "category": "AA",
+    "type": "AA",
     "provider": "",
     "code": "https://vscode.blockscan.com/ethereum/0x0000fb7702036ff9f76044a501ac1aa74cbab16b",
     "repo": "",
@@ -1604,7 +1604,7 @@
   {
     "address": "0x4EaC96c6D3CD7045ce3b46DfB52D7107958Be151",
     "name": "",
-    "category": "Utility",
+    "type": "Utility",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1633,7 +1633,7 @@
   {
     "address": "0x735BDA71C59929FdFFf95fC93D0CFfC2aFB1983B",
     "name": "",
-    "category": "Executor",
+    "type": "Executor",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1662,7 +1662,7 @@
   {
     "address": "0x1840E96ae85FBf92295Da8943056670d06D9BDb7",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "",
     "repo": "",
@@ -1690,7 +1690,7 @@
   {
     "address": "0x775c8D470CC8d4530b8F233322480649f4FAb758",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1718,7 +1718,7 @@
   {
     "address": "0x976d1885a5d42ccfe5327a06c8d6b6d519fde365",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1746,7 +1746,7 @@
   {
     "address": "0xa65eaa25c97783600134354c6ccf62686be12386",
     "name": "BatchCallAndSponsor",
-    "category": "Other",
+    "type": "Other",
     "provider": "quicknode",
     "code": "https://vscode.blockscan.com/ethereum/0xb2cb3e92969828c2207367d9f4331a701b9464e6",
     "repo": "https://github.com/quiknode-labs/qn-guide-examples/blob/main/ethereum/eip-7702/src/BatchCallAndSponsor.sol",
@@ -1775,7 +1775,7 @@
   {
     "address": "0xa9526ba55F7cABa1A6eB1cb4d555F29022ebFeed",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1803,7 +1803,7 @@
   {
     "address": "0xe264dccc54e4b6906c0d1fee11d4326c06d33c80",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1831,7 +1831,7 @@
   {
     "address": "0x8a0a91114ce5be2df367d08f729ba2aae2eb4262",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1859,7 +1859,7 @@
   {
     "address": "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
     "name": "EIP7702StatelessDeleGator",
-    "category": "Wallet",
+    "type": "Wallet",
     "provider": "Metamask",
     "code": "https://vscode.blockscan.com/ethereum/0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
     "repo": "https://github.com/MetaMask/delegation-framework/tree/main/src/EIP7702",
@@ -1891,7 +1891,7 @@
   {
     "address": "0x000000004f43c49e93c970e84001853a70923b03",
     "name": "Nexus",
-    "category": "AA",
+    "type": "AA",
     "provider": "Biconomy",
     "code": "https://vscode.blockscan.com/ethereum/0x000000004f43c49e93c970e84001853a70923b03",
     "repo": "https://github.com/bcnmy/nexus",
@@ -1929,7 +1929,7 @@
   {
     "address": "0x227380efd3392ec33cf148ade5e0a89d33121814",
     "name": "MinimalDelegation",
-    "category": "AA",
+    "type": "AA",
     "provider": "Uniswap",
     "code": "https://vscode.blockscan.com/ethereum/0x227380efd3392ec33cf148ade5e0a89d33121814",
     "repo": "https://github.com/Uniswap/minimal-delegation",
@@ -1963,7 +1963,7 @@
   {
     "address": "0xfde60f1fe9e8d425272b98bee16acc795f2b83b9",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -1991,7 +1991,7 @@
   {
     "address": "0xb0a7d836421c41fc2f87bf349a296090a48bd544",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -2019,7 +2019,7 @@
   {
     "address": "0xb65dd26d7e0726a27cb39c6f9f22c03345ec3b1a",
     "name": "BatchCallAndSponsor",
-    "category": "Other",
+    "type": "Other",
     "provider": "quicknode",
     "code": "https://vscode.blockscan.com/ethereum/0xb2cb3e92969828c2207367d9f4331a701b9464e6",
     "repo": "https://github.com/quiknode-labs/qn-guide-examples/blob/main/ethereum/eip-7702/src/BatchCallAndSponsor.sol",
@@ -2047,7 +2047,7 @@
   {
     "address": "0xb2cb3e92969828c2207367d9f4331a701b9464e6",
     "name": "MinimalDelegationEntry",
-    "category": "AA",
+    "type": "AA",
     "provider": "Uniswap",
     "code": "https://vscode.blockscan.com/ethereum/0xb2cb3e92969828c2207367d9f4331a701b9464e6",
     "repo": "https://github.com/Uniswap/minimal-delegation",
@@ -2081,7 +2081,7 @@
   {
     "address": "0x5291d8e0a0cdf6b803174e5a6895459eb31aad3f",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",
@@ -2109,7 +2109,7 @@
   {
     "address": "0x5826683b26d1fbc55bf44c2b3b20e288dda9df58",
     "name": "",
-    "category": "Other",
+    "type": "Other",
     "provider": "",
     "code": "closed-source",
     "repo": "",

@@ -173,6 +173,18 @@ const Codes: React.FC = () => {
     },
     {
       title: intl.formatMessage({
+        id: 'pages.codes.type',
+        defaultMessage: 'Type',
+      }),
+      dataIndex: 'type',
+      render: (_, record) => {
+        return record.type ? (
+          <Tag color="cyan">{record.type}</Tag>
+        ) : null;
+      },
+    },
+    {
+      title: intl.formatMessage({
         id: 'pages.codes.provider',
         defaultMessage: 'Provider',
       }),

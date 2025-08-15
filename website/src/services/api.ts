@@ -48,6 +48,7 @@ export interface CodeItem {
   tags?: string[]; // 添加标签字段
   details?: CodeInfoItem; // 添加details字段
   provider?: string; // 添加provider字段
+  type?: string; // 添加type字段
 }
 
 // 定义中继者数据类型
@@ -130,6 +131,7 @@ export interface Overview {
     tvl_balance: number;
     provider?: string;
     tags?: string[];
+    type?: string;
   }>;
   top10_relayers: Array<{
     relayer_address: string;
