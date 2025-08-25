@@ -184,7 +184,7 @@ export default {
   'pages.welcome.viewAll': 'View All',
   
   // Statistics page
-  'pages.statistics.title': 'Code Statistics',
+  'pages.statistics.title': 'Statistics',
   'pages.statistics.codeCountByType': 'Code Count by Type',
   'pages.statistics.authorizerCountByType': 'Authorizer Count by Type',
   'pages.statistics.tvlByType': 'TVL by Type',
