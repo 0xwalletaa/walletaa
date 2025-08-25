@@ -1,5 +1,6 @@
 export default {
   'menu.welcome': 'Welcome',
+  'menu.statistics': 'Statistics',
   'menu.transactions': 'Transactions',
   'menu.authorizers': 'Authorizers',
   'menu.codes': 'Codes',

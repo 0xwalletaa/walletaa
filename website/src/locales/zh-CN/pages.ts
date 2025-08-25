@@ -183,6 +183,17 @@ export default {
   'pages.welcome.viewAll': '查看全部',
   'pages.welcome.tvlComposition': 'TVL 组成',
   'pages.welcome.total': '总计',
+  
+  // Statistics page
+  'pages.statistics.title': '代码统计',
+  'pages.statistics.codeCountByType': '按类型统计代码数量',
+  'pages.statistics.authorizerCountByType': '按类型统计授权者数量',
+  'pages.statistics.tvlByType': '按类型统计TVL',
+  'pages.statistics.codeCountByTag': '按标签统计代码数量',
+  'pages.statistics.authorizerCountByTag': '按标签统计授权者数量',
+  'pages.statistics.tvlByTag': '按标签统计TVL',
+  'pages.statistics.count': '数量',
+  'pages.statistics.authorizers': '授权者数量',
   'pages.comparison.title': '对比',
   'pages.comparison.txCountTitle': '交易数量对比',
   'pages.comparison.authorizerCountTitle': '授权者数量对比',

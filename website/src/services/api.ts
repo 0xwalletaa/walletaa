@@ -160,6 +160,16 @@ export interface ComparisonData {
   };
 }
 
+// 定义代码统计数据类型
+export interface CodeStatistics {
+  code_count_by_type: Record<string, number>;
+  code_authorizer_by_type: Record<string, number>;
+  code_tvl_by_type: Record<string, number>;
+  code_count_by_tag: Record<string, number>;
+  code_authorizer_by_tag: Record<string, number>;
+  code_tvl_by_tag: Record<string, number>;
+}
+
 // 获取交易列表接口
 export async function getTransactions(params: {
   page?: number;
@@ -287,6 +297,13 @@ export async function getOverview() {
 // 获取comparison数据
 export async function getComparison(): Promise<ComparisonData> {
   return request(`${BASE_URL()}/comparison`, {
+    method: 'GET',
+  });
+}
+
+// 获取代码统计数据
+export async function getCodeStatistics(): Promise<CodeStatistics> {
+  return request(`${BASE_URL()}/code_statistics`, {
     method: 'GET',
   });
 } 
