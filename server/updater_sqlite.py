@@ -313,7 +313,21 @@ def update_info_by_code(info_db_path, code_db_path):
     
     code_conn = sqlite3.connect(code_db_path)
     code_cursor = code_conn.cursor()
-        
+    
+    code_address_to_type = {}
+    code_info = json.load(open(f'code_info.json'))
+    for item in code_info:
+        code_address = item['address'].lower()
+        code_address_to_type[code_address] = item['type']
+    
+    code_count_by_type = {}
+    code_authorizer_by_type = {}
+    code_tvl_by_type = {}
+    
+    code_count_by_tag = {}
+    code_authorizer_by_tag = {}
+    code_tvl_by_tag = {}
+    
     info_read_cursor.execute("SELECT code_address, count(authorizer_address), sum(tvl_balance) FROM authorizers GROUP BY code_address")
     for row in info_read_cursor:
         code_address, authorizer_count, tvl_balance = row
@@ -330,6 +344,29 @@ def update_info_by_code(info_db_path, code_db_path):
                     for tag in util.FUNCTION_TO_TAGS[function]:
                         if tag not in tags:
                             tags.append(tag)
+            
+            for tag in tags:
+                if tag not in code_count_by_tag:
+                    code_count_by_tag[tag] = 0
+                    code_authorizer_by_tag[tag] = 0
+                    code_tvl_by_tag[tag] = 0
+                code_count_by_tag[tag] += 1
+                code_authorizer_by_tag[tag] += authorizer_count
+                code_tvl_by_tag[tag] += tvl_balance
+                
+            if code_address in code_address_to_type:
+                the_type = code_address_to_type[code_address]
+            else:
+                the_type = "Other"
+                
+            if the_type not in code_count_by_type:
+                code_count_by_type[the_type] = 0
+                code_authorizer_by_type[the_type] = 0
+                code_tvl_by_type[the_type] = 0
+            code_count_by_type[the_type] += 1
+            code_authorizer_by_type[the_type] += authorizer_count
+            code_tvl_by_type[the_type] += tvl_balance
+                
             info_write_cursor.execute("UPDATE codes SET tags = ? WHERE code_address = ?", (json.dumps(tags), code_address))
     
     code_info = json.load(open(f'code_info.json'))
@@ -339,6 +376,19 @@ def update_info_by_code(info_db_path, code_db_path):
     
     info_conn.commit()
     info_conn.close()
+    
+    code_statistics = {
+        'code_count_by_type': code_count_by_type,
+        'code_authorizer_by_type': code_authorizer_by_type,
+        'code_tvl_by_type': code_tvl_by_type,
+        'code_count_by_tag': code_count_by_tag,
+        'code_authorizer_by_tag': code_authorizer_by_tag,
+        'code_tvl_by_tag': code_tvl_by_tag
+    }
+    
+    cache_path = f'/dev/shm/{NAME}_code_statistics.json'
+    with open(cache_path, 'w') as f:
+        json.dump(code_statistics, f)
 
 
 def update_info_daily(info_db_path, from_latest=True):

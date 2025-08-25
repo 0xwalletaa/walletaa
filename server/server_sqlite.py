@@ -273,6 +273,16 @@ def get_authorizers_with_zero():
         app.logger.error(f"Error getting authorizer data (including zero): {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# code_statistics query interface
+@app.route('/code_statistics', methods=['GET'])
+def get_code_statistics():
+    cached_code_statistics_path = f'/dev/shm/{NAME}_code_statistics.json'
+    if os.path.exists(cached_code_statistics_path):
+        code_statistics = json.loads(open(cached_code_statistics_path).read())
+        return jsonify(code_statistics)
+    else:
+        return jsonify({'error': 'Code statistics not found'}), 404
+
 # codes_by_tvl_balance pagination query interface
 @app.route('/codes_by_tvl_balance', methods=['GET'])
 def get_codes_by_tvl_balance():
