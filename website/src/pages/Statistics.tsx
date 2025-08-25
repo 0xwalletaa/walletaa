@@ -87,11 +87,11 @@ const Statistics: React.FC = () => {
           <Col xl={8} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
               bordered={false}
-              title={intl.formatMessage({ id: 'pages.statistics.codeCountByType' })}
+              title={intl.formatMessage({ id: 'pages.statistics.tvlByType' })}
               style={{ height: '100%' }}
             >
               <Pie
-                data={getTypeCountPieData()}
+                data={getTypeTvlPieData()}
                 angleField="value"
                 colorField="type"
                 radius={0.8}
@@ -112,7 +112,7 @@ const Statistics: React.FC = () => {
                   },
                 }}
                 tooltip={{
-                  items: [{ name: intl.formatMessage({ id: 'pages.statistics.count' }), field: 'value' }],
+                  items: [{ name: 'TVL', field: 'value', valueFormatter: (value) => `$${numeral(value).format('0,0.00')}` }],
                 }}
               />
             </Card>
@@ -153,11 +153,11 @@ const Statistics: React.FC = () => {
           <Col xl={8} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
               bordered={false}
-              title={intl.formatMessage({ id: 'pages.statistics.tvlByType' })}
+              title={intl.formatMessage({ id: 'pages.statistics.codeCountByType' })}
               style={{ height: '100%' }}
             >
               <Pie
-                data={getTypeTvlPieData()}
+                data={getTypeCountPieData()}
                 angleField="value"
                 colorField="type"
                 radius={0.8}
@@ -178,7 +178,7 @@ const Statistics: React.FC = () => {
                   },
                 }}
                 tooltip={{
-                  items: [{ name: 'TVL', field: 'value', valueFormatter: (value) => `$${numeral(value).format('0,0.00')}` }],
+                  items: [{ name: intl.formatMessage({ id: 'pages.statistics.count' }), field: 'value' }],
                 }}
               />
             </Card>
@@ -190,11 +190,11 @@ const Statistics: React.FC = () => {
           <Col xl={8} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
               bordered={false}
-              title={intl.formatMessage({ id: 'pages.statistics.codeCountByTag' })}
+              title={intl.formatMessage({ id: 'pages.statistics.tvlByTag' })}
               style={{ height: '100%' }}
             >
               <Bar
-                data={getTagCountBarData()}
+                data={getTagTvlBarData()}
                 xField="tag"
                 yField="value"
                 colorField="tag"
@@ -215,7 +215,7 @@ const Statistics: React.FC = () => {
                   },
                 }}
                 tooltip={{
-                  items: [{ name: intl.formatMessage({ id: 'pages.statistics.count' }), field: 'value' }],
+                  items: [{ name: 'TVL', field: 'value', valueFormatter: (value) => `$${numeral(value).format('0,0.00')}` }],
                 }}
                 state={{
                   unselected: { opacity: 0.5 },
@@ -270,11 +270,11 @@ const Statistics: React.FC = () => {
           <Col xl={8} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
               bordered={false}
-              title={intl.formatMessage({ id: 'pages.statistics.tvlByTag' })}
+              title={intl.formatMessage({ id: 'pages.statistics.codeCountByTag' })}
               style={{ height: '100%' }}
             >
               <Bar
-                data={getTagTvlBarData()}
+                data={getTagCountBarData()}
                 xField="tag"
                 yField="value"
                 colorField="tag"
@@ -295,7 +295,7 @@ const Statistics: React.FC = () => {
                   },
                 }}
                 tooltip={{
-                  items: [{ name: 'TVL', field: 'value', valueFormatter: (value) => `$${numeral(value).format('0,0.00')}` }],
+                  items: [{ name: intl.formatMessage({ id: 'pages.statistics.count' }), field: 'value' }],
                 }}
                 state={{
                   unselected: { opacity: 0.5 },
