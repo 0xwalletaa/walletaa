@@ -18,6 +18,12 @@ export default [
     component: './Welcome',
   },
   {
+    path: '/statistics',
+    name: 'statistics',
+    icon: 'barChart',
+    component: './Statistics',
+  },
+  {
     name: 'codes',
     icon: 'code',
     path: '/codes',

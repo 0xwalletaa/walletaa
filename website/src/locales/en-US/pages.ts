@@ -182,6 +182,17 @@ export default {
   'pages.relayers.search.placeholder': 'Enter relayer address',
   'pages.relayers.search.button': 'Search',
   'pages.welcome.viewAll': 'View All',
+  
+  // Statistics page
+  'pages.statistics.title': 'Statistics',
+  'pages.statistics.codeCountByType': 'Code Count by Type',
+  'pages.statistics.authorizerCountByType': 'Authorizer Count by Type',
+  'pages.statistics.tvlByType': 'TVL by Type',
+  'pages.statistics.codeCountByTag': 'Code Count by Tag',
+  'pages.statistics.authorizerCountByTag': 'Authorizer Count by Tag',
+  'pages.statistics.tvlByTag': 'TVL by Tag',
+  'pages.statistics.count': 'Count',
+  'pages.statistics.authorizers': 'Authorizers',
   'pages.welcome.tvlComposition': 'TVL Composition',
   'pages.welcome.total': 'Total',
   'pages.comparison.title': 'Comparison',

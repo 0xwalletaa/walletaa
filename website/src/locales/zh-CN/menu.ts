@@ -1,5 +1,6 @@
 export default {
   'menu.welcome': '欢迎',
+  'menu.statistics': '统计',
   'menu.transactions': '交易',
   'menu.authorizers': '授权者',
   'menu.codes': '代码',
