@@ -30,6 +30,7 @@ parser.add_argument('--contract', required=True, help='Contract address')
 parser.add_argument('--num_threads', type=int, default=4, help='Number of parallel threads')
 parser.add_argument('--data_expiry', type=int, default=86400, help='Data expiry time (seconds)')
 parser.add_argument('--limit', type=int, default=500000, help='Processing limit')
+parser.add_argument('--block_db_path', type=str, default='', help='block_db_path')
 
 args = parser.parse_args()
 
@@ -44,11 +45,15 @@ DATA_EXPIRY = args.data_expiry
 # Processing limit
 LIMIT = args.limit
 
+BLOCK_DB_PATH = args.block_db_path
+
 web3s = [
     Web3(Web3.HTTPProvider(endpoint)) for endpoint in WEB3_ENPOINTS
 ]
 
 block_db_path = f'{NAME}_block.db'
+if BLOCK_DB_PATH != '':
+    block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
 tvl_db_path = f'{NAME}_tvl.db'
 
 # another db

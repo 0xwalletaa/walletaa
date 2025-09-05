@@ -18,6 +18,7 @@ parser.add_argument('--name', help='Blockchain network name')
 parser.add_argument('--endpoints', nargs='+', help='List of Web3 endpoints')
 parser.add_argument('--start_block', type=int, help='Starting block number')
 parser.add_argument('--num_threads', type=int, default=4, help='Number of parallel threads')
+parser.add_argument('--block_db_path', type=str, default='', help='block_db_path')
 
 args = parser.parse_args()
 
@@ -25,8 +26,11 @@ NAME = args.name
 WEB3_ENPOINTS = args.endpoints
 START_BLOCK = args.start_block
 NUM_THREADS = args.num_threads
+BLOCK_DB_PATH = args.block_db_path
 
 block_db_path = f'{NAME}_block.db'
+if BLOCK_DB_PATH != '':
+    block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
 
 web3s = [
     Web3(Web3.HTTPProvider(endpoint, request_kwargs={'timeout': 10})) for endpoint in WEB3_ENPOINTS
@@ -113,7 +117,7 @@ def init_db():
 # Get all existing block numbers from database
 def get_existing_blocks(conn):
     cursor = conn.cursor()
-    cursor.execute("SELECT block_number FROM blocks")
+    cursor.execute("SELECT block_number FROM blocks WHERE block_number >= ?", (START_BLOCK,))
     existing_blocks = set(row[0] for row in cursor.fetchall())
     return existing_blocks
 

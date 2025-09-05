@@ -12,7 +12,8 @@ https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
 --num_threads 5 \
---start_block 135600000
+--start_block 135600000 \
+--block_db_path /mnt
 
 python3 get_tvl.py --name op --contract 0x89038D59C4Bd24970150c92B4f48A819f38d9c69 --endpoints \
 https://api.zan.top/opt-mainnet \
@@ -26,7 +27,8 @@ https://optimism.lava.build \
 https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
---num_threads 5
+--num_threads 5 \
+--block_db_path /mnt
 
 python3 get_code.py --name op --endpoints \
 https://api.zan.top/opt-mainnet \
@@ -40,7 +42,8 @@ https://optimism.lava.build \
 https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
---num_threads 5
+--num_threads 5 \
+--block_db_path /mnt
 
 # sleep 60
 # done

@@ -11,7 +11,9 @@ https://gnosis.drpc.org \
 https://rpc.gnosischain.com \
 https://rpc.gnosis.gateway.fm \
 --num_threads 5 \
---start_block 39800000 #TODO: is it right?
+--start_block 39800000 \
+--block_db_path /mnt
+#TODO: is start_block right?
 
 python3 get_tvl.py --name gnosis --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \
 https://gnosis.oat.farm \
@@ -24,7 +26,8 @@ https://endpoints.omniatech.io/v1/gnosis/mainnet/public \
 https://gnosis.drpc.org \
 https://rpc.gnosischain.com \
 https://rpc.gnosis.gateway.fm \
---num_threads 5
+--num_threads 5 \
+--block_db_path /mnt
 
 python3 get_code.py --name gnosis --endpoints \
 https://gnosis.oat.farm \
@@ -37,7 +40,8 @@ https://endpoints.omniatech.io/v1/gnosis/mainnet/public \
 https://gnosis.drpc.org \
 https://rpc.gnosischain.com \
 https://rpc.gnosis.gateway.fm \
---num_threads 5
+--num_threads 5 \
+--block_db_path /mnt
 
 # sleep 60
 # done

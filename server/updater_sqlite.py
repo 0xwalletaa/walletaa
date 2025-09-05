@@ -8,7 +8,7 @@ import requests
 import datetime
 
 NAME = os.environ.get("NAME")
-
+BLOCK_DB_PATH = os.environ.get("BLOCK_DB_PATH")
 DATA_EXPIRY = 86400
 
 def create_db_if_not_exists(db_path):
@@ -429,6 +429,8 @@ def update_info_daily(info_db_path, from_latest=True):
     info_conn.close()
 
 block_db_path = f'../backend/{NAME}_block.db'
+if BLOCK_DB_PATH != '':
+    block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
 code_db_path = f'../backend/{NAME}_code.db'
 

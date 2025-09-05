@@ -9,7 +9,8 @@ https://scroll-mainnet.public.blastapi.io \
 https://scroll.api.onfinality.io/public \
 https://scroll-rpc.publicnode.com \
 --num_threads 5 \
---start_block 14900000
+--start_block 14900000 \
+--block_db_path /mnt
 
 python3 get_tvl.py --name scroll --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \
 https://scroll.drpc.org \
@@ -20,7 +21,8 @@ https://scroll-mainnet.chainstacklabs.com \
 https://scroll-mainnet.public.blastapi.io \
 https://scroll.api.onfinality.io/public \
 https://scroll-rpc.publicnode.com \
---num_threads 5
+--num_threads 5 \
+--block_db_path /mnt
 
 python3 get_code.py --name scroll --endpoints \
 https://scroll.drpc.org \
@@ -31,7 +33,8 @@ https://scroll-mainnet.chainstacklabs.com \
 https://scroll-mainnet.public.blastapi.io \
 https://scroll.api.onfinality.io/public \
 https://scroll-rpc.publicnode.com \
---num_threads 5
+--num_threads 5 \
+--block_db_path /mnt
 
 # sleep 60
 # done
