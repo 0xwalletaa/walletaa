@@ -718,6 +718,70 @@ def get_overview():
         app.logger.error(f"Error getting overview data: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# calls pagination query interface
+@app.route('/calls', methods=['GET'])
+def get_calls():
+    try:
+        # Get pagination parameters, default to page 1, 10 items per page
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
+        search_by = request.args.get('search_by', '')  # Get filter search_by parameter
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Build query
+        if search_by != '':
+            if len(search_by) == 42:  # address (only search indexed fields)
+                query = 'SELECT * FROM calls WHERE original_code_address = ? OR parsed_code_address = ?'
+                params = [search_by.lower(), search_by.lower()]
+            else:
+                query = 'SELECT * FROM calls WHERE 1=0'
+                params = []
+        else:
+            query = 'SELECT * FROM calls'
+            params = []
+        
+        # Add sorting
+        if order.lower() == 'asc':
+            query += ' ORDER BY timestamp ASC'
+        else:
+            query += ' ORDER BY timestamp DESC'
+        
+        # Get total count
+        count_query = f"SELECT COUNT(*) FROM ({query}) AS subquery"
+        cursor.execute(count_query, params)
+        total = cursor.fetchone()[0]
+        
+        # Add pagination
+        query += ' LIMIT ? OFFSET ?'
+        params.extend([page_size, (page - 1) * page_size])
+        
+        # Execute query
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        
+        # Convert to dictionary
+        calls = []
+        for row in rows:
+            call = dict(row)
+            calls.append(call)
+        
+        conn.close()
+        
+        # Return results
+        return jsonify({
+            'total': total,
+            'page': page,
+            'page_size': page_size,
+            'order': order,
+            'calls': calls
+        })
+    except Exception as e:
+        app.logger.error(f"Error getting calls data: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 # comparison query interface
 @app.route('/comparison', methods=['GET'])
 def get_comparison():
