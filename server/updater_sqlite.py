@@ -100,6 +100,25 @@ def create_db_if_not_exists(db_path):
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_relayers_authorization_count ON relayers(authorization_count DESC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_relayers_authorization_fee ON relayers(authorization_fee DESC)')
     
+    # Crate calls table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS calls (
+        tx_hash TEXT,
+        block_number INTEGER,
+        tx_index INTEGER,
+        call_type_trace_address TEXT,
+        from_address TEXT,
+        original_code_address TEXT,
+        parsed_code_address TEXT,
+        value TEXT,
+        calling_function TEXT,
+        timestamp INTEGER
+    )
+    ''')    
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_block_number ON calls(block_number)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_timestamp ON calls(timestamp DESC)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_original_code_address ON calls(original_code_address)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_parsed_code_address ON calls(parsed_code_address)')
 
     # # Create tvl table
     cursor.execute('''
@@ -428,11 +447,62 @@ def update_info_daily(info_db_path, from_latest=True):
     info_conn.commit()
     info_conn.close()
 
+
+def update_info_by_trace(info_db_path, trace_db_path, block_db_path):
+    info_conn = sqlite3.connect(info_db_path)
+    info_cursor = info_conn.cursor()
+    
+    trace_conn = sqlite3.connect(trace_db_path)
+    trace_cursor = trace_conn.cursor()
+    
+    block_conn = sqlite3.connect(block_db_path)
+    block_timestamp_cursor = block_conn.cursor()
+    
+    
+    trace_cursor.execute("SELECT block_number, traces FROM traces ORDER BY block_number ASC")
+    
+    wrong_block_number = 0
+    # Process row by row to avoid loading all data at once
+    for row in trace_cursor:  # Iterate cursor directly
+        block_number, traces = row
+        if traces == "[]":
+            continue
+        
+        info_cursor.execute("SELECT tx_hash FROM calls WHERE block_number = ?", (block_number,))
+        if info_cursor.fetchone() is not None:
+            continue
+        
+        try:
+            block_timestamp_cursor.execute("SELECT timestamp FROM blocks WHERE block_number = ?", (block_number,))
+            timestamp = block_timestamp_cursor.fetchone()[0]
+        except:
+            print(f"Block {block_number} not found in blocks table")
+            continue
+        
+        traces = json.loads(traces)
+
+        for trace in traces:
+            call_type_trace_address = trace['action']['callType'] + "_" + "_".join(str(x) for x in trace['traceAddress'])
+            from_address = trace['action']['from']
+            original_code_address = trace['action']['originalCodeAddress']
+            parsed_code_address = trace['action']['parsedCodeAddress']
+            value = trace['action']['value']
+            calling_function = trace['action']['input'][:10]
+            info_cursor.execute("INSERT INTO calls (tx_hash, block_number, tx_index, call_type_trace_address, from_address, original_code_address, parsed_code_address, value, calling_function, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (trace['transactionHash'], block_number, trace['transactionPosition'], call_type_trace_address, from_address, original_code_address, parsed_code_address, value, calling_function, timestamp))
+
+        info_conn.commit()
+
+
+    info_conn.close()
+    block_conn.close()
+    
+    
 block_db_path = f'../backend/{NAME}_block.db'
 if BLOCK_DB_PATH != '':
     block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
 code_db_path = f'../backend/{NAME}_code.db'
+trace_db_path = f'../backend/{NAME}_trace.db'
 
 try:
     os.mkdir('db')
@@ -462,3 +532,10 @@ start_time = time.time()
 update_info_daily(info_db_path, from_latest=True)
 end_time = time.time()
 print(f"Daily update: {end_time - start_time} seconds")
+
+
+if NAME == "mainnet":
+    start_time = time.time()
+    update_info_by_trace(info_db_path, trace_db_path, block_db_path)
+    end_time = time.time()
+    print(f"Trace update: {end_time - start_time} seconds")
