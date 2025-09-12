@@ -211,4 +211,20 @@ export default {
   'component.chainSelect.scroll': 'Scroll',
   'component.chainSelect.uni': 'Uni',
   'component.chainSelect.ink': 'Ink',
+  
+  // Calls page
+  'pages.calls.headerTitle': '调用列表',
+  'pages.calls.block_number': '区块号',
+  'pages.calls.timestamp': '时间戳',
+  'pages.calls.tx_hash': '交易哈希',
+  'pages.calls.call_type_trace_address': '调用类型和跟踪',
+  'pages.calls.from_address': '发起地址',
+  'pages.calls.authorizer_address': '授权者地址',
+  'pages.calls.code_address': '代码地址',
+  'pages.calls.value': '数值 (ETH)',
+  'pages.calls.calling_function': '函数选择器',
+  'pages.calls.search.placeholder': '输入原始代码地址或解析代码地址',
+  'pages.calls.search.button': '搜索',
+  'pages.calls.notSupported.title': '暂不支持',
+  'pages.calls.notSupported.subtitle': 'Calls功能目前仅在主网(Mainnet)支持',
 };

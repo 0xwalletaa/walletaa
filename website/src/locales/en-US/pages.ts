@@ -212,4 +212,20 @@ export default {
   'component.chainSelect.scroll': 'Scroll',
   'component.chainSelect.uni': 'Uni',
   'component.chainSelect.ink': 'Ink',
+  
+  // Calls page
+  'pages.calls.headerTitle': 'Call List',
+  'pages.calls.block_number': 'Block Number',
+  'pages.calls.timestamp': 'Timestamp',
+  'pages.calls.tx_hash': 'Transaction Hash',
+  'pages.calls.call_type_trace_address': 'Call Type & Trace',
+  'pages.calls.from_address': 'From Address',
+  'pages.calls.authorizer_address': 'Authorizer Address',
+  'pages.calls.code_address': 'Code Address',
+  'pages.calls.value': 'Value (ETH)',
+  'pages.calls.calling_function': 'Function Selector',
+  'pages.calls.search.placeholder': 'Enter original code address or parsed code address',
+  'pages.calls.search.button': 'Search',
+  'pages.calls.notSupported.title': 'Not Supported',
+  'pages.calls.notSupported.subtitle': 'Calls feature is currently only supported on Mainnet',
 };

@@ -5,6 +5,7 @@ export default {
   'menu.authorizers': '授权者',
   'menu.codes': '代码',
   'menu.relayers': '中继者',
+  'menu.calls': '调用',
   'menu.comparison': '对比',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',

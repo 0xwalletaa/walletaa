@@ -36,6 +36,12 @@ export default [
     component: './Transactions',
   },
   {
+    name: 'calls',
+    icon: 'interaction',
+    path: '/calls',
+    component: './Calls',
+  },
+  {
     name: 'authorizers',
     icon: 'team',
     path: '/authorizers',

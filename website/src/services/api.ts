@@ -26,6 +26,20 @@ export interface TransactionItem {
   }>;
 }
 
+// 定义调用数据类型
+export interface CallItem {
+  tx_hash: string;
+  block_number: number;
+  tx_index: number;
+  call_type_trace_address: string;
+  from_address: string;
+  original_code_address: string;
+  parsed_code_address: string;
+  value: string;
+  calling_function: string;
+  timestamp: number;
+}
+
 // 定义授权者数据类型
 export interface AuthorizerItem {
   authorizer_address: string;
@@ -291,6 +305,19 @@ export async function getRelayersByAuthorizationFee(params: {
 export async function getOverview() {
   return request(`${BASE_URL()}/overview`, {
     method: 'GET',
+  });
+}
+
+// 获取调用列表接口
+export async function getCalls(params: {
+  page?: number;
+  page_size?: number;
+  order?: string;
+  search_by?: string;
+}) {
+  return request(`${BASE_URL()}/calls`, {
+    method: 'GET',
+    params,
   });
 }
 
