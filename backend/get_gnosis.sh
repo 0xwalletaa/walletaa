@@ -11,7 +11,7 @@ https://gnosis.drpc.org \
 https://rpc.gnosischain.com \
 https://rpc.gnosis.gateway.fm \
 --num_threads 5 \
---start_block 39800000 \
+--start_block 42000000 \
 --block_db_path /mnt
 #TODO: is start_block right?
 

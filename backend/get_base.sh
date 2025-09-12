@@ -14,7 +14,7 @@ https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
 --num_threads 5 \
---start_block 30000000 \
+--start_block 35400000 \
 --block_db_path /mnt
 
 python3 get_tvl.py --name base --contract 0x16Eef38116c2081fbC4d4E54F81d0D08640ff00F  --endpoints \

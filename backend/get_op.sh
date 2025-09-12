@@ -12,7 +12,7 @@ https://op-pokt.nodies.app \
 https://optimism.rpc.subquery.network/public \
 https://optimism.api.onfinality.io/public \
 --num_threads 5 \
---start_block 135600000 \
+--start_block 141000000 \
 --block_db_path /mnt
 
 python3 get_tvl.py --name op --contract 0x89038D59C4Bd24970150c92B4f48A819f38d9c69 --endpoints \
