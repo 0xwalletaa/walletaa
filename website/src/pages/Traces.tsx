@@ -84,16 +84,6 @@ const Traces: React.FC = () => {
       : address;
   };
 
-  const formatValue = (value: string) => {
-    try {
-      const numValue = parseFloat(value);
-      if (numValue === 0) return '0';
-      return numeral(numValue / 1e18).format('0,0.000000');
-    } catch {
-      return value;
-    }
-  };
-
   // 解析函数选择器
   const parseFunctionSelector = (selector: string) => {
     const functionName = FUNCTION_SELECTORS[selector];
@@ -242,22 +232,8 @@ const Traces: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.traces.value',
-        defaultMessage: 'Value (ETH)',
-      }),
-      dataIndex: 'value',
-      render: (dom: any) => {
-        if (typeof dom === 'string') {
-          const formatted = formatValue(dom);
-          return formatted;
-        }
-        return dom;
-      },
-    },
-    {
-      title: intl.formatMessage({
         id: 'pages.traces.calling_function',
-        defaultMessage: 'Function Selector',
+        defaultMessage: 'Calling Function',
       }),
       dataIndex: 'calling_function',
       width: 280,

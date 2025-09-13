@@ -222,7 +222,7 @@ export default {
   'pages.traces.authorizer_address': '授权者地址',
   'pages.traces.code_address': '代码地址',
   'pages.traces.value': '数值 (ETH)',
-  'pages.traces.calling_function': '函数选择器',
+  'pages.traces.calling_function': '调用函数',
   'pages.traces.search.placeholder': '输入原始代码地址或解析代码地址',
   'pages.traces.search.button': '搜索',
   'pages.traces.notSupported.title': '暂不支持',

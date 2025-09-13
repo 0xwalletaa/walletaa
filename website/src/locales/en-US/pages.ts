@@ -223,7 +223,7 @@ export default {
   'pages.traces.authorizer_address': 'Authorizer Address',
   'pages.traces.code_address': 'Code Address',
   'pages.traces.value': 'Value (ETH)',
-  'pages.traces.calling_function': 'Function Selector',
+  'pages.traces.calling_function': 'Calling Function',
   'pages.traces.search.placeholder': 'Enter original code address or parsed code address',
   'pages.traces.search.button': 'Search',
   'pages.traces.notSupported.title': 'Not Supported',
