@@ -36,10 +36,10 @@ export default [
     component: './Transactions',
   },
   {
-    name: 'calls',
+    name: 'traces',
     icon: 'interaction',
-    path: '/calls',
-    component: './Calls',
+    path: '/traces',
+    component: './Traces',
   },
   {
     name: 'authorizers',

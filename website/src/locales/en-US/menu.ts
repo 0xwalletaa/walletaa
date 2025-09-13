@@ -5,7 +5,7 @@ export default {
   'menu.authorizers': 'Authorizers',
   'menu.codes': 'Codes',
   'menu.relayers': 'Relayers',
-  'menu.calls': 'Calls',
+  'menu.traces': 'Traces',
   'menu.comparison': 'Comparison',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',

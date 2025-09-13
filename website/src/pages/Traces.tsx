@@ -10,8 +10,25 @@ import React, { useRef, useState, useEffect } from 'react';
 import { getCalls, CallItem } from '@/services/api';
 import { getChainConfig, getCurrentChain } from '@/services/config';
 import numeral from 'numeral';
+import { ethers } from 'ethers';
 
-const Calls: React.FC = () => {
+// 函数签名映射（选择器 => 完整函数签名）
+const FUNCTION_SIGNATURES: string[] = [
+  'execute(bytes32,bytes)',
+  'initialize()',
+  'isValidSignature(bytes32,bytes)',
+  'onERC721Received(address,address,uint256,bytes)',
+  'onERC1155Received(address,address,uint256,uint256,bytes)',
+];
+
+// 使用ethers动态计算函数选择器
+const FUNCTION_SELECTORS: Record<string, string> = {};
+FUNCTION_SIGNATURES.forEach(signature => {
+  const selector = ethers.id(signature).slice(0, 10);
+  FUNCTION_SELECTORS[selector] = signature;
+});
+
+const Traces: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchByParam, setSearchByParam] = useState<string>('');
@@ -77,10 +94,16 @@ const Calls: React.FC = () => {
     }
   };
 
+  // 解析函数选择器
+  const parseFunctionSelector = (selector: string) => {
+    const functionName = FUNCTION_SELECTORS[selector];
+    return functionName || selector;
+  };
+
   const columns: ProColumns<CallItem>[] = [
     {
       title: intl.formatMessage({
-        id: 'pages.calls.block_number',
+        id: 'pages.traces.block_number',
         defaultMessage: 'Block Number',
       }),
       dataIndex: 'block_number',
@@ -90,7 +113,7 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.timestamp',
+        id: 'pages.traces.timestamp',
         defaultMessage: 'Timestamp',
       }),
       dataIndex: 'timestamp',
@@ -104,7 +127,7 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.tx_hash',
+        id: 'pages.traces.tx_hash',
         defaultMessage: 'Transaction Hash',
       }),
       dataIndex: 'tx_hash',
@@ -129,7 +152,7 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.call_type_trace_address',
+        id: 'pages.traces.call_type_trace_address',
         defaultMessage: 'Call Type & Trace',
       }),
       dataIndex: 'call_type_trace_address',
@@ -144,7 +167,7 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.from_address',
+        id: 'pages.traces.from_address',
         defaultMessage: 'From Address',
       }),
       dataIndex: 'from_address',
@@ -169,7 +192,7 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.authorizer_address',
+        id: 'pages.traces.authorizer_address',
         defaultMessage: 'Authorizer Address',
       }),
       dataIndex: 'original_code_address',
@@ -194,7 +217,7 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.code_address',
+        id: 'pages.traces.code_address',
         defaultMessage: 'Code Address',
       }),
       dataIndex: 'parsed_code_address',
@@ -219,7 +242,7 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.value',
+        id: 'pages.traces.value',
         defaultMessage: 'Value (ETH)',
       }),
       dataIndex: 'value',
@@ -233,13 +256,33 @@ const Calls: React.FC = () => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.calls.calling_function',
+        id: 'pages.traces.calling_function',
         defaultMessage: 'Function Selector',
       }),
       dataIndex: 'calling_function',
+      width: 280,
       render: (dom: any) => {
         if (typeof dom === 'string') {
-          return <Tag color="magenta">{dom}</Tag>;
+          const parsedFunction = parseFunctionSelector(dom);
+          const isKnownFunction = FUNCTION_SELECTORS[dom];
+          
+          if (isKnownFunction) {
+            return (
+              <Tooltip title={`Function: ${parsedFunction} | Selector: ${dom}`}>
+                <Tag color="magenta" style={{ 
+                  maxWidth: '260px', 
+                  overflow: 'hidden', 
+                  textOverflow: 'ellipsis', 
+                  whiteSpace: 'nowrap',
+                  display: 'inline-block'
+                }}>
+                  {parsedFunction}
+                </Tag>
+              </Tooltip>
+            );
+          } else {
+            return <Tag color="magenta">{dom}</Tag>;
+          }
         }
         return dom;
       },
@@ -253,11 +296,11 @@ const Calls: React.FC = () => {
         <Result
           status="info"
           title={intl.formatMessage({
-            id: 'pages.calls.notSupported.title',
+            id: 'pages.traces.notSupported.title',
             defaultMessage: '暂不支持',
           })}
           subTitle={intl.formatMessage({
-            id: 'pages.calls.notSupported.subtitle', 
+            id: 'pages.traces.notSupported.subtitle', 
             defaultMessage: 'Calls功能目前仅在主网(Mainnet)支持',
           })}
         />
@@ -272,7 +315,7 @@ const Calls: React.FC = () => {
           <Col flex="auto">
             <Input
               placeholder={intl.formatMessage({
-                id: 'pages.calls.search.placeholder',
+                id: 'pages.traces.search.placeholder',
                 defaultMessage: '输入原始代码地址或解析代码地址',
               })}
               value={searchValue}
@@ -287,7 +330,7 @@ const Calls: React.FC = () => {
               onClick={handleSearch}
             >
               {intl.formatMessage({
-                id: 'pages.calls.search.button',
+                id: 'pages.traces.search.button',
                 defaultMessage: '搜索',
               })}
             </Button>
@@ -297,7 +340,7 @@ const Calls: React.FC = () => {
 
       <ProTable<CallItem>
         headerTitle={intl.formatMessage({
-          id: 'pages.calls.headerTitle',
+          id: 'pages.traces.headerTitle',
           defaultMessage: 'Call List',
         })}
         actionRef={actionRef}
@@ -335,4 +378,4 @@ const Calls: React.FC = () => {
   );
 };
 
-export default Calls;
+export default Traces;
