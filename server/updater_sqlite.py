@@ -493,9 +493,29 @@ def update_info_by_trace(info_db_path, trace_db_path, block_db_path):
 
         info_conn.commit()
 
+    top10_calling_functions = []
+    info_cursor.execute("SELECT calling_function, count(*) FROM calls GROUP BY calling_function ORDER BY count(*) DESC LIMIT 10")
+    for row in info_cursor:
+        calling_function, count = row
+        top10_calling_functions.append({'calling_function': calling_function, 'count': count})
+    
+    top10_parsed_code_addresses = []
+    info_cursor.execute("SELECT parsed_code_address, count(*) FROM calls GROUP BY parsed_code_address ORDER BY count(*) DESC LIMIT 10")
+    for row in info_cursor:
+        parsed_code_address, count = row
+        top10_parsed_code_addresses.append({'parsed_code_address': parsed_code_address, 'count': count})
 
     info_conn.close()
     block_conn.close()
+
+    trace_statistics = {
+        'top10_calling_functions': top10_calling_functions,
+        'top10_parsed_code_addresses': top10_parsed_code_addresses
+    }
+    
+    cache_path = f'/dev/shm/{NAME}_trace_statistics.json'
+    with open(cache_path, 'w') as f:
+        json.dump(trace_statistics, f)
     
     
 block_db_path = f'../backend/{NAME}_block.db'
