@@ -184,6 +184,20 @@ export interface CodeStatistics {
   code_tvl_by_tag: Record<string, number>;
 }
 
+// 定义追踪统计数据类型
+export interface TraceStatistics {
+  top10_calling_functions: Array<{
+    calling_function: string;
+    count: number;
+  }>;
+  top10_parsed_code_addresses: Array<{
+    parsed_code_address: string;
+    count: number;
+    type: string;
+    provider: string;
+  }>;
+}
+
 // 获取交易列表接口
 export async function getTransactions(params: {
   page?: number;
@@ -331,6 +345,13 @@ export async function getComparison(): Promise<ComparisonData> {
 // 获取代码统计数据
 export async function getCodeStatistics(): Promise<CodeStatistics> {
   return request(`${BASE_URL()}/code_statistics`, {
+    method: 'GET',
+  });
+}
+
+// 获取追踪统计数据
+export async function getTraceStatistics(): Promise<TraceStatistics> {
+  return request(`${BASE_URL()}/trace_statistics`, {
     method: 'GET',
   });
 } 
