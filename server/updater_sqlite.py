@@ -119,6 +119,7 @@ def create_db_if_not_exists(db_path):
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_timestamp ON calls(timestamp DESC)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_original_code_address ON calls(original_code_address)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_parsed_code_address ON calls(parsed_code_address)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_calls_calling_function ON calls(calling_function)')
 
     # # Create tvl table
     cursor.execute('''
