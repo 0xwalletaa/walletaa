@@ -19,6 +19,8 @@ const FUNCTION_SIGNATURES: string[] = [
   'isValidSignature(bytes32,bytes)',
   'onERC721Received(address,address,uint256,bytes)',
   'onERC1155Received(address,address,uint256,uint256,bytes)',
+  'initialize(address)',
+  'collectERC20(address,uint256)',
 ];
 
 // 使用ethers动态计算函数选择器
