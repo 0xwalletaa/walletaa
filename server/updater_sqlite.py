@@ -493,6 +493,13 @@ def update_info_by_trace(info_db_path, trace_db_path, block_db_path):
 
         info_conn.commit()
 
+    code_address_to_type = {}
+    code_address_to_provider = {}
+    for item in code_info:
+        code_address = item['address'].lower()
+        code_address_to_type[code_address] = item['type']
+        code_address_to_provider[code_address] = item['provider']
+        
     top10_calling_functions = []
     info_cursor.execute("SELECT calling_function, count(*) FROM calls GROUP BY calling_function ORDER BY count(*) DESC LIMIT 10")
     for row in info_cursor:
@@ -503,7 +510,12 @@ def update_info_by_trace(info_db_path, trace_db_path, block_db_path):
     info_cursor.execute("SELECT parsed_code_address, count(*) FROM calls GROUP BY parsed_code_address ORDER BY count(*) DESC LIMIT 10")
     for row in info_cursor:
         parsed_code_address, count = row
-        top10_parsed_code_addresses.append({'parsed_code_address': parsed_code_address, 'count': count})
+        top10_parsed_code_addresses.append({
+            'parsed_code_address': parsed_code_address,
+            'count': count,
+            'type': code_address_to_type[parsed_code_address],
+            'provider': code_address_to_provider[parsed_code_address]
+        })
 
     info_conn.close()
     block_conn.close()

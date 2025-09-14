@@ -283,6 +283,17 @@ def get_code_statistics():
     else:
         return jsonify({'error': 'Code statistics not found'}), 404
 
+# trace_statistics query interface
+@app.route('/trace_statistics', methods=['GET'])
+def get_trace_statistics():
+    cached_trace_statistics_path = f'/dev/shm/{NAME}_trace_statistics.json'
+    if os.path.exists(cached_trace_statistics_path):
+        trace_statistics = json.loads(open(cached_trace_statistics_path).read())
+        return jsonify(trace_statistics)
+    else:
+        return jsonify({'error': 'Trace statistics not found'}), 404
+
+    
 # codes_by_tvl_balance pagination query interface
 @app.route('/codes_by_tvl_balance', methods=['GET'])
 def get_codes_by_tvl_balance():
