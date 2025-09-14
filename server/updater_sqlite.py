@@ -493,6 +493,7 @@ def update_info_by_trace(info_db_path, trace_db_path, block_db_path):
 
         info_conn.commit()
 
+    code_info = json.load(open(f'code_info.json'))
     code_address_to_type = {}
     code_address_to_provider = {}
     for item in code_info:
@@ -510,11 +511,17 @@ def update_info_by_trace(info_db_path, trace_db_path, block_db_path):
     info_cursor.execute("SELECT parsed_code_address, count(*) FROM calls GROUP BY parsed_code_address ORDER BY count(*) DESC LIMIT 10")
     for row in info_cursor:
         parsed_code_address, count = row
+        the_type = "Other"
+        the_provider = ""
+        if parsed_code_address in code_address_to_type:
+            the_type = code_address_to_type[parsed_code_address]
+            the_provider = code_address_to_provider[parsed_code_address]
+
         top10_parsed_code_addresses.append({
             'parsed_code_address': parsed_code_address,
             'count': count,
-            'type': code_address_to_type[parsed_code_address],
-            'provider': code_address_to_provider[parsed_code_address]
+            'type': the_type,
+            'provider': the_provider
         })
 
     info_conn.close()
