@@ -223,7 +223,7 @@ export default {
   'pages.traces.code_address': '代码地址',
   'pages.traces.value': '数值 (ETH)',
   'pages.traces.calling_function': '调用函数',
-  'pages.traces.search.placeholder': '输入原始代码地址或解析代码地址',
+  'pages.traces.search.placeholder': '输入原始代码地址、解析代码地址或调用函数',
   'pages.traces.search.button': '搜索',
   'pages.traces.statistics.count': '调用次数',
   'pages.traces.statistics.rank': '排名',
