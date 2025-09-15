@@ -232,6 +232,8 @@ export default {
   'pages.traces.statistics.top_functions': 'Top10 调用函数',
   'pages.traces.statistics.expand': '展开更多',
   'pages.traces.statistics.collapse': '收起',
+  'pages.traces.tooltip.function': '函数',
+  'pages.traces.tooltip.selector': '选择器',
   'pages.traces.notSupported.title': '暂不支持',
   'pages.traces.notSupported.subtitle': '调用功能目前仅在主网(Mainnet)支持',
 };

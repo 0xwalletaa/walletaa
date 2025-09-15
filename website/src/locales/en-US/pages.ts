@@ -233,6 +233,8 @@ export default {
   'pages.traces.statistics.top_functions': 'Top10 Calling Function',
   'pages.traces.statistics.expand': 'Expand More',
   'pages.traces.statistics.collapse': 'Collapse',
+  'pages.traces.tooltip.function': 'Function',
+  'pages.traces.tooltip.selector': 'Selector',
   'pages.traces.notSupported.title': 'Not Supported',
   'pages.traces.notSupported.subtitle': 'Traces feature is currently only supported on Mainnet',
 };

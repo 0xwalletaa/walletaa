@@ -141,7 +141,13 @@ const Traces: React.FC = () => {
           
           if (isKnownFunction) {
             return (
-              <Tooltip title={`函数: ${parsedFunction} | 选择器: ${text}`}>
+              <Tooltip title={`${intl.formatMessage({
+                id: 'pages.traces.tooltip.function',
+                defaultMessage: 'Function',
+              })}: ${parsedFunction} | ${intl.formatMessage({
+                id: 'pages.traces.tooltip.selector',
+                defaultMessage: 'Selector',
+              })}: ${text}`}>
                 <Tag color="magenta" style={{ 
                   maxWidth: '200px', 
                   overflow: 'hidden', 
@@ -475,7 +481,13 @@ const Traces: React.FC = () => {
           
           if (isKnownFunction) {
             return (
-              <Tooltip title={`Function: ${parsedFunction} | Selector: ${dom}`}>
+              <Tooltip title={`${intl.formatMessage({
+                id: 'pages.traces.tooltip.function',
+                defaultMessage: 'Function',
+              })}: ${parsedFunction} | ${intl.formatMessage({
+                id: 'pages.traces.tooltip.selector',
+                defaultMessage: 'Selector',
+              })}: ${dom}`}>
                 <Tag color="magenta" style={{ 
                   maxWidth: '260px', 
                   overflow: 'hidden', 
