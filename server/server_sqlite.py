@@ -747,6 +747,9 @@ def get_calls():
             if len(search_by) == 42:  # address (only search indexed fields)
                 query = 'SELECT * FROM calls WHERE original_code_address = ? OR parsed_code_address = ?'
                 params = [search_by.lower(), search_by.lower()]
+            elif len(search_by) == 10:  # function selector
+                query = 'SELECT * FROM calls WHERE calling_function = ?'
+                params = [search_by.lower()]
             else:
                 query = 'SELECT * FROM calls WHERE 1=0'
                 params = []

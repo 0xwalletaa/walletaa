@@ -21,6 +21,8 @@ const FUNCTION_SIGNATURES: string[] = [
   'onERC1155Received(address,address,uint256,uint256,bytes)',
   'initialize(address)',
   'collectERC20(address,uint256)',
+  'execute(((address,uint256,bytes)[],bool))',
+  'initLoser_863360385(address)',
 ];
 
 // 使用ethers动态计算函数选择器
