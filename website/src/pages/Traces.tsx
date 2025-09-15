@@ -161,7 +161,7 @@ const Traces: React.FC = () => {
       {
         title: intl.formatMessage({
           id: 'pages.traces.statistics.count',
-          defaultMessage: 'Count',
+          defaultMessage: 'Call Count',
         }),
         dataIndex: 'count',
         key: 'count',
@@ -229,7 +229,7 @@ const Traces: React.FC = () => {
       {
         title: intl.formatMessage({
           id: 'pages.traces.statistics.count',
-          defaultMessage: 'Count',
+          defaultMessage: 'Call Count',
         }),
         dataIndex: 'count',
         key: 'count',

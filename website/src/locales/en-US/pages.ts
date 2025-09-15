@@ -226,6 +226,13 @@ export default {
   'pages.traces.calling_function': 'Calling Function',
   'pages.traces.search.placeholder': 'Enter original code address or parsed code address',
   'pages.traces.search.button': 'Search',
+  'pages.traces.statistics.count': 'Call Count',
+  'pages.traces.statistics.rank': 'Rank',
+  'pages.traces.statistics.function': 'Function',
+  'pages.traces.statistics.top_contracts': 'Top10 Calling Code',
+  'pages.traces.statistics.top_functions': 'Top10 Calling Function',
+  'pages.traces.statistics.expand': 'Expand More',
+  'pages.traces.statistics.collapse': 'Collapse',
   'pages.traces.notSupported.title': 'Not Supported',
   'pages.traces.notSupported.subtitle': 'Traces feature is currently only supported on Mainnet',
 };

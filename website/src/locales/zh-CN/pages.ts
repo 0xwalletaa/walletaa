@@ -213,11 +213,11 @@ export default {
   'component.chainSelect.ink': 'Ink',
   
   // Traces page
-  'pages.traces.headerTitle': '跟踪列表',
+  'pages.traces.headerTitle': '调用列表',
   'pages.traces.block_number': '区块号',
   'pages.traces.timestamp': '时间戳',
   'pages.traces.tx_hash': '交易哈希',
-  'pages.traces.call_type_trace_address': '调用类型和跟踪',
+  'pages.traces.call_type_trace_address': '调用类型和调用',
   'pages.traces.from_address': '发起地址',
   'pages.traces.authorizer_address': '授权者地址',
   'pages.traces.code_address': '代码地址',
@@ -225,6 +225,13 @@ export default {
   'pages.traces.calling_function': '调用函数',
   'pages.traces.search.placeholder': '输入原始代码地址或解析代码地址',
   'pages.traces.search.button': '搜索',
+  'pages.traces.statistics.count': '调用次数',
+  'pages.traces.statistics.rank': '排名',
+  'pages.traces.statistics.function': '函数',
+  'pages.traces.statistics.top_contracts': 'Top10 调用代码',
+  'pages.traces.statistics.top_functions': 'Top10 调用函数',
+  'pages.traces.statistics.expand': '展开更多',
+  'pages.traces.statistics.collapse': '收起',
   'pages.traces.notSupported.title': '暂不支持',
-  'pages.traces.notSupported.subtitle': 'Traces功能目前仅在主网(Mainnet)支持',
+  'pages.traces.notSupported.subtitle': '调用功能目前仅在主网(Mainnet)支持',
 };
