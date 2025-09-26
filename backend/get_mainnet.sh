@@ -1,5 +1,5 @@
 # while true; do
-python3 get_trace.py
+# python3 get_trace.py
 python3 get_block.py --name mainnet --endpoints \
 https://api.zan.top/eth-mainnet \
 https://endpoints.omniatech.io/v1/eth/mainnet/public \
