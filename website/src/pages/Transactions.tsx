@@ -163,10 +163,18 @@ const Transactions: React.FC = () => {
       },
     },
     {
-      title: intl.formatMessage({
-        id: 'pages.transactions.authorization_list',
-        defaultMessage: 'Authorization List',
-      }),
+      title: (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {intl.formatMessage({
+            id: 'pages.transactions.authorization_list',
+            defaultMessage: 'Authorization List',
+          })}
+          <div style={{ fontSize: '12px', fontWeight: 'normal' }}>
+            <Tag color="blue" size="small" style={{ fontWeight: 'normal' }}>Authorizer</Tag>
+            <Tag color="green" size="small" style={{ fontWeight: 'normal' }}>Code</Tag>
+          </div>
+        </div>
+      ),
       dataIndex: 'authorization_list',
       render: (_, record) => {
         if (!record.authorization_list || record.authorization_list.length === 0) {

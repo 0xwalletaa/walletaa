@@ -23,6 +23,7 @@ const FUNCTION_SIGNATURES: string[] = [
   'collectERC20(address,uint256)',
   'execute(((address,uint256,bytes)[],bool))',
   'initLoser_863360385(address)',
+  'validateUserOp((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes),bytes32,uint256)',
 ];
 
 // 使用ethers动态计算函数选择器
