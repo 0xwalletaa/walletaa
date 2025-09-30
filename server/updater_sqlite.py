@@ -538,8 +538,9 @@ def update_info_by_trace(info_db_path, trace_db_path, block_db_path):
     
     
 block_db_path = f'../backend/{NAME}_block.db'
-if BLOCK_DB_PATH != '':
-    block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
+if BLOCK_DB_PATH != None:
+    if BLOCK_DB_PATH != '':
+        block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
 code_db_path = f'../backend/{NAME}_code.db'
 trace_db_path = f'../backend/{NAME}_trace.db'
