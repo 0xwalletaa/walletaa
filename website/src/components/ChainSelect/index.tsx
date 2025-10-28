@@ -55,7 +55,7 @@ const ChainSelect: React.FC = () => {
     { value: 'base', label: intl.formatMessage({ id: 'component.chainSelect.base', defaultMessage: 'Base' }) },
     { value: 'arb', label: intl.formatMessage({ id: 'component.chainSelect.arb', defaultMessage: 'Arbitrum' }) },
     { value: 'op', label: intl.formatMessage({ id: 'component.chainSelect.op', defaultMessage: 'Optimism' }) },
-    { value: 'sepolia', label: intl.formatMessage({ id: 'component.chainSelect.sepolia', defaultMessage: 'Sepolia' }) },
+    // { value: 'sepolia', label: intl.formatMessage({ id: 'component.chainSelect.sepolia', defaultMessage: 'Sepolia' }) },
     { value: 'bsc', label: intl.formatMessage({ id: 'component.chainSelect.bsc', defaultMessage: 'BSC' }) },
     { value: 'bera', label: intl.formatMessage({ id: 'component.chainSelect.bera', defaultMessage: 'Bera' }) },
     { value: 'gnosis', label: intl.formatMessage({ id: 'component.chainSelect.gnosis', defaultMessage: 'Gnosis' }) },
