@@ -164,7 +164,8 @@ def get_db_connection():
             usdt_balance TEXT,
             usdc_balance TEXT,
             dai_balance TEXT,
-            timestamp INTEGER
+            timestamp INTEGER,
+            last_update_timestamp INTEGER
         )
         ''')
         thread_local.db_connection.commit()
@@ -287,18 +288,55 @@ def update_author_balance(author_addresses):
             # Update database
             conn = get_db_connection()
             cursor = conn.cursor()
+            current_timestamp = int(time.time())
+            
             for balance in balances:
+                # First, get existing balance data from database
                 cursor.execute(
                     """
-                    INSERT INTO author_balances (author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?) 
+                    SELECT eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, last_update_timestamp 
+                    FROM author_balances WHERE author_address = ?
+                    """,
+                    (balance['address'],)
+                )
+                existing_data = cursor.fetchone()
+                
+                # Check if any balance has changed
+                balance_changed = False
+                if existing_data:
+                    existing_eth, existing_weth, existing_wbtc, existing_usdt, existing_usdc, existing_dai, existing_last_update = existing_data
+                    
+                    # Compare each balance field
+                    if (existing_eth != balance['eth_balance'] or
+                        existing_weth != balance['weth_balance'] or
+                        existing_wbtc != balance['wbtc_balance'] or
+                        existing_usdt != balance['usdt_balance'] or
+                        existing_usdc != balance['usdc_balance'] or
+                        existing_dai != balance['dai_balance']):
+                        balance_changed = True
+                else:
+                    # New address, consider as changed
+                    balance_changed = True
+                
+                # Determine last_update_timestamp value
+                if balance_changed:
+                    last_update_timestamp = current_timestamp
+                else:
+                    # Keep existing last_update_timestamp if no change
+                    last_update_timestamp = existing_data[6] if existing_data else current_timestamp
+                
+                # Insert or update the record
+                cursor.execute(
+                    """
+                    INSERT INTO author_balances (author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp, last_update_timestamp) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) 
                     ON CONFLICT(author_address) 
-                    DO UPDATE SET eth_balance = ?, weth_balance = ?, wbtc_balance = ?, usdt_balance = ?, usdc_balance = ?, dai_balance = ?, timestamp = ?
+                    DO UPDATE SET eth_balance = ?, weth_balance = ?, wbtc_balance = ?, usdt_balance = ?, usdc_balance = ?, dai_balance = ?, timestamp = ?, last_update_timestamp = ?
                     """,
                     (balance['address'], balance['eth_balance'], balance['weth_balance'], balance['wbtc_balance'], 
-                     balance['usdt_balance'], balance['usdc_balance'], balance['dai_balance'], int(time.time()),
+                     balance['usdt_balance'], balance['usdc_balance'], balance['dai_balance'], current_timestamp, last_update_timestamp,
                      balance['eth_balance'], balance['weth_balance'], balance['wbtc_balance'], 
-                     balance['usdt_balance'], balance['usdc_balance'], balance['dai_balance'], int(time.time()))
+                     balance['usdt_balance'], balance['usdc_balance'], balance['dai_balance'], current_timestamp, last_update_timestamp)
                 )
             conn.commit()
             print(f"Updated balances for {len(balances)} addresses")

@@ -68,7 +68,8 @@ def get_db_connection():
         CREATE TABLE IF NOT EXISTS codes (
             code_address TEXT PRIMARY KEY,
             code TEXT,
-            timestamp INTEGER
+            timestamp INTEGER,
+            last_update_timestamp INTEGER
         )
         ''')
         thread_local.db_connection.commit()
@@ -158,17 +159,50 @@ def update_code(code_address):
             # Update database
             conn = get_db_connection()
             cursor = conn.cursor()
+            current_timestamp = int(time.time())
+            
+            # First, get existing code data from database
             cursor.execute(
                 """
-                INSERT INTO codes (code_address, code, timestamp) 
-                VALUES (?, ?, ?) 
-                ON CONFLICT(code_address) 
-                DO UPDATE SET code = ?, timestamp = ?
+                SELECT code, last_update_timestamp 
+                FROM codes WHERE code_address = ?
                 """,
-                (code_address, code, int(time.time()), code, int(time.time()))
+                (code_address,)
+            )
+            existing_data = cursor.fetchone()
+            
+            # Check if code has changed
+            code_changed = False
+            if existing_data:
+                existing_code, existing_last_update = existing_data
+                
+                # Compare code
+                if existing_code != code:
+                    code_changed = True
+            else:
+                # New address, consider as changed
+                code_changed = True
+            
+            # Determine last_update_timestamp value
+            if code_changed:
+                last_update_timestamp = current_timestamp
+            else:
+                # Keep existing last_update_timestamp if no change
+                last_update_timestamp = existing_data[1] if existing_data else current_timestamp
+            
+            # Insert or update the record
+            cursor.execute(
+                """
+                INSERT INTO codes (code_address, code, timestamp, last_update_timestamp) 
+                VALUES (?, ?, ?, ?) 
+                ON CONFLICT(code_address) 
+                DO UPDATE SET code = ?, timestamp = ?, last_update_timestamp = ?
+                """,
+                (code_address, code, current_timestamp, last_update_timestamp, 
+                 code, current_timestamp, last_update_timestamp)
             )
             conn.commit()
-            print(f"Updated code for address {code_address}: {code}")
+            print(f"Updated code for address {code_address}: {code} (changed: {code_changed})")
     except Exception as e:
         print(f"Error updating address {code_address} information: {e}")
 
