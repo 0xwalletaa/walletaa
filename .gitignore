@@ -27,3 +27,4 @@ backend/test*.sh
 backend/check.sh
 *.zip
 *loop.log
+server/updater_mysql_t.py

@@ -16,9 +16,10 @@ PER_EMPTY_ACCOUNT_COST = 25000
 
 def ecrecover(chain_id_, address_, nonce_, r_, s_, y_parity_):
     try:            
-        chain_id = to_bytes(hexstr=chain_id_)
+        # 将16进制字符串转为整数，让RLP库正确处理（0会被编码为空字节串）
+        chain_id = int(chain_id_, 16)
         address_bytes = to_bytes(hexstr=address_)
-        nonce = to_bytes(hexstr=nonce_)
+        nonce = int(nonce_, 16)
 
         # RLP encode [chain_id, address, nonce]
         encoded_data = rlp.encode([chain_id, address_bytes, nonce])
