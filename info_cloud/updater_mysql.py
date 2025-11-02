@@ -585,7 +585,13 @@ if BLOCK_DB_PATH != None:
     if BLOCK_DB_PATH != '':
         block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
+if BLOCK_DB_PATH != None:
+    if BLOCK_DB_PATH != '':
+        tvl_db_path = f'{BLOCK_DB_PATH}/{NAME}_tvl.db'
 code_db_path = f'../backend/{NAME}_code.db'
+if BLOCK_DB_PATH != None:
+    if BLOCK_DB_PATH != '':
+        code_db_path = f'{BLOCK_DB_PATH}/{NAME}_code.db'
 trace_db_path = f'../backend/{NAME}_trace.db'
 
 print(f"\nStarting to process {NAME} network...")
@@ -598,20 +604,20 @@ update_info_by_block(mysql_db_name, block_db_path)
 end_time = time.time()
 print(f"Block update: {end_time - start_time} seconds")
 
-# start_time = time.time()
-# update_info_by_tvl(mysql_db_name, tvl_db_path)
-# end_time = time.time()
-# print(f"TVL update: {end_time - start_time} seconds")
+start_time = time.time()
+update_info_by_tvl(mysql_db_name, tvl_db_path)
+end_time = time.time()
+print(f"TVL update: {end_time - start_time} seconds")
 
-# start_time = time.time()
-# update_info_by_code(mysql_db_name, code_db_path)
-# end_time = time.time()
-# print(f"Code update: {end_time - start_time} seconds")
+start_time = time.time()
+update_info_by_code(mysql_db_name, code_db_path)
+end_time = time.time()
+print(f"Code update: {end_time - start_time} seconds")
 
-# start_time = time.time()
-# update_info_daily(mysql_db_name, from_latest=True)
-# end_time = time.time()
-# print(f"Daily update: {end_time - start_time} seconds")
+start_time = time.time()
+update_info_daily(mysql_db_name, from_latest=True)
+end_time = time.time()
+print(f"Daily update: {end_time - start_time} seconds")
 
 
 # if NAME == "mainnet":
