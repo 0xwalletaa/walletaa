@@ -301,7 +301,7 @@ def update_info_by_tvl(mysql_db_name, tvl_db_path):
     print(f"Price update: {end_time - start_time} seconds")
     
     start_time = time.time()
-    info_read_cursor.execute("SELECT authorizer_address FROM authorizers WHERE tvl_timestamp < %s", (int(time.time()) - DATA_EXPIRY,))
+    info_read_cursor.execute("SELECT authorizer_address FROM authorizers")
     expired_count = 0
     for row in info_read_cursor:
         authorizer_address = row[0]
