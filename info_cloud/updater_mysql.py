@@ -9,7 +9,7 @@ import requests
 import datetime
 
 NAME = os.environ.get("NAME")
-BLOCK_DB_PATH = os.environ.get("BLOCK_DB_PATH")
+DB_PATH = os.environ.get("DB_PATH")
 DATA_EXPIRY = 86400
 
 def get_mysql_connection(mysql_db_name, with_database=True):
@@ -302,10 +302,10 @@ def update_info_by_tvl(mysql_db_name, tvl_db_path):
     
     start_time = time.time()
     info_read_cursor.execute("SELECT authorizer_address FROM authorizers")
-    expired_count = 0
+    count = 0
     for row in info_read_cursor:
         authorizer_address = row[0]
-        expired_count += 1
+        count += 1
         tvl_cursor.execute("SELECT eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp FROM author_balances WHERE author_address = ?", (authorizer_address,))
         result = tvl_cursor.fetchone()
         if result is not None:
@@ -321,7 +321,7 @@ def update_info_by_tvl(mysql_db_name, tvl_db_path):
             info_write_cursor.execute("UPDATE authorizers SET tvl_balance = %s, tvl_timestamp = %s WHERE authorizer_address = %s", (tvl_balance, timestamp, authorizer_address))
 
     end_time = time.time()
-    print(f"TVL [expired]: {end_time - start_time} seconds, data count: {expired_count}")
+    print(f"TVL [update]: {end_time - start_time} seconds, data count: {count}")
     
     start_time = time.time()
     tvl_cursor.execute("SELECT sum(eth_balance), sum(weth_balance), sum(wbtc_balance), sum(usdt_balance), sum(usdc_balance), sum(dai_balance) FROM author_balances")
@@ -581,17 +581,17 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
     
     
 block_db_path = f'../backend/{NAME}_block.db'
-if BLOCK_DB_PATH != None:
-    if BLOCK_DB_PATH != '':
-        block_db_path = f'{BLOCK_DB_PATH}/{NAME}_block.db'
+if DB_PATH != None:
+    if DB_PATH != '':
+        block_db_path = f'{DB_PATH}/{NAME}_block.db'
 tvl_db_path = f'../backend/{NAME}_tvl.db'
-if BLOCK_DB_PATH != None:
-    if BLOCK_DB_PATH != '':
-        tvl_db_path = f'{BLOCK_DB_PATH}/{NAME}_tvl.db'
+if DB_PATH != None:
+    if DB_PATH != '':
+        tvl_db_path = f'{DB_PATH}/{NAME}_tvl.db'
 code_db_path = f'../backend/{NAME}_code.db'
-if BLOCK_DB_PATH != None:
-    if BLOCK_DB_PATH != '':
-        code_db_path = f'{BLOCK_DB_PATH}/{NAME}_code.db'
+if DB_PATH != None:
+    if DB_PATH != '':
+        code_db_path = f'{DB_PATH}/{NAME}_code.db'
 trace_db_path = f'../backend/{NAME}_trace.db'
 
 print(f"\nStarting to process {NAME} network...")
