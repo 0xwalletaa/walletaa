@@ -12,8 +12,11 @@ import pymysql
 from pymysql.cursors import DictCursor
 import glob
 
-NAME = os.environ.get("NAME")
+# 从环境变量读取允许的链名称列表
+ALLOWED_NAMES_STR = os.environ.get("ALLOWED_NAMES", "mainnet")
+ALLOWED_NAMES = set(name.strip() for name in ALLOWED_NAMES_STR.split(','))
 
+NAME = "multi"  # 服务名称用于日志目录
 util.NAME = NAME
 
 # Configure logging
@@ -35,11 +38,18 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Add CORS support, allow all do
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
 
-# MySQL database name
-mysql_db_name = f'walletaa_{NAME}'
+def validate_chain_name(name):
+    """验证链名称是否在允许的列表中"""
+    if name not in ALLOWED_NAMES:
+        return jsonify({
+            'error': f'Chain name "{name}" is not supported',
+            'allowed_names': list(ALLOWED_NAMES)
+        }), 404
+    return None
 
-def get_db_connection():
-    """Get MySQL database connection"""
+def get_db_connection(name):
+    """Get MySQL database connection for specified chain"""
+    mysql_db_name = f'walletaa_{name}'
     conn = pymysql.connect(
         host='localhost',
         user=mysql_db_name,
@@ -51,8 +61,13 @@ def get_db_connection():
     return conn
 
 # Pagination query interface
-@app.route('/transactions', methods=['GET'])
-def get_transactions():
+@app.route('/<name>/transactions', methods=['GET'])
+def get_transactions(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -60,7 +75,7 @@ def get_transactions():
         order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -119,8 +134,13 @@ def get_transactions():
         return jsonify({'error': str(e)}), 500
 
 # authorizers pagination query interface
-@app.route('/authorizers', methods=['GET'])
-def get_authorizers():
+@app.route('/<name>/authorizers', methods=['GET'])
+def get_authorizers(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -132,7 +152,7 @@ def get_authorizers():
         if order_by not in set(['tvl_balance', 'historical_code_address_count']):
             order_by = 'tvl_balance'
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -203,8 +223,13 @@ def get_authorizers():
         return jsonify({'error': str(e)}), 500
 
 # authorizers_with_zero pagination query interface
-@app.route('/authorizers_with_zero', methods=['GET'])
-def get_authorizers_with_zero():
+@app.route('/<name>/authorizers_with_zero', methods=['GET'])
+def get_authorizers_with_zero(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -216,7 +241,7 @@ def get_authorizers_with_zero():
         if order_by not in set(['tvl_balance', 'historical_code_address_count']):
             order_by = 'tvl_balance'
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -284,9 +309,14 @@ def get_authorizers_with_zero():
         return jsonify({'error': str(e)}), 500
 
 # code_statistics query interface
-@app.route('/code_statistics', methods=['GET'])
-def get_code_statistics():
-    cached_code_statistics_path = f'/dev/shm/{NAME}_code_statistics.json'
+@app.route('/<name>/code_statistics', methods=['GET'])
+def get_code_statistics(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    cached_code_statistics_path = f'/dev/shm/{name}_code_statistics.json'
     if os.path.exists(cached_code_statistics_path):
         code_statistics = json.loads(open(cached_code_statistics_path).read())
         return jsonify(code_statistics)
@@ -294,9 +324,14 @@ def get_code_statistics():
         return jsonify({'error': 'Code statistics not found'}), 404
 
 # trace_statistics query interface
-@app.route('/trace_statistics', methods=['GET'])
-def get_trace_statistics():
-    cached_trace_statistics_path = f'/dev/shm/{NAME}_trace_statistics.json'
+@app.route('/<name>/trace_statistics', methods=['GET'])
+def get_trace_statistics(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    cached_trace_statistics_path = f'/dev/shm/{name}_trace_statistics.json'
     if os.path.exists(cached_trace_statistics_path):
         trace_statistics = json.loads(open(cached_trace_statistics_path).read())
         return jsonify(trace_statistics)
@@ -305,8 +340,13 @@ def get_trace_statistics():
 
     
 # codes_by_tvl_balance pagination query interface
-@app.route('/codes_by_tvl_balance', methods=['GET'])
-def get_codes_by_tvl_balance():
+@app.route('/<name>/codes_by_tvl_balance', methods=['GET'])
+def get_codes_by_tvl_balance(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -315,7 +355,7 @@ def get_codes_by_tvl_balance():
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         tags_by = request.args.get('tags_by', '')  # Get filter tags_by parameter
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -378,8 +418,13 @@ def get_codes_by_tvl_balance():
         return jsonify({'error': str(e)}), 500
 
 # codes_by_authorizer_count pagination query interface
-@app.route('/codes_by_authorizer_count', methods=['GET'])
-def get_codes_by_authorizer_count():
+@app.route('/<name>/codes_by_authorizer_count', methods=['GET'])
+def get_codes_by_authorizer_count(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -388,7 +433,7 @@ def get_codes_by_authorizer_count():
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         tags_by = request.args.get('tags_by', '')  # Get filter tags_by parameter
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -452,8 +497,13 @@ def get_codes_by_authorizer_count():
         return jsonify({'error': str(e)}), 500
 
 # relayers_by_tx_count pagination query interface
-@app.route('/relayers_by_tx_count', methods=['GET'])
-def get_relayers_by_tx_count():
+@app.route('/<name>/relayers_by_tx_count', methods=['GET'])
+def get_relayers_by_tx_count(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -461,7 +511,7 @@ def get_relayers_by_tx_count():
         order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -509,8 +559,13 @@ def get_relayers_by_tx_count():
         return jsonify({'error': str(e)}), 500
 
 # relayers_by_authorization_count pagination query interface
-@app.route('/relayers_by_authorization_count', methods=['GET'])
-def get_relayers_by_authorization_count():
+@app.route('/<name>/relayers_by_authorization_count', methods=['GET'])
+def get_relayers_by_authorization_count(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -518,7 +573,7 @@ def get_relayers_by_authorization_count():
         order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -566,8 +621,13 @@ def get_relayers_by_authorization_count():
         return jsonify({'error': str(e)}), 500
 
 # relayers_by_authorization_fee pagination query interface
-@app.route('/relayers_by_authorization_fee', methods=['GET'])
-def get_relayers_by_authorization_fee():
+@app.route('/<name>/relayers_by_authorization_fee', methods=['GET'])
+def get_relayers_by_authorization_fee(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -575,7 +635,7 @@ def get_relayers_by_authorization_fee():
         order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
@@ -623,9 +683,14 @@ def get_relayers_by_authorization_fee():
         return jsonify({'error': str(e)}), 500
 
 # overview query interface
-@app.route('/overview', methods=['GET'])
-def get_overview():
-    cached_overview_path = f'/dev/shm/{NAME}_overview.json'
+@app.route('/<name>/overview', methods=['GET'])
+def get_overview(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    cached_overview_path = f'/dev/shm/{name}_overview.json'
     if os.path.exists(cached_overview_path):
         overview = json.loads(open(cached_overview_path).read())
         return jsonify({
@@ -633,7 +698,7 @@ def get_overview():
         })
 
     try:
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Get basic statistical information
@@ -741,8 +806,13 @@ def get_overview():
         return jsonify({'error': str(e)}), 500
 
 # calls pagination query interface
-@app.route('/calls', methods=['GET'])
-def get_calls():
+@app.route('/<name>/calls', methods=['GET'])
+def get_calls(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # Get pagination parameters, default to page 1, 10 items per page
         page = int(request.args.get('page', 1))
@@ -750,7 +820,7 @@ def get_calls():
         order = request.args.get('order', 'desc')  # Get sort parameter, default to descending
         search_by = request.args.get('search_by', '')  # Get filter search_by parameter
         
-        conn = get_db_connection()
+        conn = get_db_connection(name)
         cursor = conn.cursor()
         
         # Build query
