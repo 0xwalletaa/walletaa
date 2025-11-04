@@ -30,6 +30,66 @@ def get_mysql_connection(mysql_db_name, with_database=True):
             charset='utf8mb4'
         )
 
+def create_used_col_and_index(mysql_db_name, block_db_path):
+    """Create 'used' column in type4_transactions table if it doesn't exist"""
+    # 连接到block db (SQLite)
+    block_conn = sqlite3.connect(block_db_path)
+    block_cursor = block_conn.cursor()
+    
+    # 检查type4_transactions表是否有used列
+    block_cursor.execute("PRAGMA table_info(type4_transactions)")
+    columns = [column[1] for column in block_cursor.fetchall()]
+    
+    has_used_column = 'used' in columns
+    
+    if not has_used_column:
+        # 添加used列，默认值为0 (False)
+        block_cursor.execute("ALTER TABLE type4_transactions ADD COLUMN used INTEGER DEFAULT 0")
+        block_conn.commit()
+        print("已添加 'used' 列到 type4_transactions 表")
+    else:
+        print("type4_transactions 表已有 'used' 列")
+    
+    # 创建used列的索引
+    try:
+        block_cursor.execute("CREATE INDEX IF NOT EXISTS idx_type4_transactions_used ON type4_transactions(used)")
+        block_conn.commit()
+        print("已创建 'used' 列的索引")
+    except Exception as e:
+        print(f"创建索引时出错: {e}")
+        
+    # 创建tx_hash的索引
+    try:
+        block_cursor.execute("CREATE INDEX IF NOT EXISTS idx_type4_transactions_tx_hash ON type4_transactions(tx_hash)")
+        block_conn.commit()
+        print("已创建 'tx_hash' 列的索引")
+    except Exception as e:
+        print(f"创建索引时出错: {e}")
+    
+    # 判断MySQL数据库是否有transactions表
+    try:
+        mysql_conn = get_mysql_connection(mysql_db_name, with_database=True)
+        mysql_cursor = mysql_conn.cursor()
+        
+        # 检查transactions表是否存在
+        mysql_cursor.execute("SHOW TABLES LIKE 'transactions'")
+        transactions_table_exists = mysql_cursor.fetchone() is not None
+        
+        if not transactions_table_exists:
+            # 如果MySQL中没有transactions表，将block db中的所有used列置为False (0)
+            block_cursor.execute("UPDATE type4_transactions SET used = 0")
+            block_conn.commit()
+            print("MySQL中没有transactions表，已将所有 'used' 列置为False")
+        else:
+            print("MySQL中已有transactions表")
+        
+        mysql_conn.close()
+    except Exception as e:
+        print(f"检查MySQL数据库时出错: {e}")
+    
+    block_conn.close()
+
+
 def create_db_if_not_exists(mysql_db_name):
     """Create information database and table structure"""
     # First connect without database to create it if needed
@@ -186,7 +246,8 @@ def update_info_by_block(mysql_db_name, block_db_path):
     block_conn = sqlite3.connect(block_db_path)
     block_tx_cursor = block_conn.cursor()
     block_timestamp_cursor = block_conn.cursor()
-    block_tx_cursor.execute("SELECT block_number, tx_hash, tx_data FROM type4_transactions ORDER BY block_number ASC")
+    block_update_cursor = block_conn.cursor()
+    block_tx_cursor.execute("SELECT block_number, tx_hash, tx_data FROM type4_transactions WHERE used=0 ORDER BY block_number ASC")
     
     wrong_block_number = 0
     tx_processed = 0
@@ -200,6 +261,9 @@ def update_info_by_block(mysql_db_name, block_db_path):
         tx_hash = "0x"+tx_hash
         info_cursor.execute("SELECT tx_hash FROM transactions WHERE tx_hash = %s", (tx_hash,))
         if info_cursor.fetchone() is not None:
+            # 如果交易已存在于MySQL中，标记为已使用
+            block_update_cursor.execute("UPDATE type4_transactions SET used = 1 WHERE tx_hash = ?", (tx_hash[2:],))
+            block_conn.commit()
             continue
         if "authorizationList" not in tx_data_str:
             wrong_block_number = block_number
@@ -252,6 +316,10 @@ def update_info_by_block(mysql_db_name, block_db_path):
             info_cursor.execute("INSERT INTO relayers (relayer_address, tx_count, authorization_count, authorization_fee) VALUES (%s, %s, %s, %s)", (type4_tx['relayer_address'] , 1, len(type4_tx['authorization_list']),  type4_tx['authorization_fee']))
             
         info_conn.commit()
+        
+        # 标记交易为已使用
+        block_update_cursor.execute("UPDATE type4_transactions SET used = 1 WHERE tx_hash = ?", (tx_hash[2:],))
+        block_conn.commit()
         
         tx_processed += 1
         
@@ -599,6 +667,7 @@ print(f"\nStarting to process {NAME} network...")
 mysql_db_name = f'walletaa_{NAME}'
 
 create_db_if_not_exists(mysql_db_name)
+create_used_col_and_index(mysql_db_name, block_db_path)
 start_time = time.time()
 update_info_by_block(mysql_db_name, block_db_path)
 end_time = time.time()
