@@ -878,8 +878,13 @@ def get_calls(name):
         return jsonify({'error': str(e)}), 500
 
 # comparison query interface
-@app.route('/comparison', methods=['GET'])
-def get_comparison():
+@app.route('/<name>/comparison', methods=['GET'])
+def get_comparison(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
     try:
         # 查找 /dev/shm/ 目录下所有的 *overview.json 文件
         overview_files = glob.glob('/dev/shm/*overview.json')
