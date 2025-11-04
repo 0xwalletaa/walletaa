@@ -459,10 +459,17 @@ def update_info_by_code(mysql_db_name, code_db_path):
     code_authorizer_by_tag = {}
     code_tvl_by_tag = {}
     
+    info_read_cursor.execute("SELECT code_address FROM authorizations GROUP BY code_address")
+    for row in info_read_cursor:
+        code_address = row[0]
+        info_write_cursor.execute("INSERT IGNORE INTO codes (code_address) VALUES (%s)", (code_address,))
+    info_write_cursor.execute("UPDATE codes SET authorizer_count = 0, tvl_balance = 0")
+    info_conn.commit()
+    
     info_read_cursor.execute("SELECT code_address, count(authorizer_address), sum(tvl_balance) FROM authorizers GROUP BY code_address")
     for row in info_read_cursor:
         code_address, authorizer_count, tvl_balance = row
-        info_write_cursor.execute("INSERT INTO codes (code_address, authorizer_count, tvl_balance) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE authorizer_count = VALUES(authorizer_count), tvl_balance = VALUES(tvl_balance)", (code_address, authorizer_count, tvl_balance))
+        info_write_cursor.execute("UPDATE codes SET authorizer_count = authorizer_count + %s, tvl_balance = tvl_balance + %s WHERE code_address = %s", (authorizer_count, tvl_balance, code_address))
         
         code_cursor.execute("SELECT code FROM codes WHERE LOWER(code_address) = ?", (code_address,))
         row = code_cursor.fetchone()
