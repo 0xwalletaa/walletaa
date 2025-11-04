@@ -72,6 +72,7 @@ def get_db_connection():
             last_update_timestamp INTEGER
         )
         ''')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_last_update_timestamp ON codes(last_update_timestamp ASC)')
         thread_local.db_connection.commit()
     return thread_local.db_connection
 
