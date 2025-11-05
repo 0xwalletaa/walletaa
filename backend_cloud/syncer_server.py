@@ -344,6 +344,162 @@ def get_code(name):
             'error': str(e)
         }), 500
 
+@app.route('/<name>/add_tvl_addresses', methods=['POST'])
+@require_token
+def add_tvl_addresses(name):
+    """Batch add addresses to TVL database
+    
+    Request body:
+        addresses: list of address strings
+    
+    Returns:
+        Success status and count of added addresses
+    """
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    try:
+        data = request.get_json()
+        if not data or 'addresses' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'addresses field is required in request body'
+            }), 400
+        
+        addresses = data['addresses']
+        if not isinstance(addresses, list):
+            return jsonify({
+                'success': False,
+                'error': 'addresses must be a list'
+            }), 400
+        
+        if len(addresses) == 0:
+            return jsonify({
+                'success': True,
+                'chain': name,
+                'added_count': 0,
+                'message': 'No addresses provided'
+            })
+        
+        # Get TVL database connection
+        conn = get_tvl_db_connection(name)
+        cursor = conn.cursor()
+        
+        # Check table structure
+        cursor.execute("PRAGMA table_info(author_balances)")
+        columns = [col[1] for col in cursor.fetchall()]
+        
+        # Batch insert addresses
+        import time as time_module
+        current_timestamp = int(time_module.time())
+        added_count = 0
+        
+        for address in addresses:
+            try:
+                # Insert with default values
+                cursor.execute("""
+                    INSERT OR IGNORE INTO author_balances 
+                    (author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp, last_update_timestamp)
+                    VALUES (?, 0, 0, 0, 0, 0, 0, ?, ?)
+                """, (address, current_timestamp, current_timestamp))
+                if cursor.rowcount > 0:
+                    added_count += 1
+            except Exception as e:
+                print(f"Error adding TVL address {address}: {e}")
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'chain': name,
+            'added_count': added_count,
+            'total_addresses': len(addresses)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/<name>/add_code_addresses', methods=['POST'])
+@require_token
+def add_code_addresses(name):
+    """Batch add addresses to code database
+    
+    Request body:
+        addresses: list of address strings
+    
+    Returns:
+        Success status and count of added addresses
+    """
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    try:
+        data = request.get_json()
+        if not data or 'addresses' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'addresses field is required in request body'
+            }), 400
+        
+        addresses = data['addresses']
+        if not isinstance(addresses, list):
+            return jsonify({
+                'success': False,
+                'error': 'addresses must be a list'
+            }), 400
+        
+        if len(addresses) == 0:
+            return jsonify({
+                'success': True,
+                'chain': name,
+                'added_count': 0,
+                'message': 'No addresses provided'
+            })
+        
+        # Get code database connection
+        conn = get_code_db_connection(name)
+        cursor = conn.cursor()
+        
+        # Batch insert addresses
+        import time as time_module
+        current_timestamp = int(time_module.time())
+        added_count = 0
+        
+        for address in addresses:
+            try:
+                # Insert with empty code
+                cursor.execute("""
+                    INSERT OR IGNORE INTO codes 
+                    (code_address, code, timestamp, last_update_timestamp)
+                    VALUES (?, '', ?, ?)
+                """, (address, current_timestamp, current_timestamp))
+                if cursor.rowcount > 0:
+                    added_count += 1
+            except Exception as e:
+                print(f"Error adding code address {address}: {e}")
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'chain': name,
+            'added_count': added_count,
+            'total_addresses': len(addresses)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 if __name__ == '__main__':
     print(f"Starting syncer server on port {PORT}")
     print(f"Allowed chains: {', '.join(ALLOWED_NAMES)}")
