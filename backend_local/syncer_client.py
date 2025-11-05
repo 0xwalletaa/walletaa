@@ -415,7 +415,7 @@ def sync_code(name):
 
 def get_pending_db_path(name):
     """Get path to pending database"""
-    return f'{DB_PATH}/{name}_pending.db'
+    return f'../info_local/{name}_pending.db'
 
 def sync_pending(name):
     """Sync pending addresses to server
@@ -570,6 +570,9 @@ def main():
     
     # 4. Sync code data
     sync_code(NAME)
+    
+    # 5. Sync pending addresses
+    sync_pending(NAME)
     
     elapsed_time = time.time() - start_time
     print(f"\n" + "=" * 80)
