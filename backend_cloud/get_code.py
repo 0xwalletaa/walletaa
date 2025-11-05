@@ -76,51 +76,6 @@ def get_db_connection():
         thread_local.db_connection.commit()
     return thread_local.db_connection
 
-def get_code_addresses():
-    code_addresses = set()
-    
-    """Get all code addresses from info_db_path"""
-    if os.path.exists(info_db_path):
-        conn = sqlite3.connect(info_db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT distinct code_address FROM authorizations")
-        for row in cursor:
-            if row[0] != 'error':
-                code_addresses.add(row[0])
-        conn.close()
-        print(f"Got {len(code_addresses)} code addresses from info_db_path")
-        return list(code_addresses)
-
-    """Get all code addresses from mainnet_blocks database"""
-    try:
-        # Connect to database
-        conn = sqlite3.connect(block_db_path)
-        cursor = conn.cursor()
-        
-        # Get all type4 transaction data
-        cursor.execute("SELECT tx_data FROM type4_transactions")
-        
-        # Iterate through all transaction data
-        for row in cursor:
-            tx_data_str = row[0]
-            try:
-                tx_data = json.loads(tx_data_str)
-                
-                # Check if authorizationList field exists
-                if 'authorizationList' in tx_data and tx_data['authorizationList']:
-                    for auth in tx_data['authorizationList']:
-                        code_addresses.add(auth['address'])
-            except json.JSONDecodeError as e:
-                print(f"Error parsing transaction data: {e}")
-                continue
-        
-        conn.close()
-        print(f"Got {len(code_addresses)} unique code addresses from database")
-        return list(code_addresses)
-    except Exception as e:
-        print(f"Error getting code addresses: {e}")
-        return []
-
 def get_code(code_address):
     """Get code for specified address"""
     try:
@@ -154,7 +109,7 @@ def update_code(code_address):
     try:
         # Get code
         code = get_code(code_address)
-        print(f"Got code for address {code_address}: {code}")
+        print(f"Got code for address {code_address}: {code[:10]}...")
         
         if code is not None:
             # Update database
@@ -203,9 +158,16 @@ def update_code(code_address):
                  code, current_timestamp, last_update_timestamp)
             )
             conn.commit()
-            print(f"Updated code for address {code_address}: {code} (changed: {code_changed})")
+            print(f"Updated code for address {code_address}: {code[:10]}... (changed: {code_changed})")
     except Exception as e:
         print(f"Error updating address {code_address} information: {e}")
+
+def get_unfresh_code_addresses():
+    """Get all code addresses that are not fresh"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT code_address FROM codes WHERE timestamp < ?", (int(time.time()) - DATA_EXPIRY,))
+    return [row[0] for row in cursor.fetchall()]
 
 def main():
     # Initialize database connection (main thread)
@@ -213,19 +175,13 @@ def main():
     
     # Get all author addresses
     time_start = time.time()
-    code_addresses = get_code_addresses()
+    unfresh_code_addresses = get_unfresh_code_addresses()
     time_end = time.time()  
-    print(f"Got {len(code_addresses)} code addresses in {time_end - time_start} seconds")
+    print(f"Got {len(unfresh_code_addresses)} code addresses in {time_end - time_start} seconds")
 
-    if not code_addresses:
+    if not unfresh_code_addresses:
         print("No code addresses found, exiting program")
         return
-    
-    unfresh_code_addresses = []
-    for address in code_addresses:
-        if not is_data_fresh(address):
-            print(f"Code for address {address} has expired")
-            unfresh_code_addresses.append(address)
     
     # Use thread pool to get balances in parallel
     print(f"Starting to update code data for {len(unfresh_code_addresses)} addresses...")
