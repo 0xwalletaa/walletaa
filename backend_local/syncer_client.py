@@ -47,6 +47,48 @@ def get_auth_headers():
         return {'Authorization': f'Bearer {AUTH_TOKEN}'}
     return {}
 
+def generate_blocks_string(block_numbers):
+    """将块号列表转换为紧凑的字符串格式，如 '3,5,7,9,12-20,23-55'
+    
+    Args:
+        block_numbers: 块号列表（需要已排序）
+        
+    Returns:
+        str: 紧凑格式的块字符串
+    """
+    if not block_numbers:
+        return ''
+    
+    # 确保排序
+    block_numbers = sorted(block_numbers)
+    
+    ranges = []
+    range_start = block_numbers[0]
+    range_end = block_numbers[0]
+    
+    for i in range(1, len(block_numbers)):
+        if block_numbers[i] == range_end + 1:
+            # 连续的块，扩展范围
+            range_end = block_numbers[i]
+        else:
+            # 不连续，保存当前范围
+            if range_start == range_end:
+                ranges.append(str(range_start))
+            else:
+                ranges.append(f'{range_start}-{range_end}')
+            
+            # 开始新范围
+            range_start = block_numbers[i]
+            range_end = block_numbers[i]
+    
+    # 保存最后一个范围
+    if range_start == range_end:
+        ranges.append(str(range_start))
+    else:
+        ranges.append(f'{range_start}-{range_end}')
+    
+    return ','.join(ranges)
+
 def get_db_paths(name):
     """Get database paths for specified chain"""
     block_db_path = f'{DB_PATH}/{name}_block.db'
@@ -91,23 +133,35 @@ def check_block_exists(cursor, block_number):
     cursor.execute("SELECT 1 FROM blocks WHERE block_number = ? LIMIT 1", (block_number,))
     return cursor.fetchone() is not None
 
-def sync_block_batch(conn, name, start_block, end_block):
-    """Request and sync a batch of blocks from server"""
+def sync_block_batch(conn, name, block_numbers):
+    """Request and sync a batch of blocks from server
+    
+    Args:
+        conn: database connection
+        name: chain name
+        block_numbers: list of block numbers to sync
+    
+    Returns:
+        int: number of blocks synced
+    """
     try:
-        response = requests.get(
+        # 生成blocks字符串
+        blocks_str = generate_blocks_string(block_numbers)
+        
+        response = requests.post(
             f"{SERVER_URL}/{name}/get_block_txs",
-            params={'start_block': start_block, 'end_block': end_block},
-            headers=get_auth_headers(),
+            json={'blocks': blocks_str},
+            headers={**get_auth_headers(), 'Content-Type': 'application/json'},
             timeout=60
         )
         
         if response.status_code != 200:
-            print(f"    HTTP Error {response.status_code} for blocks {start_block}-{end_block}")
+            print(f"    HTTP Error {response.status_code} for blocks: {blocks_str}")
             return 0
         
         data = response.json()
         if not data.get('success'):
-            print(f"    Error: {data.get('error')} for blocks {start_block}-{end_block}")
+            print(f"    Error: {data.get('error')} for blocks: {blocks_str}")
             return 0
         
         blocks = data.get('blocks', [])
@@ -134,7 +188,7 @@ def sync_block_batch(conn, name, start_block, end_block):
         conn.commit()
         return synced_count
     except Exception as e:
-        print(f"    Exception syncing blocks {start_block}-{end_block}: {e}")
+        print(f"    Exception syncing blocks: {e}")
         return 0
 
 def get_last_update_timestamp(name, table_name):
@@ -224,11 +278,10 @@ def sync_blocks(name, start_block):
             conn.close()
             return True
         
-        # Iterate through blocks and accumulate missing ones
+        # Iterate through blocks and collect missing ones
         batch_size = 1000
         total_synced = 0
-        missing_batch_start = None
-        missing_batch_end = None
+        missing_blocks = []
         
         print(f"  Scanning blocks from {start_block} to {remote_highest}...")
         
@@ -236,44 +289,29 @@ def sync_blocks(name, start_block):
             exists = check_block_exists(cursor, block_num)
             
             if not exists:
-                # Block is missing
-                if missing_batch_start is None:
-                    # Start a new missing batch
-                    missing_batch_start = block_num
-                    missing_batch_end = block_num
-                else:
-                    # Continue the missing batch
-                    missing_batch_end = block_num
-                    
-                    # Check if batch is full
-                    if missing_batch_end - missing_batch_start + 1 >= batch_size:
-                        # Request this batch
-                        print(f"  Syncing missing blocks {missing_batch_start} to {missing_batch_end}...")
-                        synced = sync_block_batch(conn, name, missing_batch_start, missing_batch_end)
-                        total_synced += synced
-                        
-                        # Reset batch
-                        missing_batch_start = None
-                        missing_batch_end = None
-            else:
-                # Block exists, if we have accumulated missing blocks, request them now
-                if missing_batch_start is not None:
-                    print(f"  Syncing missing blocks {missing_batch_start} to {missing_batch_end}...")
-                    synced = sync_block_batch(conn, name, missing_batch_start, missing_batch_end)
+                # Block is missing, add to list
+                missing_blocks.append(block_num)
+                
+                # Check if batch is full
+                if len(missing_blocks) >= batch_size:
+                    # Request this batch
+                    blocks_str = generate_blocks_string(missing_blocks)
+                    print(f"  Syncing {len(missing_blocks)} missing blocks: {blocks_str}")
+                    synced = sync_block_batch(conn, name, missing_blocks)
                     total_synced += synced
                     
-                    # Reset batch
-                    missing_batch_start = None
-                    missing_batch_end = None
+                    # Clear batch
+                    missing_blocks = []
             
             # Progress indicator every 10000 blocks
             if (block_num - start_block) % 10000 == 0 and block_num > start_block:
                 print(f"  Scanned up to block {block_num}...")
         
         # Don't forget the last batch if it exists
-        if missing_batch_start is not None:
-            print(f"  Syncing missing blocks {missing_batch_start} to {missing_batch_end}...")
-            synced = sync_block_batch(conn, name, missing_batch_start, missing_batch_end)
+        if missing_blocks:
+            blocks_str = generate_blocks_string(missing_blocks)
+            print(f"  Syncing {len(missing_blocks)} missing blocks: {blocks_str}")
+            synced = sync_block_batch(conn, name, missing_blocks)
             total_synced += synced
         
         conn.close()

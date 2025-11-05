@@ -43,6 +43,45 @@ AUTH_TOKEN = load_token()
 
 app = Flask(__name__)
 
+def parse_blocks_string(blocks_str):
+    """解析块字符串，如 '3,5,7,9,12-20,23-55' 返回块号列表
+    
+    Args:
+        blocks_str: 块字符串，支持单个块号和范围
+        
+    Returns:
+        list: 排序后的块号列表
+    """
+    if not blocks_str or blocks_str.strip() == '':
+        return []
+    
+    block_numbers = set()
+    parts = blocks_str.split(',')
+    
+    for part in parts:
+        part = part.strip()
+        if not part:
+            continue
+            
+        if '-' in part:
+            # 处理范围，如 12-20
+            try:
+                start, end = part.split('-', 1)
+                start_num = int(start.strip())
+                end_num = int(end.strip())
+                if start_num <= end_num:
+                    block_numbers.update(range(start_num, end_num + 1))
+            except ValueError:
+                continue
+        else:
+            # 处理单个块号
+            try:
+                block_numbers.add(int(part))
+            except ValueError:
+                continue
+    
+    return sorted(list(block_numbers))
+
 def require_token(f):
     """Decorator to require authentication token"""
     @wraps(f)
@@ -149,14 +188,14 @@ def get_highest_block(name):
             'error': str(e)
         }), 500
 
-@app.route('/<name>/get_block_txs', methods=['GET'])
+@app.route('/<name>/get_block_txs', methods=['POST'])
 @require_token
 def get_block_txs(name):
-    """Get blocks and type4 transactions in the specified range
+    """Get blocks and type4 transactions for specified blocks
     
-    Parameters:
-        start_block: int - starting block number
-        end_block: int - ending block number
+    Request body:
+        blocks: string - 块字符串，支持零散块号和区间
+                例如: '3,5,7,9,12-20,23-55'
     
     Returns:
         List of blocks with their type4 transactions
@@ -167,31 +206,41 @@ def get_block_txs(name):
         return error_response
     
     try:
-        start_block = request.args.get('start_block', type=int)
-        end_block = request.args.get('end_block', type=int)
-        
-        if start_block is None or end_block is None:
+        data = request.get_json()
+        if not data or 'blocks' not in data:
             return jsonify({
                 'success': False,
-                'error': 'start_block and end_block parameters are required'
+                'error': 'blocks field is required in request body (e.g., "3,5,7,9,12-20,23-55")'
             }), 400
         
-        if start_block > end_block:
+        blocks_str = data['blocks']
+        
+        if not blocks_str:
             return jsonify({
                 'success': False,
-                'error': 'start_block must be less than or equal to end_block'
+                'error': 'blocks parameter cannot be empty'
+            }), 400
+        
+        # 解析块字符串
+        block_numbers = parse_blocks_string(blocks_str)
+        
+        if not block_numbers:
+            return jsonify({
+                'success': False,
+                'error': 'No valid block numbers found in blocks parameter'
             }), 400
         
         conn = get_block_db_connection(name)
         cursor = conn.cursor()
         
-        # Get blocks in the range
-        cursor.execute("""
+        # 为了性能，使用 IN 查询
+        placeholders = ','.join(['?'] * len(block_numbers))
+        cursor.execute(f"""
             SELECT block_number, tx_count, type4_tx_count, timestamp
             FROM blocks
-            WHERE block_number >= ? AND block_number <= ?
+            WHERE block_number IN ({placeholders})
             ORDER BY block_number ASC
-        """, (start_block, end_block))
+        """, block_numbers)
         
         blocks = []
         for row in cursor.fetchall():
@@ -224,7 +273,8 @@ def get_block_txs(name):
             'success': True,
             'chain': name,
             'blocks': blocks,
-            'count': len(blocks)
+            'count': len(blocks),
+            'requested_count': len(block_numbers)
         })
     except Exception as e:
         return jsonify({
