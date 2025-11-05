@@ -485,8 +485,8 @@ def sync_pending(name):
         total_tvl_synced = 0
         while True:
             try:
-                # Read up to 1000 addresses
-                cursor.execute("SELECT address FROM tvl LIMIT 1000")
+                # Read up to 10000 addresses
+                cursor.execute("SELECT address FROM tvl LIMIT 10000")
                 rows = cursor.fetchall()
                 
                 if not rows:
@@ -521,20 +521,20 @@ def sync_pending(name):
                 total_tvl_synced += len(addresses)
                 print(f"  Synced and removed {len(addresses)} TVL addresses (added: {data.get('added_count', 0)})")
                 
-                # If we got less than 1000 rows, we're done
-                if len(addresses) < 1000:
+                # If we got less than 10000 rows, we're done
+                if len(addresses) < 10000:
                     break
                     
             except Exception as e:
                 print(f"  Error syncing TVL addresses: {e}")
-                break
+                continue
         
         # Sync pending code addresses
         total_code_synced = 0
         while True:
             try:
-                # Read up to 1000 addresses
-                cursor.execute("SELECT address FROM code LIMIT 1000")
+                # Read up to 10000 addresses
+                cursor.execute("SELECT address FROM code LIMIT 10000")
                 rows = cursor.fetchall()
                 
                 if not rows:
@@ -569,13 +569,13 @@ def sync_pending(name):
                 total_code_synced += len(addresses)
                 print(f"  Synced and removed {len(addresses)} code addresses (added: {data.get('added_count', 0)})")
                 
-                # If we got less than 1000 rows, we're done
-                if len(addresses) < 1000:
+                # If we got less than 10000 rows, we're done
+                if len(addresses) < 10000:
                     break
                     
             except Exception as e:
                 print(f"  Error syncing code addresses: {e}")
-                break
+                continue
         
         conn.close()
         
