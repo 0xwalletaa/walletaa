@@ -403,7 +403,7 @@ def add_tvl_addresses(name):
                     INSERT OR IGNORE INTO author_balances 
                     (author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp, last_update_timestamp)
                     VALUES (?, 0, 0, 0, 0, 0, 0, ?, ?)
-                """, (address, current_timestamp, current_timestamp))
+                """, (address, 0, current_timestamp))
                 if cursor.rowcount > 0:
                     added_count += 1
             except Exception as e:
@@ -479,7 +479,7 @@ def add_code_addresses(name):
                     INSERT OR IGNORE INTO codes 
                     (code_address, code, timestamp, last_update_timestamp)
                     VALUES (?, '', ?, ?)
-                """, (address, current_timestamp, current_timestamp))
+                """, (address, 0, current_timestamp))
                 if cursor.rowcount > 0:
                     added_count += 1
             except Exception as e:
