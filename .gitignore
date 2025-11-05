@@ -30,3 +30,4 @@ backend/check.sh
 server/updater_mysql_t.py
 info_local/batch_update.sh
 */syncer_token.txt
+test.sh

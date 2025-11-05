@@ -14,6 +14,12 @@ parser.add_argument('--name', required=True, help='Blockchain network name')
 parser.add_argument('--server_url', required=True, help='Syncer server URL (e.g., http://server:5000)')
 parser.add_argument('--start_block', type=int, default=0, help='Starting block number')
 parser.add_argument('--db_path', type=str, default='../info_local', help='Local database path')
+
+# Add mutually exclusive required group for download/upload
+mode_group = parser.add_mutually_exclusive_group(required=True)
+mode_group.add_argument('--download', action='store_true', help='Download data from server (blocks, TVL, code)')
+mode_group.add_argument('--upload', action='store_true', help='Upload pending addresses to server')
+
 args = parser.parse_args()
 
 NAME = args.name
@@ -582,8 +588,11 @@ def sync_pending(name):
 
 def main():
     """Main synchronization function"""
+    mode = "DOWNLOAD" if args.download else "UPLOAD"
+    
     print(f"=" * 80)
     print(f"Starting syncer client")
+    print(f"Mode: {mode}")
     print(f"Chain: {NAME}")
     print(f"Server: {SERVER_URL}")
     print(f"Start block: {START_BLOCK}")
@@ -597,24 +606,27 @@ def main():
     
     start_time = time.time()
     
-    # 1. Sync highest block info
-    sync_highest_block(NAME)
+    if args.download:
+        # Download mode: Sync data from server
+        # 1. Sync highest block info
+        sync_highest_block(NAME)
+        
+        # 2. Sync blocks and transactions
+        sync_blocks(NAME, START_BLOCK)
+        
+        # 3. Sync TVL data
+        sync_tvl(NAME)
+        
+        # 4. Sync code data
+        sync_code(NAME)
     
-    # 2. Sync blocks and transactions
-    sync_blocks(NAME, START_BLOCK)
-    
-    # 3. Sync TVL data
-    sync_tvl(NAME)
-    
-    # 4. Sync code data
-    sync_code(NAME)
-    
-    # 5. Sync pending addresses
-    sync_pending(NAME)
+    elif args.upload:
+        # Upload mode: Sync pending addresses to server
+        sync_pending(NAME)
     
     elapsed_time = time.time() - start_time
     print(f"\n" + "=" * 80)
-    print(f"Sync for {NAME} completed in {elapsed_time:.2f} seconds")
+    print(f"{mode} sync for {NAME} completed in {elapsed_time:.2f} seconds")
     print(f"=" * 80)
 
 if __name__ == "__main__":
