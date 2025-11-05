@@ -7,6 +7,7 @@ import sqlite3
 import pymysql
 import requests
 import datetime
+import argparse
 
 NAME = os.environ.get("NAME")
 DB_PATH = os.environ.get("DB_PATH")
@@ -725,50 +726,65 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
         json.dump(trace_statistics, f)
     
     
-block_db_path = f'../backend/{NAME}_block.db'
-if DB_PATH != None:
-    if DB_PATH != '':
-        block_db_path = f'{DB_PATH}/{NAME}_block.db'
-tvl_db_path = f'../backend/{NAME}_tvl.db'
-if DB_PATH != None:
-    if DB_PATH != '':
-        tvl_db_path = f'{DB_PATH}/{NAME}_tvl.db'
-code_db_path = f'../backend/{NAME}_code.db'
-if DB_PATH != None:
-    if DB_PATH != '':
-        code_db_path = f'{DB_PATH}/{NAME}_code.db'
-trace_db_path = f'../backend/{NAME}_trace.db'
+if __name__ == "__main__":
+    # 解析命令行参数
+    parser = argparse.ArgumentParser(description='Update MySQL database from blockchain data')
+    parser.add_argument('--no-tvl', action='store_true', help='Skip TVL update')
+    parser.add_argument('--no-code', action='store_true', help='Skip code update')
+    args = parser.parse_args()
 
-print(f"\nStarting to process {NAME} network...")
+    block_db_path = f'../backend/{NAME}_block.db'
+    if DB_PATH != None:
+        if DB_PATH != '':
+            block_db_path = f'{DB_PATH}/{NAME}_block.db'
+    tvl_db_path = f'../backend/{NAME}_tvl.db'
+    if DB_PATH != None:
+        if DB_PATH != '':
+            tvl_db_path = f'{DB_PATH}/{NAME}_tvl.db'
+    code_db_path = f'../backend/{NAME}_code.db'
+    if DB_PATH != None:
+        if DB_PATH != '':
+            code_db_path = f'{DB_PATH}/{NAME}_code.db'
+    trace_db_path = f'../backend/{NAME}_trace.db'
 
-mysql_db_name = f'walletaa_{NAME}'
+    print(f"\nStarting to process {NAME} network...")
 
-create_db_if_not_exists(mysql_db_name)
-create_used_col_and_index(mysql_db_name, block_db_path)
-init_pending_db()
-start_time = time.time()
-update_info_by_block(mysql_db_name, block_db_path)
-end_time = time.time()
-print(f"Block update: {end_time - start_time} seconds")
+    mysql_db_name = f'walletaa_{NAME}'
 
-start_time = time.time()
-update_info_by_tvl(mysql_db_name, tvl_db_path)
-end_time = time.time()
-print(f"TVL update: {end_time - start_time} seconds")
+    create_db_if_not_exists(mysql_db_name)
+    create_used_col_and_index(mysql_db_name, block_db_path)
+    init_pending_db()
+    start_time = time.time()
+    update_info_by_block(mysql_db_name, block_db_path)
+    end_time = time.time()
+    print(f"Block update: {end_time - start_time} seconds")
 
-start_time = time.time()
-update_info_by_code(mysql_db_name, code_db_path)
-end_time = time.time()
-print(f"Code update: {end_time - start_time} seconds")
+    # 根据 --no-tvl 参数决定是否执行 TVL 更新
+    if not args.no_tvl:
+        start_time = time.time()
+        update_info_by_tvl(mysql_db_name, tvl_db_path)
+        end_time = time.time()
+        print(f"TVL update: {end_time - start_time} seconds")
+    else:
+        print("TVL update: skipped (--no-tvl option enabled)")
 
-start_time = time.time()
-update_info_daily(mysql_db_name, from_latest=True)
-end_time = time.time()
-print(f"Daily update: {end_time - start_time} seconds")
+    # 根据 --no-code 参数决定是否执行 code 更新
+    if not args.no_code:
+        start_time = time.time()
+        update_info_by_code(mysql_db_name, code_db_path)
+        end_time = time.time()
+        print(f"Code update: {end_time - start_time} seconds")
+    else:
+        print("Code update: skipped (--no-code option enabled)")
+
+    start_time = time.time()
+    update_info_daily(mysql_db_name, from_latest=True)
+    end_time = time.time()
+    print(f"Daily update: {end_time - start_time} seconds")
 
 
-# if NAME == "mainnet":
-#     start_time = time.time()
-#     update_info_by_trace(mysql_db_name, trace_db_path, block_db_path)
-#     end_time = time.time()
-#     print(f"Trace update: {end_time - start_time} seconds")
+    # if NAME == "mainnet":
+    #     start_time = time.time()
+    #     update_info_by_trace(mysql_db_name, trace_db_path, block_db_path)
+    #     end_time = time.time()
+    #     print(f"Trace update: {end_time - start_time} seconds")
