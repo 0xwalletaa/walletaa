@@ -172,62 +172,6 @@ def get_db_connection():
         thread_local.db_connection.commit()
     return thread_local.db_connection
 
-def get_author_addresses():
-    author_addresses = set()
-    
-    """Get all author addresses from info_db_path"""
-    if os.path.exists(info_db_path):
-        conn = sqlite3.connect(info_db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT authorizer_address FROM authorizers WHERE tvl_timestamp < ? LIMIT ?", (int(time.time()) - DATA_EXPIRY, LIMIT))
-        for row in cursor:
-            if row[0] != 'error':
-                author_addresses.add(row[0])
-            if len(author_addresses) >= LIMIT:
-                break
-        conn.close()
-        print(f"Got {len(author_addresses)} author addresses from info_db_path")
-        # print(author_addresses)
-        return list(author_addresses)
-    
-    """Get all author addresses from mainnet_blocks database"""
-    
-    try:
-        # Connect to database
-        conn = sqlite3.connect(block_db_path)
-        cursor = conn.cursor()
-        
-        # Get all type4 transaction data
-        cursor.execute("SELECT tx_data FROM type4_transactions")
-        
-        # Iterate through all transaction data
-        for (tx_data_str,) in cursor:
-            try:
-                tx_data = json.loads(tx_data_str)
-                
-                # Check if authorizationList field exists
-                if 'authorizationList' in tx_data and tx_data['authorizationList']:
-                    for auth in tx_data['authorizationList']:
-                        try:
-                            author = ecrecover(auth)
-                            if author and not is_data_fresh(author.lower()):
-                                author_addresses.add(author.lower())
-                        except Exception as e:
-                            print(f"Error processing signature recovery: {e}, data: {auth}")
-                            continue
-                
-                print(len(author_addresses), LIMIT)
-            except json.JSONDecodeError as e:
-                print(f"Error parsing transaction data: {e}")
-                continue
-        
-        conn.close()
-        print(f"Got {len(author_addresses)} unique author addresses from database")
-        return list(author_addresses)
-    except Exception as e:
-        print(f"Error getting author addresses: {e}")
-        return []
-
 def get_address_balances(author_addresses):
     """Query token balances for specified address list"""
     try:
@@ -261,22 +205,12 @@ def get_address_balances(author_addresses):
         print(f"Error getting address balances: {e}")
         return []
 
-def is_data_fresh(author_address):
-    """Check if data is within expiry time"""
+def get_unfresh_author_addresses():
+    """Get all author addresses that are not fresh"""
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT timestamp FROM author_balances WHERE author_address = ?", 
-        (author_address,)
-    )
-    result = cursor.fetchone()
-    
-    if result:
-        last_update = result[0]
-        current_time = int(time.time())
-        return (current_time - last_update) < DATA_EXPIRY
-    
-    return False
+    cursor.execute("SELECT author_address FROM author_balances WHERE timestamp < ? LIMIT ?", (int(time.time()) - DATA_EXPIRY, LIMIT))
+    return [row[0] for row in cursor.fetchall()]
 
 def update_author_balance(author_addresses):
     """Update author address balance information"""
@@ -290,6 +224,7 @@ def update_author_balance(author_addresses):
             conn = get_db_connection()
             cursor = conn.cursor()
             current_timestamp = int(time.time())
+            balance_changed_count = 0
             
             for balance in balances:
                 # First, get existing balance data from database
@@ -315,6 +250,7 @@ def update_author_balance(author_addresses):
                         existing_usdc != balance['usdc_balance'] or
                         existing_dai != balance['dai_balance']):
                         balance_changed = True
+                        balance_changed_count += 1
                 else:
                     # New address, consider as changed
                     balance_changed = True
@@ -340,7 +276,7 @@ def update_author_balance(author_addresses):
                      balance['usdt_balance'], balance['usdc_balance'], balance['dai_balance'], current_timestamp, last_update_timestamp)
                 )
             conn.commit()
-            print(f"Updated balances for {len(balances)} addresses")
+            print(f"Updated balances for {len(balances)} addresses, balance changed count: {balance_changed_count}")
     except Exception as e:
         print(f"Error updating author {author_addresses} information: {e}")
 
@@ -348,21 +284,8 @@ def main():
     # Initialize database connection (main thread)
     get_db_connection()
     
-    # Get all author addresses
-    time_start = time.time()
-    author_addresses = get_author_addresses()
-    time_end = time.time()  
-    print(f"Got {len(author_addresses)} author addresses in {time_end - time_start} seconds")
-
-    if not author_addresses:
-        print("No author addresses found, exiting program")
-        return
-    
-    unfresh_author_addresses = []
-    for address in author_addresses:
-        if not is_data_fresh(address):
-            # print(f"Address {address} balance expired")
-            unfresh_author_addresses.append(address)
+    unfresh_author_addresses = get_unfresh_author_addresses()
+    print(f"Got {len(unfresh_author_addresses)} unfresh author addresses")
     
     # Use thread pool to get balances in parallel
     print(f"Starting to update balance data for {len(unfresh_author_addresses)} addresses...")
