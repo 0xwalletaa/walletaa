@@ -13,53 +13,6 @@ NAME = os.environ.get("NAME")
 DB_PATH = os.environ.get("DB_PATH")
 DATA_EXPIRY = 86400
 
-def get_pending_db_path():
-    """Get path to pending database"""
-    return f'../info_local/{NAME}_pending.db'
-
-def init_pending_db():
-    """Initialize pending database with tvl and code tables"""
-    pending_db_path = get_pending_db_path()
-    conn = sqlite3.connect(pending_db_path)
-    cursor = conn.cursor()
-    
-    # Create tvl table for pending addresses
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS tvl (
-        address VARCHAR(42) PRIMARY KEY
-    )
-    ''')
-    
-    # Create index on address
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_tvl_address ON tvl(address)')
-    
-    # Create code table for pending addresses
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS code (
-        address VARCHAR(42) PRIMARY KEY
-    )
-    ''')
-    
-    # Create index on address
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_code_address ON code(address)')
-    
-    conn.commit()
-    conn.close()
-    print(f"Initialized pending database: {pending_db_path}")
-
-def add_pending_tvl_address(cursor, address):
-    """Add address to pending tvl table"""
-    try:
-        cursor.execute("INSERT OR IGNORE INTO tvl (address) VALUES (?)", (address,))
-    except Exception as e:
-        print(f"Error adding pending tvl address {address}: {e}")
-
-def add_pending_code_address(cursor, address):
-    """Add address to pending code table"""
-    try:
-        cursor.execute("INSERT OR IGNORE INTO code (address) VALUES (?)", (address,))
-    except Exception as e:
-        print(f"Error adding pending code address {address}: {e}")
 
 def get_mysql_connection(mysql_db_name, with_database=True):
     """Helper function to create MySQL connection"""
@@ -401,9 +354,8 @@ def update_info_by_tvl(mysql_db_name, tvl_db_path):
     tvl_conn = sqlite3.connect(tvl_db_path)
     tvl_cursor = tvl_conn.cursor()
     
-    # Connect to pending database once
-    pending_conn = sqlite3.connect(get_pending_db_path())
-    pending_cursor = pending_conn.cursor()
+    # Open pending tvl file (overwrite mode)
+    pending_tvl_file = open(f'../info_local/{NAME}_pending_tvl.txt', 'w')
     
     start_time = time.time()
     while True:
@@ -441,12 +393,11 @@ def update_info_by_tvl(mysql_db_name, tvl_db_path):
                 tvl_balance = float(eth_balance) * float(ETH_PRICE) + float(weth_balance) * float(ETH_PRICE) + float(wbtc_balance) * float(BTC_PRICE) + float(usdt_balance) + float(usdc_balance) + float(dai_balance)
             info_write_cursor.execute("UPDATE authorizers SET tvl_balance = %s, tvl_timestamp = %s WHERE authorizer_address = %s", (tvl_balance, timestamp, authorizer_address))
         else:
-            # Add missing address to pending tvl database
-            add_pending_tvl_address(pending_cursor, authorizer_address)
+            # Add missing address to pending tvl file
+            pending_tvl_file.write(f"{authorizer_address}\n")
     
-    # Commit pending addresses
-    pending_conn.commit()
-    pending_conn.close()
+    # Close pending file
+    pending_tvl_file.close()
 
     end_time = time.time()
     print(f"TVL [update]: {end_time - start_time} seconds, data count: {count}")
@@ -505,9 +456,8 @@ def update_info_by_code(mysql_db_name, code_db_path):
     code_conn = sqlite3.connect(code_db_path)
     code_cursor = code_conn.cursor()
     
-    # Connect to pending database once
-    pending_conn = sqlite3.connect(get_pending_db_path())
-    pending_cursor = pending_conn.cursor()
+    # Open pending code file (overwrite mode)
+    pending_code_file = open(f'../info_local/{NAME}_pending_code.txt', 'w')
     
     code_address_to_type = {}
     code_info = json.load(open(f'code_info.json'))
@@ -571,12 +521,11 @@ def update_info_by_code(mysql_db_name, code_db_path):
                 
             info_write_cursor.execute("UPDATE codes SET tags = %s WHERE code_address = %s", (json.dumps(tags), code_address))
         else:
-            # Add missing address to pending code database
-            add_pending_code_address(pending_cursor, code_address)
+            # Add missing address to pending code file
+            pending_code_file.write(f"{code_address}\n")
     
-    # Commit pending addresses
-    pending_conn.commit()
-    pending_conn.close()
+    # Close pending file
+    pending_code_file.close()
     
     code_info = json.load(open(f'code_info.json'))
     for item in code_info:
@@ -753,7 +702,6 @@ if __name__ == "__main__":
 
     create_db_if_not_exists(mysql_db_name)
     create_used_col_and_index(mysql_db_name, block_db_path)
-    init_pending_db()
     start_time = time.time()
     update_info_by_block(mysql_db_name, block_db_path)
     end_time = time.time()
