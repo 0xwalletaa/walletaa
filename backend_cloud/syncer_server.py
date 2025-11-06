@@ -445,10 +445,11 @@ def add_tvl_addresses(name):
         import time as time_module
         current_timestamp = int(time_module.time())
         added_count = 0
+        existed_data = []
         
         for address in addresses:
             try:
-                # Insert with default values
+                # Try to insert with default values
                 cursor.execute("""
                     INSERT OR IGNORE INTO author_balances 
                     (author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp, last_update_timestamp)
@@ -456,6 +457,27 @@ def add_tvl_addresses(name):
                 """, (address, 0, current_timestamp))
                 if cursor.rowcount > 0:
                     added_count += 1
+                else:
+                    # Address already exists, read its data
+                    cursor.execute("""
+                        SELECT author_address, eth_balance, weth_balance, wbtc_balance,
+                               usdt_balance, usdc_balance, dai_balance, timestamp, last_update_timestamp
+                        FROM author_balances
+                        WHERE author_address = ?
+                    """, (address,))
+                    row = cursor.fetchone()
+                    if row:
+                        existed_data.append({
+                            'author_address': row['author_address'],
+                            'eth_balance': row['eth_balance'],
+                            'weth_balance': row['weth_balance'],
+                            'wbtc_balance': row['wbtc_balance'],
+                            'usdt_balance': row['usdt_balance'],
+                            'usdc_balance': row['usdc_balance'],
+                            'dai_balance': row['dai_balance'],
+                            'timestamp': row['timestamp'],
+                            'last_update_timestamp': row['last_update_timestamp']
+                        })
             except Exception as e:
                 print(f"Error adding TVL address {address}: {e}")
         
@@ -466,7 +488,9 @@ def add_tvl_addresses(name):
             'success': True,
             'chain': name,
             'added_count': added_count,
-            'total_addresses': len(addresses)
+            'total_addresses': len(addresses),
+            'existed': existed_data,
+            'existed_count': len(existed_data)
         })
     except Exception as e:
         return jsonify({
@@ -521,10 +545,11 @@ def add_code_addresses(name):
         import time as time_module
         current_timestamp = int(time_module.time())
         added_count = 0
+        existed_data = []
         
         for address in addresses:
             try:
-                # Insert with empty code
+                # Try to insert with empty code
                 cursor.execute("""
                     INSERT OR IGNORE INTO codes 
                     (code_address, code, timestamp, last_update_timestamp)
@@ -532,6 +557,21 @@ def add_code_addresses(name):
                 """, (address, 0, current_timestamp))
                 if cursor.rowcount > 0:
                     added_count += 1
+                else:
+                    # Address already exists, read its data
+                    cursor.execute("""
+                        SELECT code_address, code, timestamp, last_update_timestamp
+                        FROM codes
+                        WHERE code_address = ?
+                    """, (address,))
+                    row = cursor.fetchone()
+                    if row:
+                        existed_data.append({
+                            'code_address': row['code_address'],
+                            'code': row['code'],
+                            'timestamp': row['timestamp'],
+                            'last_update_timestamp': row['last_update_timestamp']
+                        })
             except Exception as e:
                 print(f"Error adding code address {address}: {e}")
         
@@ -542,7 +582,9 @@ def add_code_addresses(name):
             'success': True,
             'chain': name,
             'added_count': added_count,
-            'total_addresses': len(addresses)
+            'total_addresses': len(addresses),
+            'existed': existed_data,
+            'existed_count': len(existed_data)
         })
     except Exception as e:
         return jsonify({

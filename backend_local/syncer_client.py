@@ -516,7 +516,34 @@ def sync_pending(name):
                                         continue
                                 else:
                                     total_tvl_synced += len(addresses)
-                                    print(f"  Batch synced: {len(addresses)} TVL addresses (added: {data.get('added_count', 0)})")
+                                    added_count = data.get('added_count', 0)
+                                    existed_count = data.get('existed_count', 0)
+                                    print(f"  Batch synced: {len(addresses)} TVL addresses (added: {added_count}, existed: {existed_count})")
+                                    
+                                    # Insert existed data to local database
+                                    existed_data = data.get('existed', [])
+                                    if existed_data:
+                                        try:
+                                            tvl_conn = init_tvl_db(name)
+                                            tvl_cursor = tvl_conn.cursor()
+                                            for record in existed_data:
+                                                try:
+                                                    tvl_cursor.execute(
+                                                        """INSERT OR REPLACE INTO author_balances 
+                                                        (author_address, eth_balance, weth_balance, wbtc_balance, usdt_balance, usdc_balance, dai_balance, timestamp, last_update_timestamp)
+                                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                                        (record['author_address'], record['eth_balance'], record['weth_balance'],
+                                                         record['wbtc_balance'], record['usdt_balance'], record['usdc_balance'],
+                                                         record['dai_balance'], record['timestamp'], record['last_update_timestamp'])
+                                                    )
+                                                except Exception as e:
+                                                    print(f"    Error inserting existed TVL record: {e}")
+                                            tvl_conn.commit()
+                                            tvl_conn.close()
+                                            print(f"    Inserted {len(existed_data)} existed TVL records to local database")
+                                        except Exception as e:
+                                            print(f"    Error processing existed TVL data: {e}")
+                                    
                                     success = True
                                     break
                         except Exception as e:
@@ -591,7 +618,32 @@ def sync_pending(name):
                                         continue
                                 else:
                                     total_code_synced += len(addresses)
-                                    print(f"  Batch synced: {len(addresses)} code addresses (added: {data.get('added_count', 0)})")
+                                    added_count = data.get('added_count', 0)
+                                    existed_count = data.get('existed_count', 0)
+                                    print(f"  Batch synced: {len(addresses)} code addresses (added: {added_count}, existed: {existed_count})")
+                                    
+                                    # Insert existed data to local database
+                                    existed_data = data.get('existed', [])
+                                    if existed_data:
+                                        try:
+                                            code_conn = init_code_db(name)
+                                            code_cursor = code_conn.cursor()
+                                            for record in existed_data:
+                                                try:
+                                                    code_cursor.execute(
+                                                        """INSERT OR REPLACE INTO codes 
+                                                        (code_address, code, timestamp, last_update_timestamp)
+                                                        VALUES (?, ?, ?, ?)""",
+                                                        (record['code_address'], record['code'], record['timestamp'], record['last_update_timestamp'])
+                                                    )
+                                                except Exception as e:
+                                                    print(f"    Error inserting existed code record: {e}")
+                                            code_conn.commit()
+                                            code_conn.close()
+                                            print(f"    Inserted {len(existed_data)} existed code records to local database")
+                                        except Exception as e:
+                                            print(f"    Error processing existed code data: {e}")
+                                    
                                     success = True
                                     break
                         except Exception as e:
