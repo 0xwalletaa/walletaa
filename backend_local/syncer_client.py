@@ -457,6 +457,94 @@ def sync_code(name):
         print(f"  Exception: {e}")
         return False
 
+def sync_wrong(name):
+    """Sync wrong blocks to server for deletion
+    
+    This function reads wrong block numbers from local text file
+    and sends them to the server for deletion.
+    After successful sync, the file is removed.
+    """
+    try:
+        print(f"\n[{name}] Syncing wrong blocks...")
+        
+        wrong_block_file_path = f'../info_local/{name}_wrong_block.txt'
+        
+        if not os.path.exists(wrong_block_file_path):
+            print(f"  No wrong block file found")
+            return True
+        
+        try:
+            # Read all wrong block numbers
+            with open(wrong_block_file_path, 'r') as f:
+                block_numbers = []
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            block_numbers.append(int(line))
+                        except ValueError:
+                            print(f"  Invalid block number: {line}")
+            
+            if not block_numbers:
+                print(f"  No valid block numbers found in file")
+                os.remove(wrong_block_file_path)
+                return True
+            
+            print(f"  Found {len(block_numbers)} wrong blocks to delete: {block_numbers}")
+            
+            # Send to server
+            max_retries = 3
+            success = False
+            
+            for retry in range(max_retries):
+                try:
+                    response = requests.post(
+                        f"{SERVER_URL}/{name}/delete_wrong_block",
+                        json={'block_numbers': block_numbers},
+                        headers={**get_auth_headers(), 'Content-Type': 'application/json'},
+                        timeout=60
+                    )
+                    
+                    if response.status_code != 200:
+                        print(f"  HTTP Error {response.status_code} for wrong blocks (retry {retry + 1}/{max_retries})")
+                        if retry < max_retries - 1:
+                            time.sleep(2)
+                            continue
+                    else:
+                        data = response.json()
+                        if not data.get('success'):
+                            print(f"  Error: {data.get('error')} (retry {retry + 1}/{max_retries})")
+                            if retry < max_retries - 1:
+                                time.sleep(2)
+                                continue
+                        else:
+                            deleted_blocks = data.get('deleted_blocks', 0)
+                            deleted_transactions = data.get('deleted_transactions', 0)
+                            print(f"  Successfully deleted {deleted_blocks} blocks and {deleted_transactions} transactions")
+                            success = True
+                            break
+                except Exception as e:
+                    print(f"  Exception syncing wrong blocks: {e} (retry {retry + 1}/{max_retries})")
+                    if retry < max_retries - 1:
+                        time.sleep(2)
+                        continue
+            
+            if success:
+                # Remove file after successful sync
+                os.remove(wrong_block_file_path)
+                print(f"  Wrong block file removed: {wrong_block_file_path}")
+            else:
+                print(f"  Failed to sync wrong blocks after {max_retries} retries")
+                
+        except Exception as e:
+            print(f"  Error processing wrong block file: {e}")
+            
+        return True
+        
+    except Exception as e:
+        print(f"  Exception: {e}")
+        return False
+
 def sync_pending(name):
     """Sync pending addresses to server
     
@@ -711,7 +799,11 @@ def main():
         sync_code(NAME)
     
     elif args.upload:
-        # Upload mode: Sync pending addresses to server
+        # Upload mode: Sync pending addresses and wrong blocks to server
+        # 1. Sync wrong blocks
+        sync_wrong(NAME)
+        
+        # 2. Sync pending addresses
         sync_pending(NAME)
     
     elapsed_time = time.time() - start_time

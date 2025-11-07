@@ -592,6 +592,82 @@ def add_code_addresses(name):
             'error': str(e)
         }), 500
 
+@app.route('/<name>/delete_wrong_block', methods=['POST'])
+@require_token
+def delete_wrong_block(name):
+    """Delete wrong blocks and their type4 transactions
+    
+    Request body:
+        block_numbers: list of block numbers to delete
+    
+    Returns:
+        Success status and count of deleted blocks
+    """
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    try:
+        data = request.get_json()
+        if not data or 'block_numbers' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'block_numbers field is required in request body'
+            }), 400
+        
+        block_numbers = data['block_numbers']
+        if not isinstance(block_numbers, list):
+            return jsonify({
+                'success': False,
+                'error': 'block_numbers must be a list'
+            }), 400
+        
+        if len(block_numbers) == 0:
+            return jsonify({
+                'success': True,
+                'chain': name,
+                'deleted_blocks': 0,
+                'deleted_transactions': 0,
+                'message': 'No block numbers provided'
+            })
+        
+        # Get block database connection
+        conn = get_block_db_connection(name)
+        cursor = conn.cursor()
+        
+        deleted_blocks = 0
+        deleted_transactions = 0
+        
+        for block_number in block_numbers:
+            try:
+                # Delete type4 transactions for this block
+                cursor.execute("DELETE FROM type4_transactions WHERE block_number = ?", (block_number,))
+                deleted_transactions += cursor.rowcount
+                
+                # Delete block
+                cursor.execute("DELETE FROM blocks WHERE block_number = ?", (block_number,))
+                deleted_blocks += cursor.rowcount
+                
+            except Exception as e:
+                print(f"Error deleting block {block_number}: {e}")
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'chain': name,
+            'deleted_blocks': deleted_blocks,
+            'deleted_transactions': deleted_transactions,
+            'total_requested': len(block_numbers)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 if __name__ == '__main__':
     print(f"Starting syncer server on port {PORT}")
     print(f"Allowed chains: {', '.join(ALLOWED_NAMES)}")

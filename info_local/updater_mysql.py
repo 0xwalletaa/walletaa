@@ -338,6 +338,12 @@ def update_info_by_block(mysql_db_name, block_db_path):
 
     if wrong_block_number > 0:
         print(f"Wrong block number: {wrong_block_number}")
+        # Write wrong block to file
+        wrong_block_file_path = f'../info_local/{NAME}_wrong_block.txt'
+        with open(wrong_block_file_path, 'a') as f:
+            f.write(f"{wrong_block_number}\n")
+        print(f"Wrong block number {wrong_block_number} written to {wrong_block_file_path}")
+        
         block_tx_cursor.execute("DELETE FROM type4_transactions WHERE block_number = ?", (wrong_block_number,))
         block_timestamp_cursor.execute("DELETE FROM blocks WHERE block_number = ?", (wrong_block_number,))
         block_conn.commit()
