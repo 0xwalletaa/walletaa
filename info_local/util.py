@@ -73,7 +73,9 @@ def parse_type4_tx_data(tx_data_str_):
         parsed_result = parse_authorization(authorization)
         if parsed_result is not None:
             authorization_list.append(parsed_result)
-        
+    
+    if type(tx_data['gasPrice']) == str:
+        tx_data['gasPrice'] = int(tx_data['gasPrice'], 16)
     authorization_fee = PER_EMPTY_ACCOUNT_COST * len(authorization_list) * tx_data['gasPrice'] / 10**18
     
     ret = {
