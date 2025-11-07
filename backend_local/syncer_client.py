@@ -158,7 +158,7 @@ def sync_block_batch(conn, name, block_numbers):
             f"{SERVER_URL}/{name}/get_block_txs",
             json={'blocks': blocks_str},
             headers={**get_auth_headers(), 'Content-Type': 'application/json'},
-            timeout=60
+            timeout=10
         )
         
         if response.status_code != 200:
@@ -222,7 +222,7 @@ def sync_highest_block(name):
         response = requests.get(
             f"{SERVER_URL}/{name}/get_highest_block",
             headers=get_auth_headers(),
-            timeout=30
+            timeout=10
         )
         
         if response.status_code == 200:
@@ -257,7 +257,7 @@ def sync_blocks(name, start_block):
         response = requests.get(
             f"{SERVER_URL}/{name}/get_highest_block",
             headers=get_auth_headers(),
-            timeout=30
+            timeout=10
         )
         if response.status_code != 200:
             print(f"  Failed to get remote highest block")
@@ -345,7 +345,7 @@ def sync_tvl(name):
                 f"{SERVER_URL}/{name}/get_tvl",
                 params={'last_update_timestamp': last_timestamp},
                 headers=get_auth_headers(),
-                timeout=60
+                timeout=10
             )
             
             if response.status_code != 200:
@@ -411,7 +411,7 @@ def sync_code(name):
                 f"{SERVER_URL}/{name}/get_code",
                 params={'last_update_timestamp': last_timestamp},
                 headers=get_auth_headers(),
-                timeout=60
+                timeout=10
             )
             
             if response.status_code != 200:
@@ -502,7 +502,7 @@ def sync_wrong(name):
                         f"{SERVER_URL}/{name}/delete_wrong_block",
                         json={'block_numbers': block_numbers},
                         headers={**get_auth_headers(), 'Content-Type': 'application/json'},
-                        timeout=60
+                        timeout=10
                     )
                     
                     if response.status_code != 200:
@@ -587,7 +587,7 @@ def sync_pending(name):
                                 f"{SERVER_URL}/{name}/add_tvl_addresses",
                                 json={'addresses': addresses},
                                 headers={**get_auth_headers(), 'Content-Type': 'application/json'},
-                                timeout=60
+                                timeout=10
                             )
                             
                             if response.status_code != 200:
@@ -689,7 +689,7 @@ def sync_pending(name):
                                 f"{SERVER_URL}/{name}/add_code_addresses",
                                 json={'addresses': addresses},
                                 headers={**get_auth_headers(), 'Content-Type': 'application/json'},
-                                timeout=60
+                                timeout=10
                             )
                             
                             if response.status_code != 200:
