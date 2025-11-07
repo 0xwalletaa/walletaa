@@ -76,13 +76,19 @@ def parse_type4_tx_data(tx_data_str_):
     
     if type(tx_data['gasPrice']) == str:
         tx_data['gasPrice'] = int(tx_data['gasPrice'], 16)
+    if type(tx_data['blockNumber']) == str:
+        tx_data['blockNumber'] = int(tx_data['blockNumber'], 16)
+    if type(tx_data['transactionIndex']) == str:
+        tx_data['transactionIndex'] = int(tx_data['transactionIndex'], 16)
     authorization_fee = PER_EMPTY_ACCOUNT_COST * len(authorization_list) * tx_data['gasPrice'] / 10**18
     
+    if not tx_data['hash'].startswith('0x'):
+        tx_data['hash'] = '0x' + tx_data['hash']
     ret = {
         'block_number': tx_data['blockNumber'],
         'block_hash': tx_data['blockHash'],
         'tx_index': tx_data['transactionIndex'],
-        'tx_hash': '0x' + tx_data['hash'],
+        'tx_hash': tx_data['hash'],
         'relayer_address': tx_data['from'].lower(),
         'authorization_fee': authorization_fee,
         'authorization_list': authorization_list,
