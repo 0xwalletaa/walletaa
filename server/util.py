@@ -408,7 +408,7 @@ for tag in TAG_INFO:
 def get_code_function_info():
     conn = sqlite3.connect(f'../backend/{NAME}_code.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT code_address, code FROM codes WHERE code_address = '0x89383882fc2d0cd4d7952a3267a3b6dae967e704'")
+    cursor.execute("SELECT code_address, code FROM codes")
     rows = cursor.fetchall()
     
     ret = {}
