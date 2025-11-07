@@ -221,6 +221,7 @@ def process_block_batch(block_numbers):
     except requests.exceptions.RequestException as e:
         print(f"Network error for blocks {block_numbers[0]}-{block_numbers[-1]}: {str(e)}")
         conn.rollback()
+        
         return False
     except Exception as e:
         print(f"Batch processing error for blocks {block_numbers[0]}-{block_numbers[-1]}: {str(e)}")
@@ -229,17 +230,43 @@ def process_block_batch(block_numbers):
 
 def process_block_batch_with_retry(block_numbers):
     """
-    Retry mechanism for batch processing
+    Retry mechanism for batch processing with binary split on failure
     :param block_numbers: List of block numbers to process
     :return: True if successful, False otherwise
     """
+    if not block_numbers:
+        return True
+    
+    # Try processing the batch with retries
     max_retries = 3
     for retry in range(max_retries):
         if process_block_batch(block_numbers):
             return True
         else:
-            print(f"Retrying batch {block_numbers[0]}-{block_numbers[-1]}, attempt {retry+1}/{max_retries}")
-    return False
+            if retry < max_retries - 1:
+                print(f"Retrying batch {block_numbers[0]}-{block_numbers[-1]}, attempt {retry+1}/{max_retries}")
+    
+    # If all retries failed, use binary split
+    print(f"All retries failed for batch {block_numbers[0]}-{block_numbers[-1]}")
+    
+    # If only one block, cannot split further - fail
+    if len(block_numbers) == 1:
+        print(f"Failed to process single block #{block_numbers[0]}, skipping...")
+        return False
+    
+    # Binary split: divide the batch into two halves
+    mid = len(block_numbers) // 2
+    left_half = block_numbers[:mid]
+    right_half = block_numbers[mid:]
+    
+    print(f"Binary splitting batch into {len(left_half)} + {len(right_half)} blocks")
+    
+    # Process both halves sequentially (recursive)
+    result_left = process_block_batch_with_retry(left_half)
+    result_right = process_block_batch_with_retry(right_half)
+    
+    # Return True only if both halves succeed
+    return result_left and result_right
 
 def main():
     # Initialize database
