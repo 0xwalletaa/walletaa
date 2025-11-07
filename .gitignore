@@ -32,3 +32,4 @@ info_local/batch_update.sh
 */syncer_token.txt
 test*.sh
 *pending*.txt
+loop.sh
