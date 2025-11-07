@@ -9,12 +9,22 @@ from web3 import Web3
 from collections import Counter
 from hexbytes import HexBytes
 import random
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--openethereumx_url', required=True, help='Openethereumx URL (e.g., http://server:5000)')
+parser.add_argument('--db_path', type=str, default='../info_local', help='Local database path')
+
+args = parser.parse_args()
+OPENETHEREUMX_URL = args.openethereumx_url
+DB_PATH = args.db_path
 
 NAME = "mainnet"
-WEB3_ENPOINTS = ["http://trace-mainnet.walletaa.com"]
+#TODO: provide public url on walletaa,com
+WEB3_ENPOINTS = [OPENETHEREUMX_URL] 
 START_BLOCK = 22431084
 
-trace_db_path = f'{NAME}_trace.db'
+trace_db_path = f'{DB_PATH}/{NAME}_trace.db'
 
 web3s = [
     Web3(Web3.HTTPProvider(endpoint, request_kwargs={'timeout': 10})) for endpoint in WEB3_ENPOINTS
@@ -122,7 +132,7 @@ def main():
         for block_number in range(START_BLOCK, latest_block):
             if block_number not in existing_blocks:
                 blocks_needed.append(block_number)
-                if len(blocks_needed) > 100000:
+                if len(blocks_needed) > 10000000:
                     break
         
         del existing_blocks
