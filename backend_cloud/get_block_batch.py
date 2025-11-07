@@ -11,6 +11,7 @@ from hexbytes import HexBytes
 import random
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+import requests
 
 # Add command line argument parsing
 parser = argparse.ArgumentParser(description='Process blockchain transaction data')
@@ -135,11 +136,11 @@ def process_block_batch(block_numbers):
     
     conn = get_db_connection()
     try:
-        # Select a web3 instance for this batch
+        # Select a web3 instance and get its endpoint URL
         web3_instance = random.choice(web3s)
+        endpoint_url = web3_instance.provider.endpoint_uri
         
-        # Prepare batch requests using web3.py's batch request feature
-        from web3 import Web3
+        # Prepare batch requests
         batch_requests = []
         for block_number in block_numbers:
             batch_requests.append({
@@ -149,14 +150,31 @@ def process_block_batch(block_numbers):
                 'id': block_number
             })
         
-        # Send batch request
-        response = web3_instance.provider.make_request('', batch_requests)
+        # Send batch request using requests library
+        response = requests.post(
+            endpoint_url,
+            json=batch_requests,
+            headers={'Content-Type': 'application/json'},
+            timeout=30
+        )
+        response.raise_for_status()
+        
+        # Parse response
+        response_data = response.json()
+        
+        # Handle case where response might be a single object or a list
+        if isinstance(response_data, dict):
+            response_data = [response_data]
         
         # Process each block response
         all_block_data = []
         all_type4_txs = []
         
-        for block_resp in response:
+        for block_resp in response_data:
+            if not isinstance(block_resp, dict):
+                print(f"Unexpected response format: {type(block_resp)}")
+                continue
+                
             if 'result' not in block_resp or block_resp['result'] is None:
                 block_number = block_resp.get('id', 'unknown')
                 print(f"Block #{block_number} not found in response")
@@ -200,6 +218,10 @@ def process_block_batch(block_numbers):
         print(f"Batch committed: {len(all_block_data)} blocks")
         return True
     
+    except requests.exceptions.RequestException as e:
+        print(f"Network error for blocks {block_numbers[0]}-{block_numbers[-1]}: {str(e)}")
+        conn.rollback()
+        return False
     except Exception as e:
         print(f"Batch processing error for blocks {block_numbers[0]}-{block_numbers[-1]}: {str(e)}")
         conn.rollback()
