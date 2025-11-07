@@ -1,4 +1,4 @@
-python3 get_block.py --name arb --endpoints \
+python3 get_block_batch.py --name arb --endpoints \
 https://rpc.owlracle.info/arb/70d38ce1826c4a60bb2a8e05a6c8b20f \
 https://arbitrum-one.rpc.grove.city/v1/01fdb492 \
 https://arbitrum-one-public.nodies.app \
@@ -15,7 +15,7 @@ https://arbitrum.gateway.tenderly.co \
 https://arb1.arbitrum.io/rpc \
 https://arbitrum-one.public.blastapi.io \
 https://1rpc.io/arb \
---num_threads 15 \
+--num_threads 10 \
 --start_block 378200000 \
 --block_db_path /mnt
 
