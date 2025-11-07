@@ -4,7 +4,7 @@ import { getChainConfig } from './config';
 // 定义API基础地址 - 动态获取
 export const BASE_URL = () => {
   const config = getChainConfig();
-  return `https://walletaa.com${config.BASE_URL}`;
+  return `https://legacy.walletaa.com${config.BASE_URL}`;
   const isDev = process.env.NODE_ENV === 'development';
   return `https://${isDev ? 'dev.' : ''}walletaa.com${config.BASE_URL}`;
 };
