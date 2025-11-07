@@ -137,7 +137,7 @@ def main():
         for block_number in range(START_BLOCK, latest_block):
             if block_number not in existing_blocks:
                 blocks_needed.append(block_number)
-                if len(blocks_needed) > 10000000:
+                if len(blocks_needed) > 10000:
                     break
         
         del existing_blocks

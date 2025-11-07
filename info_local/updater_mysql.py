@@ -637,7 +637,7 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
             info_cursor.execute("INSERT INTO calls (tx_hash, block_number, tx_index, call_type_trace_address, from_address, original_code_address, parsed_code_address, value, calling_function, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (trace['transactionHash'], block_number, trace['transactionPosition'], call_type_trace_address, from_address, original_code_address, parsed_code_address, value, calling_function, timestamp))
 
         info_conn.commit()
-        trace_cursor_write.execute("UPDATE traces SET used = 1 WHERE block_number = %s", (block_number,))
+        trace_cursor_write.execute("UPDATE traces SET used = 1 WHERE block_number = ?", (block_number,))
         trace_conn.commit()
 
     code_info = json.load(open(f'code_info.json'))
