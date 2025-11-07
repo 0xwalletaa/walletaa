@@ -598,17 +598,18 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
     info_cursor = info_conn.cursor()
     
     trace_conn = sqlite3.connect(trace_db_path)
-    trace_cursor = trace_conn.cursor()
+    trace_cursor_read = trace_conn.cursor()
+    trace_cursor_write = trace_conn.cursor()
     
     block_conn = sqlite3.connect(block_db_path)
     block_timestamp_cursor = block_conn.cursor()
     
     
-    trace_cursor.execute("SELECT block_number, traces FROM traces ORDER BY block_number ASC")
+    trace_cursor_read.execute("SELECT block_number, traces FROM traces WHERE used = 0 ORDER BY block_number ASC")
     
     wrong_block_number = 0
     # Process row by row to avoid loading all data at once
-    for row in trace_cursor:  # Iterate cursor directly
+    for row in trace_cursor_read:  # Iterate cursor directly
         block_number, traces = row
         if traces == "[]":
             continue
@@ -636,6 +637,8 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
             info_cursor.execute("INSERT INTO calls (tx_hash, block_number, tx_index, call_type_trace_address, from_address, original_code_address, parsed_code_address, value, calling_function, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (trace['transactionHash'], block_number, trace['transactionPosition'], call_type_trace_address, from_address, original_code_address, parsed_code_address, value, calling_function, timestamp))
 
         info_conn.commit()
+        trace_cursor_write.execute("UPDATE traces SET used = 1 WHERE block_number = %s", (block_number,))
+        trace_conn.commit()
 
     code_info = json.load(open(f'code_info.json'))
     code_address_to_type = {}
@@ -701,6 +704,9 @@ if __name__ == "__main__":
         if DB_PATH != '':
             code_db_path = f'{DB_PATH}/{NAME}_code.db'
     trace_db_path = f'../backend/{NAME}_trace.db'
+    if DB_PATH != None:
+        if DB_PATH != '':
+            trace_db_path = f'{DB_PATH}/{NAME}_trace.db'
 
     print(f"\nStarting to process {NAME} network...")
 
@@ -737,8 +743,8 @@ if __name__ == "__main__":
     print(f"Daily update: {end_time - start_time} seconds")
 
 
-    # if NAME == "mainnet":
-    #     start_time = time.time()
-    #     update_info_by_trace(mysql_db_name, trace_db_path, block_db_path)
-    #     end_time = time.time()
-    #     print(f"Trace update: {end_time - start_time} seconds")
+    if NAME == "mainnet":
+        start_time = time.time()
+        update_info_by_trace(mysql_db_name, trace_db_path, block_db_path)
+        end_time = time.time()
+        print(f"Trace update: {end_time - start_time} seconds")

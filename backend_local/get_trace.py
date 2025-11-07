@@ -63,7 +63,8 @@ def init_db():
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS traces (
             block_number INTEGER PRIMARY KEY,
-            traces TEXT
+            traces TEXT,
+            used BOOLEAN DEFAULT 0
         )
         ''')
         print("Created traces table")
@@ -72,7 +73,11 @@ def init_db():
         ON traces(block_number ASC);
         ''')
         print("Created idx_traces_block_number index")
-    
+        cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_traces_used 
+        ON traces(used ASC);
+        ''')
+        print("Created idx_traces_used index")
     conn.commit()
     return conn
 
