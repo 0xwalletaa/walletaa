@@ -7,7 +7,7 @@ https://unichain.drpc.org \
 https://mainnet.unichain.org \
 https://unichain.api.onfinality.io/public \
 --num_threads 5 \
---start_block 26350000 \
+--start_block 30940000 \
 --block_db_path /mnt
 
 python3 get_tvl.py --name uni --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \

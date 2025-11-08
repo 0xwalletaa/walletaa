@@ -5,7 +5,7 @@ https://berachain-rpc.publicnode.com \
 https://rpc.berachain.com \
 https://rpc.berachain-apis.com \
 --num_threads 4 \
---start_block 10300000 \
+--start_block 12780000 \
 --block_db_path /mnt
 
 python3 get_tvl.py --name bera --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \

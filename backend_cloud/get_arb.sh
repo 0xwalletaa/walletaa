@@ -16,7 +16,7 @@ https://arb1.arbitrum.io/rpc \
 https://arbitrum-one.public.blastapi.io \
 https://1rpc.io/arb \
 --num_threads 10 \
---start_block 378200000 \
+--start_block 398010000 \
 --block_db_path /mnt
 
 python3 get_tvl.py --name arb --contract 0x3aF42ae5A628e7bC0824B9b786DA512cFd18D4e9  --endpoints \
