@@ -616,6 +616,8 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
         
         info_cursor.execute("SELECT tx_hash FROM calls WHERE block_number = %s", (block_number,))
         if info_cursor.fetchone() is not None:
+            trace_cursor_write.execute("UPDATE traces SET used = 1 WHERE block_number = ?", (block_number,))
+            trace_conn.commit()
             continue
         
         try:
