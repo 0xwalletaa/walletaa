@@ -192,7 +192,7 @@ def create_db_if_not_exists(mysql_db_name):
         tx_hash VARCHAR(66),
         block_number BIGINT,
         tx_index INT,
-        call_type_trace_address VARCHAR(255),
+        call_type_trace_address TEXT,
         from_address VARCHAR(42),
         original_code_address VARCHAR(42),
         parsed_code_address VARCHAR(42),
