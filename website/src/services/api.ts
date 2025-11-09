@@ -375,4 +375,23 @@ export async function getAuthorizationsByAuthorizer(params: {
     method: 'GET',
     params,
   });
+}
+
+// 定义每日授权数据类型
+export interface DailyAuthorizationData {
+  date: string;
+  count: number;
+}
+
+// 获取指定代码地址的每日授权数量
+export async function getDailyAuthorizationCountByCode(params: {
+  code_address: string;
+}): Promise<{
+  code_address: string;
+  daily_data: DailyAuthorizationData[];
+}> {
+  return request(`${BASE_URL()}/daily_authorization_count_by_code`, {
+    method: 'GET',
+    params,
+  });
 } 

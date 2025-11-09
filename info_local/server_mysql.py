@@ -930,6 +930,55 @@ def get_authorizations_by_authorizer(name):
         app.logger.error(f"Error getting authorizations by authorizer: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# daily authorization count by code query interface
+@app.route('/<name>/daily_authorization_count_by_code', methods=['GET'])
+def get_daily_authorization_count_by_code(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    try:
+        # Get code_address parameter
+        code_address = request.args.get('code_address', '')
+        
+        if not code_address:
+            return jsonify({'error': 'code_address is required'}), 400
+        
+        conn = get_db_connection(name)
+        cursor = conn.cursor()
+        
+        # Query daily authorization count for the specific code
+        query = '''
+            SELECT date, COUNT(DISTINCT authorizer_address) as count
+            FROM authorizations
+            WHERE code_address = %s
+            GROUP BY date
+            ORDER BY date ASC
+        '''
+        
+        cursor.execute(query, [code_address.lower()])
+        rows = cursor.fetchall()
+        
+        # Convert to dictionary list
+        daily_data = []
+        for row in rows:
+            daily_data.append({
+                'date': row['date'],
+                'count': row['count']
+            })
+        
+        conn.close()
+        
+        # Return results
+        return jsonify({
+            'code_address': code_address,
+            'daily_data': daily_data
+        })
+    except Exception as e:
+        app.logger.error(f"Error getting daily authorization count by code: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 # comparison query interface
 @app.route('/<name>/comparison', methods=['GET'])
 def get_comparison(name):
