@@ -898,7 +898,7 @@ def get_authorizations_by_authorizer(name):
         cursor = conn.cursor()
         
         # Build query
-        query = 'SELECT * FROM authorizations WHERE authorizer_address = %s ORDER BY date DESC'
+        query = 'SELECT * FROM authorizations WHERE authorizer_address = %s ORDER BY date ASC'
         params = [authorizer_address.lower()]
         
         # Get total count
