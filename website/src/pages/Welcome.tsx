@@ -1,11 +1,11 @@
-import { InfoCircleOutlined, LinkOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, LinkOutlined, BarChartOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Card, Col, Row, Table, Tooltip, Tag, Button, Modal, Descriptions, Typography, Space } from 'antd';
+import { Card, Col, Row, Table, Tooltip, Tag, Button, Modal, Descriptions, Typography, Space, Spin, message } from 'antd';
 import { Area, Column, Pie } from '@ant-design/plots';
 import numeral from 'numeral';
 import React, { useEffect, useState, ReactNode } from 'react';
-import { getOverview, Overview, CodeInfoItem, TVLData } from '@/services/api';
+import { getOverview, Overview, CodeInfoItem, TVLData, getDailyAuthorizationCountByCode, DailyAuthorizationData } from '@/services/api';
 import { getChainConfig, getCurrentChain, getUrlWithChain } from '@/services/config';
 import tagInfoMap from '@/utils/tagInfoMap';
 import { history } from '@umijs/max';
@@ -107,6 +107,10 @@ const Welcome: React.FC = () => {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentCode, setCurrentCode] = useState<CodeInfoItem | null>(null);
+  const [chartModalVisible, setChartModalVisible] = useState<boolean>(false);
+  const [chartLoading, setChartLoading] = useState<boolean>(false);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [currentCodeAddress, setCurrentCodeAddress] = useState<string>('');
   const chainConfig = getChainConfig();
   const { Text, Link } = Typography;
 
@@ -140,6 +144,33 @@ const Welcome: React.FC = () => {
     if (record.details) {
       setCurrentCode(record.details);
       setModalVisible(true);
+    }
+  };
+
+  // 处理显示图表 - 获取每日授权数量
+  const handleViewChart = async (codeAddress: string) => {
+    setCurrentCodeAddress(codeAddress);
+    setChartModalVisible(true);
+    setChartLoading(true);
+    
+    try {
+      const result = await getDailyAuthorizationCountByCode({
+        code_address: codeAddress
+      });
+      // 转换数据格式为 { x: date, y: count }
+      const formattedData = (result.daily_data || []).map(item => ({
+        x: item.date,
+        y: item.count
+      }));
+      setChartData(formattedData as any);
+    } catch (error) {
+      message.error(intl.formatMessage({
+        id: 'pages.codes.chart.load_error',
+        defaultMessage: '加载图表数据失败',
+      }));
+      console.error('Error loading chart data:', error);
+    } finally {
+      setChartLoading(false);
     }
   };
 
@@ -808,6 +839,20 @@ const Welcome: React.FC = () => {
                   title: intl.formatMessage({ id: 'pages.welcome.authorizerCount' }),
                   dataIndex: 'authorizer_count',
                   key: 'authorizer_count',
+                  render: (text: number, record: any) => (
+                    <Space>
+                      {text}
+                      <Tooltip title={intl.formatMessage({
+                        id: 'pages.codes.view_chart',
+                        defaultMessage: '查看每日授权数量',
+                      })}>
+                        <BarChartOutlined 
+                          style={{ color: '#1890ff', cursor: 'pointer', fontSize: '16px' }}
+                          onClick={() => handleViewChart(record.code_address)}
+                        />
+                      </Tooltip>
+                    </Space>
+                  ),
                 },
                 {
                   title: (
@@ -1056,6 +1101,82 @@ const Welcome: React.FC = () => {
         width={800}
       >
         {renderCodeDetail(currentCode)}
+      </Modal>
+
+      <Modal
+        title={
+          <Space>
+            {intl.formatMessage({
+              id: 'pages.codes.chart_title',
+              defaultMessage: '每日授权数量',
+            })}
+            {currentCodeAddress && (
+              <Tooltip title={currentCodeAddress}>
+                <Tag color="green">{formatAddress(currentCodeAddress)}</Tag>
+              </Tooltip>
+            )}
+          </Space>
+        }
+        open={chartModalVisible}
+        onCancel={() => {
+          setChartModalVisible(false);
+          setChartData([]);
+          setCurrentCodeAddress('');
+        }}
+        footer={[
+          <Button key="close" onClick={() => {
+            setChartModalVisible(false);
+            setChartData([]);
+            setCurrentCodeAddress('');
+          }}>
+            {intl.formatMessage({
+              id: 'pages.codes.close',
+              defaultMessage: 'Close',
+            })}
+          </Button>
+        ]}
+        width={900}
+      >
+        <Spin spinning={chartLoading}>
+          {chartData.length > 0 ? (
+            <Column
+              data={chartData}
+              xField="x"
+              yField="y"
+              height={400}
+              paddingBottom={12}
+              axis={{
+                x: {
+                  title: false,
+                },
+                y: {
+                  title: false,
+                  gridLineDash: null,
+                  gridStroke: '#ccc',
+                },
+              }}
+              columnStyle={{
+                radius: [4, 4, 0, 0],
+              }}
+              tooltip={{
+                name: intl.formatMessage({
+                  id: 'pages.codes.chart.count',
+                  defaultMessage: '授权数量',
+                }),
+                field: 'y',
+              }}
+            />
+          ) : (
+            !chartLoading && (
+              <div style={{ textAlign: 'center', padding: '50px 0', color: '#999' }}>
+                {intl.formatMessage({
+                  id: 'pages.codes.chart.no_data',
+                  defaultMessage: '暂无数据',
+                })}
+              </div>
+            )
+          )}
+        </Spin>
       </Modal>
     </PageContainer>
   );
