@@ -877,6 +877,59 @@ def get_calls(name):
         app.logger.error(f"Error getting calls data: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# authorizations by authorizer pagination query interface
+@app.route('/<name>/authorizations_by_authorizer', methods=['GET'])
+def get_authorizations_by_authorizer(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    try:
+        # Get pagination parameters
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        authorizer_address = request.args.get('authorizer_address', '')
+        
+        if not authorizer_address:
+            return jsonify({'error': 'authorizer_address is required'}), 400
+        
+        conn = get_db_connection(name)
+        cursor = conn.cursor()
+        
+        # Build query
+        query = 'SELECT * FROM authorizations WHERE authorizer_address = %s ORDER BY date DESC'
+        params = [authorizer_address.lower()]
+        
+        # Get total count
+        count_query = f"SELECT COUNT(*) as count FROM authorizations WHERE authorizer_address = %s"
+        cursor.execute(count_query, [authorizer_address.lower()])
+        total = cursor.fetchone()['count']
+        
+        # Add pagination
+        query += ' LIMIT %s OFFSET %s'
+        params.extend([page_size, (page - 1) * page_size])
+        
+        # Execute query
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        
+        # Convert to dictionary
+        authorizations = [dict(row) for row in rows]
+        
+        conn.close()
+        
+        # Return results
+        return jsonify({
+            'total': total,
+            'page': page,
+            'page_size': page_size,
+            'authorizations': authorizations
+        })
+    except Exception as e:
+        app.logger.error(f"Error getting authorizations by authorizer: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 # comparison query interface
 @app.route('/<name>/comparison', methods=['GET'])
 def get_comparison(name):
