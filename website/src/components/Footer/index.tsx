@@ -1,4 +1,4 @@
-import { GithubOutlined, TwitterOutlined } from '@ant-design/icons';
+import { GithubOutlined, TwitterOutlined, MessageOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
 import React from 'react';
 
@@ -20,13 +20,23 @@ const Footer: React.FC = () => {
           blankTarget: true,
         },
         {
-          key: 'twitter',
+          key: 'x',
           title: (
             <>
-              <TwitterOutlined /> Twitter
+              <TwitterOutlined /> X
             </>
           ),
           href: 'https://twitter.com/wallet_aa',
+          blankTarget: true,
+        },
+        {
+          key: 'telegram',
+          title: (
+            <>
+              <MessageOutlined /> Telegram
+            </>
+          ),
+          href: 'https://t.me/+BrxklVaUBnRhOWIx',
           blankTarget: true,
         },
       ]}
