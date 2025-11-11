@@ -4,7 +4,7 @@ echo ""
 
 # Sync mainnet
 python3 syncer_client.py --name mainnet --server_url "$SERVER_URL" --start_block 23750000 --db_path "$DB_PATH" --download
-python3 syncer_client.py --name bsc --server_url "$SERVER_URL" --start_block 67454000 --db_path "$DB_PATH" --download
+python3 syncer_client.py --name bsc --server_url "$SERVER_URL" --start_block 67834000 --db_path "$DB_PATH" --download
 python3 syncer_client.py --name op --server_url "$SERVER_URL" --start_block 143490000 --db_path "$DB_PATH" --download
 python3 syncer_client.py --name arb --server_url "$SERVER_URL" --start_block 398010000 --db_path "$DB_PATH" --download
 python3 syncer_client.py --name base --server_url "$SERVER_URL" --start_block 37900000 --db_path "$DB_PATH" --download
