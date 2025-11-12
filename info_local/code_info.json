@@ -54,8 +54,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": "Accross Proxy",
-    "manualReview": "Owner controlled accross proxy"
+    "usage": "Owner controlled accross proxy",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x7702cb554e6bFb442cb743A7dF23154544a7176C",
@@ -84,7 +84,7 @@
     "isContractAddress": true,
     "audit": true,
     "usage": "account abstraction",
-    "manualReview": false
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x411d38d27f6f2c7f3b70ff29dada64cbd7bfa9b2",
