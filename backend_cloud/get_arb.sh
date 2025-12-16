@@ -16,8 +16,7 @@ https://arb1.arbitrum.io/rpc \
 https://arbitrum-one.public.blastapi.io \
 https://1rpc.io/arb \
 --num_threads 10 \
---start_block 398010000 \
---block_db_path /mnt
+--start_block 398010000
 
 python3 get_tvl.py --name arb --contract 0x3aF42ae5A628e7bC0824B9b786DA512cFd18D4e9  --endpoints \
 https://arbitrum.rpc.subquery.network/public \
@@ -31,8 +30,7 @@ https://arb1.lava.build \
 https://arbitrum-one.public.blastapi.io \
 https://1rpc.io/arb \
 https://arb1.arbitrum.io/rpc \
---num_threads 5 \
---block_db_path /mnt
+--num_threads 5
 
 python3 get_code.py --name arb --endpoints \
 https://arbitrum.rpc.subquery.network/public \
@@ -46,5 +44,4 @@ https://arb1.lava.build \
 https://arbitrum-one.public.blastapi.io \
 https://1rpc.io/arb \
 https://arb1.arbitrum.io/rpc \
---num_threads 5 \
---block_db_path /mnt
+--num_threads 5

@@ -1,4 +1,3 @@
-# while true; do
 python3 get_block.py --name base --endpoints \
 https://base.llamarpc.com \
 https://base.api.onfinality.io/public \
@@ -14,8 +13,7 @@ https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
 --num_threads 5 \
---start_block 37900000 \
---block_db_path /mnt
+--start_block 37900000
 
 python3 get_tvl.py --name base --contract 0x16Eef38116c2081fbC4d4E54F81d0D08640ff00F  --endpoints \
 https://base.api.onfinality.io/public \
@@ -29,8 +27,7 @@ https://api.zan.top/base-mainnet \
 https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
---num_threads 5 \
---block_db_path /mnt
+--num_threads 5
 
 python3 get_code.py --name base --endpoints \
 https://base.llamarpc.com \
@@ -46,7 +43,4 @@ https://api.zan.top/base-mainnet \
 https://base.gateway.tenderly.co \
 https://base.rpc.subquery.network/public \
 https://base.gateway.tenderly.co \
---num_threads 5 \
---block_db_path /mnt
-# sleep 120
-# done
+--num_threads 5
