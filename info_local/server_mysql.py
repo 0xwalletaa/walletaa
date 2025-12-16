@@ -877,6 +877,108 @@ def get_calls(name):
         app.logger.error(f"Error getting calls data: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# authorizations by authorizer pagination query interface
+@app.route('/<name>/authorizations_by_authorizer', methods=['GET'])
+def get_authorizations_by_authorizer(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    try:
+        # Get pagination parameters
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        authorizer_address = request.args.get('authorizer_address', '')
+        
+        if not authorizer_address:
+            return jsonify({'error': 'authorizer_address is required'}), 400
+        
+        conn = get_db_connection(name)
+        cursor = conn.cursor()
+        
+        # Build query
+        query = 'SELECT * FROM authorizations WHERE authorizer_address = %s ORDER BY date ASC'
+        params = [authorizer_address.lower()]
+        
+        # Get total count
+        count_query = f"SELECT COUNT(*) as count FROM authorizations WHERE authorizer_address = %s"
+        cursor.execute(count_query, [authorizer_address.lower()])
+        total = cursor.fetchone()['count']
+        
+        # Add pagination
+        query += ' LIMIT %s OFFSET %s'
+        params.extend([page_size, (page - 1) * page_size])
+        
+        # Execute query
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        
+        # Convert to dictionary
+        authorizations = [dict(row) for row in rows]
+        
+        conn.close()
+        
+        # Return results
+        return jsonify({
+            'total': total,
+            'page': page,
+            'page_size': page_size,
+            'authorizations': authorizations
+        })
+    except Exception as e:
+        app.logger.error(f"Error getting authorizations by authorizer: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# daily authorization count by code query interface
+@app.route('/<name>/daily_authorization_count_by_code', methods=['GET'])
+def get_daily_authorization_count_by_code(name):
+    # 验证链名称
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    
+    try:
+        # Get code_address parameter
+        code_address = request.args.get('code_address', '')
+        
+        if not code_address:
+            return jsonify({'error': 'code_address is required'}), 400
+        
+        conn = get_db_connection(name)
+        cursor = conn.cursor()
+        
+        # Query daily authorization count for the specific code
+        query = '''
+            SELECT date, COUNT(DISTINCT authorizer_address) as count
+            FROM authorizations
+            WHERE code_address = %s
+            GROUP BY date
+            ORDER BY date ASC
+        '''
+        
+        cursor.execute(query, [code_address.lower()])
+        rows = cursor.fetchall()
+        
+        # Convert to dictionary list
+        daily_data = []
+        for row in rows:
+            daily_data.append({
+                'date': row['date'],
+                'count': row['count']
+            })
+        
+        conn.close()
+        
+        # Return results
+        return jsonify({
+            'code_address': code_address,
+            'daily_data': daily_data
+        })
+    except Exception as e:
+        app.logger.error(f"Error getting daily authorization count by code: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 # comparison query interface
 @app.route('/<name>/comparison', methods=['GET'])
 def get_comparison(name):

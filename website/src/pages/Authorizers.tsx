@@ -3,11 +3,11 @@ import {
   PageContainer,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl, history, useLocation } from '@umijs/max';
+import { useIntl, history, useLocation } from '@umijs/max';
 import { Tag, Tooltip, Switch, Space, Input, Button, Card, Row, Col, Modal } from 'antd';
 import { LinkOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import React, { useRef, useState, useEffect } from 'react';
-import { getAuthorizers, getAuthorizersWithZero, AuthorizerItem } from '@/services/api';
+import { getAuthorizers, getAuthorizersWithZero, AuthorizerItem, getAuthorizationsByAuthorizer, AuthorizationItem } from '@/services/api';
 import { getChainConfig } from '@/services/config';
 import numeral from 'numeral';
 
@@ -19,6 +19,7 @@ const Authorizers: React.FC = () => {
   const [searchByParam, setSearchByParam] = useState<string>('');
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<AuthorizerItem>();
+  const authorizationsActionRef = useRef<ActionType>();
   const { EXPLORER_URL } = getChainConfig();
   const location = useLocation();
 
@@ -213,47 +214,28 @@ const Authorizers: React.FC = () => {
         id: 'pages.authorizers.historical_code_address',
         defaultMessage: 'Historical Code Address',
       }),
-      dataIndex: 'historical_code_address',
+      dataIndex: 'historical_code_address_count',
       sorter: true,
       sortDirections: ['descend', 'ascend'],
       defaultSortOrder: sortApi === 'historical_code_address_count' ? 'descend' : undefined,
-      render: (dom) => {
-        if (!dom || !Array.isArray(dom) || dom.length === 0) {
-          return '-';
-        }
-        
-        if (dom.length <= 10) {
-          return (
-            <div>
-              {(dom as string[]).map((address, index) => (
-                <Tooltip key={index} title={
-                  <span>
-                    {address}
-                    <a href={`${EXPLORER_URL}/address/${address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
-                      <LinkOutlined />
-                    </a>
-                  </span>
-                }>
-                  <Tag color="purple" style={{ marginBottom: '2px' }}>{`${formatAddress(address)}`}</Tag>
-                </Tooltip>
-              ))}
-            </div>
-          );
-        } else {
+      render: (dom, record) => {
+        const count = record.historical_code_address_count || 0;
+        if (count > 0) {
           return (
             <a
               onClick={() => {
-                setCurrentRow({ ...currentRow, historical_code_address: dom } as AuthorizerItem);
+                setCurrentRow(record);
                 setShowDetail(true);
               }}
             >
               {intl.formatMessage(
                 { id: 'pages.authorizers.viewMore', defaultMessage: '查看全部 {count} 个历史代码地址' },
-                { count: dom.length }
+                { count }
               )}
             </a>
           );
         }
+        return '-';
       },
     },
   ];
@@ -330,7 +312,7 @@ const Authorizers: React.FC = () => {
             if (sortField === 'tvl_balance') {
               orderByParam = 'tvl_balance';
               setSortApi('tvl_balance');
-            } else if (sortField === 'historical_code_address') {
+            } else if (sortField === 'historical_code_address_count') {
               orderByParam = 'historical_code_address_count';
               setSortApi('historical_code_address_count');
             }
@@ -359,42 +341,131 @@ const Authorizers: React.FC = () => {
       />
 
       <Modal
-        title={intl.formatMessage({
-          id: 'pages.authorizers.historicalCodeAddressList',
-          defaultMessage: '历史代码地址列表',
-        })}
+        title={intl.formatMessage(
+          {
+            id: 'pages.authorizers.authorizationsListTitle',
+            defaultMessage: '授权记录列表 - {address}',
+          },
+          { address: currentRow?.authorizer_address ? `${currentRow.authorizer_address.substring(0, 6)}...${currentRow.authorizer_address.substring(currentRow.authorizer_address.length - 4)}` : '' }
+        )}
         open={showDetail}
         onCancel={() => {
           setCurrentRow(undefined);
           setShowDetail(false);
         }}
         footer={null}
-        width={800}
+        width={1000}
+        afterOpenChange={(open) => {
+          if (open && authorizationsActionRef.current) {
+            authorizationsActionRef.current.reload();
+          }
+        }}
       >
-        {currentRow?.historical_code_address && (
-          <div style={{ marginTop: 20 }}>
-            {currentRow.historical_code_address && currentRow.historical_code_address.length > 0 ? (
-              <div>
-                {(currentRow.historical_code_address as string[]).map((address, index) => (
-                  <Tooltip key={index} title={
-                    <span>
-                      {address}
-                      <a href={`${EXPLORER_URL}/address/${address}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
-                        <LinkOutlined />
-                      </a>
-                    </span>
-                  }>
-                    <Tag color="purple" style={{ marginBottom: '8px', marginRight: '8px' }}>{`${formatAddress(address)}`}</Tag>
-                  </Tooltip>
-                ))}
-              </div>
-            ) : (
-              <p>{intl.formatMessage({
-                id: 'pages.authorizers.noHistoricalCodeAddress',
-                defaultMessage: '无历史代码地址',
-              })}</p>
-            )}
-          </div>
+        {currentRow?.authorizer_address && (
+          <ProTable<AuthorizationItem>
+            key={currentRow.authorizer_address}
+            actionRef={authorizationsActionRef}
+            rowKey={(record) => `${record.tx_hash}_${record.code_address}`}
+            search={false}
+            options={false}
+            request={async (params) => {
+              const { current, pageSize } = params;
+              const msg = await getAuthorizationsByAuthorizer({
+                authorizer_address: currentRow.authorizer_address,
+                page: current,
+                page_size: pageSize,
+              });
+              return {
+                data: msg.authorizations || [],
+                success: true,
+                total: msg.total || 0,
+              };
+            }}
+            columns={[
+              {
+                title: intl.formatMessage({
+                  id: 'pages.authorizers.authorization.date',
+                  defaultMessage: 'Date',
+                }),
+                dataIndex: 'date',
+                width: 120,
+              },
+              {
+                title: intl.formatMessage({
+                  id: 'pages.authorizers.authorization.tx_hash',
+                  defaultMessage: 'Transaction Hash',
+                }),
+                dataIndex: 'tx_hash',
+                render: (dom) => {
+                  return typeof dom === 'string' && dom.length > 10 ? (
+                    <Tooltip title={
+                      <span>
+                        {dom}
+                        <a href={`${EXPLORER_URL}/tx/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                          <LinkOutlined />
+                        </a>
+                      </span>
+                    }>
+                      <Tag color="blue">{`${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`}</Tag>
+                    </Tooltip>
+                  ) : (
+                    <Tag color="blue">{dom}</Tag>
+                  );
+                },
+              },
+              {
+                title: intl.formatMessage({
+                  id: 'pages.authorizers.authorization.code_address',
+                  defaultMessage: 'Code Address',
+                }),
+                dataIndex: 'code_address',
+                render: (dom) => {
+                  return typeof dom === 'string' && dom.length > 10 ? (
+                    <Tooltip title={
+                      <span>
+                        {dom}
+                        <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                          <LinkOutlined />
+                        </a>
+                      </span>
+                    }>
+                      <Tag color="green">{`${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`}</Tag>
+                    </Tooltip>
+                  ) : (
+                    <Tag color="green">{dom}</Tag>
+                  );
+                },
+              },
+              {
+                title: intl.formatMessage({
+                  id: 'pages.authorizers.authorization.relayer_address',
+                  defaultMessage: 'Relayer Address',
+                }),
+                dataIndex: 'relayer_address',
+                render: (dom) => {
+                  return typeof dom === 'string' && dom.length > 10 ? (
+                    <Tooltip title={
+                      <span>
+                        {dom}
+                        <a href={`${EXPLORER_URL}/address/${dom}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: 'white' }}>
+                          <LinkOutlined />
+                        </a>
+                      </span>
+                    }>
+                      <Tag color="orange">{`${dom.substring(0, 6)}...${dom.substring(dom.length - 4)}`}</Tag>
+                    </Tooltip>
+                  ) : (
+                    <Tag color="orange">{dom}</Tag>
+                  );
+                },
+              },
+            ]}
+            pagination={{
+              defaultPageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100'],
+            }}
+          />
         )}
       </Modal>
     </PageContainer>

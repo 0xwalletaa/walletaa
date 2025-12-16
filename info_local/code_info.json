@@ -1,5 +1,63 @@
 [
   {
+    "address": "0xAbc6f9915B90556F0A765B053d886EC78a44ab7e",
+    "name": "",
+    "type": "Proxy",
+    "provider": "",
+    "code": "",
+    "repo": "",
+    "contractAccountStandard": "",
+    "verificationMethod": "Secp256k1 ECDSA",
+    "batchCall": false,
+    "executor": false,
+    "receiveETH": true,
+    "receiveNFT": false,
+    "recovery": false,
+    "sessionKey": false,
+    "storage": "Plain Layout",
+    "nativeETHApprovalAndTransfer": "",
+    "hooks": "",
+    "signature": "EIP-712",
+    "txInitiationMethod": "Relayer",
+    "feePaymentMethod": "Relayer",
+    "upgradable": false,
+    "modularContractAccount": "",
+    "moduleRegistry": "",
+    "isContractAddress": true,
+    "audit": "",
+    "usage": "Owner controlled accross proxy",
+    "manualReview": "@doublespending"
+  },
+  {
+    "address": "0xa285975Ccb8435be613B1CdA51B661a2FE005D34",
+    "name": "",
+    "type": "Proxy",
+    "provider": "",
+    "code": "",
+    "repo": "",
+    "contractAccountStandard": "",
+    "verificationMethod": "Secp256k1 ECDSA",
+    "batchCall": false,
+    "executor": false,
+    "receiveETH": true,
+    "receiveNFT": false,
+    "recovery": false,
+    "sessionKey": false,
+    "storage": "Plain Layout",
+    "nativeETHApprovalAndTransfer": "",
+    "hooks": "",
+    "signature": "EIP-712",
+    "txInitiationMethod": "Relayer",
+    "feePaymentMethod": "Relayer",
+    "upgradable": false,
+    "modularContractAccount": "",
+    "moduleRegistry": "",
+    "isContractAddress": true,
+    "audit": "",
+    "usage": "Owner controlled accross proxy",
+    "manualReview": "@doublespending"
+  },
+  {
     "address": "0x7702cb554e6bFb442cb743A7dF23154544a7176C",
     "name": "EIP7702Proxy",
     "type": "Proxy",
@@ -25,7 +83,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x411d38d27f6f2c7f3b70ff29dada64cbd7bfa9b2",
@@ -53,7 +112,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x072c2673AdE3632594337A98A473D32a17505fDB",
@@ -83,7 +143,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Multicall for executor"
+    "usage": "Multicall for executor",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xb59f313dcf8c8107adffeabd0c041c896c64dfca",
@@ -112,7 +173,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to destination"
+    "usage": "Forwarder received ETH to destination",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x8eAc07Ec5c61138C5472616E39CCb176CA068C25",
@@ -141,7 +203,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to destination"
+    "usage": "Forwarder received ETH to destination",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x1B32B258b651A279aC4662F80b71917F4A6d03eB",
@@ -170,7 +233,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "An NFT MEV bot designed to pay a bribe to builders"
+    "usage": "An NFT MEV bot designed to pay a bribe to builders",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xf33108E790e6d037688157C05e884fE8d9C94491",
@@ -200,7 +264,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "An NFT MEV bot designed to pay a bribe to builders"
+    "usage": "An NFT MEV bot designed to pay a bribe to builders",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x000000000000e59Fc57340CD50d1B12221601B87",
@@ -229,7 +294,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": "Owner controlled proxy"
+    "usage": "Owner controlled proxy",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xE56B05A496a00C6e3d213C681Ec5E27Af4bA1983",
@@ -259,7 +325,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled specialized account"
+    "usage": "Executor-controlled specialized account",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x3C3d718877a7d95857e1ae74B3963bdDefb81931",
@@ -288,7 +355,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to destination"
+    "usage": "Forwarder received ETH to destination",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xa845C74344Fc9405b1Fcf712f04668979573c1bf",
@@ -316,7 +384,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x0913b172530805Af05ff28814cA941Bd28B5b4E9",
@@ -345,7 +414,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "MEV Bot"
+    "usage": "MEV Bot",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xb15Bed8FC30D3E82672bF7cD75417B414983934B",
@@ -373,7 +443,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xe4e49868aDF7118960C7d038964C21f62E615AFE",
@@ -402,7 +473,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled proxy to cowswap settlement"
+    "usage": "Executor-controlled proxy to cowswap settlement",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xBe833F50270aE41411AcC2B1dF81d610C9044d31",
@@ -432,7 +504,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled proxy to cowswap settlement"
+    "usage": "Executor-controlled proxy to cowswap settlement",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x89046d34E70A65ACAb2152C26a0C8e493b5ba629",
@@ -460,7 +533,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x08f5e230d412F0cd475B03b9Acb51d1562f730F9",
@@ -489,7 +563,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x831e3DbDc5B8a95b8a33b6D2ecb439B631A95215",
@@ -519,7 +594,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Cowswap Settlement"
+    "usage": "Cowswap Settlement",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x6B7879a5d747E30a3ADb37A9e41c046928FCE933",
@@ -548,7 +624,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xcc0c946EecF01A4Bc76Bc333Ea74CEb04756f17b",
@@ -576,7 +653,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xcEa43594f38316F0e01c161D8DaBDe0a07a1F512",
@@ -604,7 +682,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x17c11FDdADac2b341F2455aFe988fec4c3ba26e3",
@@ -634,7 +713,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "allow validator withdrawal EOAs to execute multiple operations (consolidation, credential switching, Execution Layer exits) in a single, atomic transaction."
+    "usage": "allow validator withdrawal EOAs to execute multiple operations (consolidation, credential switching, Execution Layer exits) in a single, atomic transaction.",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x4428a93B478fa76A5BD9c7641F54EC6373855433",
@@ -662,7 +742,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x7F7F0dCbe8add58145B2785aFea40950891b44C8",
@@ -691,7 +772,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x7785a22facd31db653ba4928f1d5b81d093f0b2f",
@@ -720,7 +802,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x0000000000000000000000000000000000000000",
@@ -749,7 +832,8 @@
     "moduleRegistry": "",
     "isContractAddress": false,
     "audit": "",
-    "usage": "Revoke EIP-7702 authorization"
+    "usage": "Revoke EIP-7702 authorization",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xB6785B782571980b3Ddb5d40659f4861fF15AA02",
@@ -779,7 +863,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled specialized account"
+    "usage": "Executor-controlled specialized account",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x9219Ae321E6C9c30526f08f2B4f440AF042DC6cd",
@@ -809,7 +894,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "One owner with multiple operators"
+    "usage": "One owner with multiple operators",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x0d11fee52609d6bddc818ef58721ecb51dae5308",
@@ -839,7 +925,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "One owner with multiple operators"
+    "usage": "One owner with multiple operators",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x5bda98554446e4a582687e81d3c4419fcd6ba6b8",
@@ -868,7 +955,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Batch token approve"
+    "usage": "Batch token approve",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x9FEeB3bF3601cDe70e439fcDc703609d58C5d278",
@@ -897,7 +985,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": false,
-    "usage": "Always reverts"
+    "usage": "Always reverts",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x000000009B1D0aF20D8C6d0A44e162d11F9b8f00",
@@ -931,7 +1020,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x3cbad1e3b9049ecdb9588fb48dd61d80faf41bd5",
@@ -965,7 +1055,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xa1b0277a9e51f465e3c0a463addf74a2425c1d60",
@@ -993,7 +1084,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "MEV Bot"
+    "usage": "MEV Bot",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x930FcC37d6042c79211EE18A02857Cb1Fd7F0D0b",
@@ -1023,7 +1115,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled specialized account"
+    "usage": "Executor-controlled specialized account",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x1f07336d35c9a70ed086f6aa3c4c0bd1266e6f63",
@@ -1053,7 +1146,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled specialized account"
+    "usage": "Executor-controlled specialized account",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x6F7c7b0129AFD6172dd36891B7048c6CF2D29c7f",
@@ -1082,7 +1176,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to 0xBB7218d77F06A89C15E9188b1f1B427Ae8F0290C"
+    "usage": "Forwarder received ETH to 0xBB7218d77F06A89C15E9188b1f1B427Ae8F0290C",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xA03fC3C62d26253B3eC3076CB871aFa3B5fa60ab",
@@ -1111,7 +1206,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x710FAd1041f0eE79916Bb1A6AdEF662303bb8b6E",
@@ -1140,7 +1236,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xe38e81a06ada5c4515a1fc8266ae470da63c00b4",
@@ -1169,7 +1266,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x89383882Fc2D0Cd4d7952a3267A3b6dAE967E704",
@@ -1198,7 +1296,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x68Ae6C736Ae31bBAb8D8b712cDc1f552e7De7351",
@@ -1227,7 +1326,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xb847F107513522Af770ee0AaD8dA0319e6da32b3",
@@ -1256,7 +1356,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Forwarder received ETH to owner"
+    "usage": "Forwarder received ETH to owner",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x69007702764179f14F51cdce752f4f775d74E139",
@@ -1295,7 +1396,8 @@
     "isContractAddress": true,
     "audit": true,
     "auditExtra": "https://github.com/alchemyplatform/modular-account/tree/develop/audits",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x1f07336D35c9a70ED086F6aA3C4c0Bd1266E6f63",
@@ -1325,7 +1427,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled specialized account"
+    "usage": "Executor-controlled specialized account",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xD2e28229F6f2c235e57De2EbC727025A1D0530FB",
@@ -1354,7 +1457,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x958260e10E1c760b85C944082a7b942fECc9025e",
@@ -1383,7 +1487,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xca11bde05977b3631167028862be2a173976ca11",
@@ -1411,7 +1516,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "batch call"
+    "usage": "batch call",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x1Ec51ea2582B3B49967fc7b7036dC21Ac0a6Bc54",
@@ -1439,7 +1545,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x2d9F81eD95F7161d7B44Ba5d711E9F0946F53C3A",
@@ -1467,7 +1574,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "MEV Bot"
+    "usage": "MEV Bot",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x0c338ca25585035142A9a0a1EEebA267256f281f",
@@ -1501,7 +1609,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x458f5a9f47A01beA5d7A32662660559D9eD3312c",
@@ -1535,7 +1644,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x71c9aB0c20A65727089d2d2b3EdA37B9BEb41173",
@@ -1563,7 +1673,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x25684dC148e5c7Ad8e8D7cd5078cE431DF9B7B4a",
@@ -1593,7 +1704,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x8BB9E00Abd81C5532f6040f5eFA7eEb6b92697f7",
@@ -1622,7 +1734,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xba2432aC4533E09492EFea59A10450893e56A8E4",
@@ -1651,7 +1764,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled proxy to cowswap settlement"
+    "usage": "Executor-controlled proxy to cowswap settlement",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xbcf8C26540CEd6c5Fc68c385281cFdddaFe36cA5",
@@ -1679,7 +1793,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": "Proxy"
+    "usage": "Proxy",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x50bA4A14bDEFF1712dF5BD2E50f51989F58af6e5",
@@ -1709,7 +1824,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "collectERC20, collectETH"
+    "usage": "collectERC20, collectETH",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x0B50b2854B262a5193596Bb8aa9AEd3d630B39c1",
@@ -1739,7 +1855,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "collectERC20, collectETH"
+    "usage": "collectERC20, collectETH",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xd6CEDDe84be40893d153Be9d467CD6aD37875b28",
@@ -1775,7 +1892,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x0000000000000000000000000000000000000001",
@@ -1803,7 +1921,8 @@
     "moduleRegistry": false,
     "isContractAddress": false,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xcc582e0251daBC0450fA40623731dc13b70483FD",
@@ -1831,7 +1950,8 @@
     "moduleRegistry": false,
     "isContractAddress": false,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xEd2Eb19fc84d432e50C3C4Ab14fde6e8cb3539C7",
@@ -1860,7 +1980,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xcda3577ca7ef65f6B7201E9BD80375f5628D15F7",
@@ -1890,7 +2011,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "collectERC20, collectETH"
+    "usage": "collectERC20, collectETH",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x80296FF8D1ED46f8e3C7992664D13B833504c2Bb",
@@ -1918,7 +2040,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x5A7FC11397E9a8AD41BF10bf13F22B0a63f96f6d",
@@ -1948,7 +2071,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xe6Cae83BdE06E4c305530e199D7217f42808555B",
@@ -1976,7 +2100,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x0000Fb7702036ff9f76044a501ac1aA74cbab16b",
@@ -2005,7 +2130,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x4EaC96c6D3CD7045ce3b46DfB52D7107958Be151",
@@ -2034,7 +2160,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Batch token transfer"
+    "usage": "Batch token transfer",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x735BDA71C59929FdFFf95fC93D0CFfC2aFB1983B",
@@ -2063,7 +2190,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": "Executor-controlled specialized account"
+    "usage": "Executor-controlled specialized account",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x1840E96ae85FBf92295Da8943056670d06D9BDb7",
@@ -2091,7 +2219,8 @@
     "moduleRegistry": false,
     "isContractAddress": false,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x775c8D470CC8d4530b8F233322480649f4FAb758",
@@ -2119,7 +2248,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x976d1885a5d42ccfe5327a06c8d6b6d519fde365",
@@ -2147,7 +2277,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xa65eaa25c97783600134354c6ccf62686be12386",
@@ -2176,7 +2307,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": false,
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xa9526ba55F7cABa1A6eB1cb4d555F29022ebFeed",
@@ -2204,7 +2336,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xe264dccc54e4b6906c0d1fee11d4326c06d33c80",
@@ -2232,7 +2365,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x8a0a91114ce5be2df367d08f729ba2aae2eb4262",
@@ -2260,7 +2394,8 @@
     "moduleRegistry": "",
     "isContractAddress": false,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
@@ -2292,7 +2427,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x000000004f43c49e93c970e84001853a70923b03",
@@ -2330,7 +2466,8 @@
     "isContractAddress": true,
     "audit": true,
     "production": true,
-    "usage": "account abstraction"
+    "usage": "account abstraction",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x227380efd3392ec33cf148ade5e0a89d33121814",
@@ -2364,7 +2501,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xfde60f1fe9e8d425272b98bee16acc795f2b83b9",
@@ -2392,7 +2530,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xb0a7d836421c41fc2f87bf349a296090a48bd544",
@@ -2420,7 +2559,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xb65dd26d7e0726a27cb39c6f9f22c03345ec3b1a",
@@ -2448,7 +2588,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": false,
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0xb2cb3e92969828c2207367d9f4331a701b9464e6",
@@ -2482,7 +2623,8 @@
     "moduleRegistry": false,
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x5291d8e0a0cdf6b803174e5a6895459eb31aad3f",
@@ -2510,7 +2652,8 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   },
   {
     "address": "0x5826683b26d1fbc55bf44c2b3b20e288dda9df58",
@@ -2538,6 +2681,7 @@
     "moduleRegistry": "",
     "isContractAddress": true,
     "audit": "",
-    "usage": ""
+    "usage": "",
+    "manualReview": "@doublespending"
   }
 ]

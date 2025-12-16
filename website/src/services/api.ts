@@ -47,7 +47,7 @@ export interface AuthorizerItem {
   tvl_balance: number;
   set_code_tx_count: number;
   unset_code_tx_count: number;
-  historical_code_address: string[];
+  historical_code_address_count: number;
   last_nonce: number;
   last_chain_id: number;
   provider?: string; // 添加provider字段
@@ -196,6 +196,15 @@ export interface TraceStatistics {
     type: string;
     provider: string;
   }>;
+}
+
+// 定义授权记录数据类型
+export interface AuthorizationItem {
+  tx_hash: string;
+  authorizer_address: string;
+  code_address: string;
+  relayer_address: string;
+  date: string;
 }
 
 // 获取交易列表接口
@@ -353,5 +362,36 @@ export async function getCodeStatistics(): Promise<CodeStatistics> {
 export async function getTraceStatistics(): Promise<TraceStatistics> {
   return request(`${BASE_URL()}/trace_statistics`, {
     method: 'GET',
+  });
+}
+
+// 获取指定授权者的授权记录列表
+export async function getAuthorizationsByAuthorizer(params: {
+  authorizer_address: string;
+  page?: number;
+  page_size?: number;
+}) {
+  return request(`${BASE_URL()}/authorizations_by_authorizer`, {
+    method: 'GET',
+    params,
+  });
+}
+
+// 定义每日授权数据类型
+export interface DailyAuthorizationData {
+  date: string;
+  count: number;
+}
+
+// 获取指定代码地址的每日授权数量
+export async function getDailyAuthorizationCountByCode(params: {
+  code_address: string;
+}): Promise<{
+  code_address: string;
+  daily_data: DailyAuthorizationData[];
+}> {
+  return request(`${BASE_URL()}/daily_authorization_count_by_code`, {
+    method: 'GET',
+    params,
   });
 } 
