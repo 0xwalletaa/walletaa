@@ -8,7 +8,7 @@ https://scroll-mainnet.public.blastapi.io \
 https://scroll.api.onfinality.io/public \
 https://scroll-rpc.publicnode.com \
 --num_threads 5 \
---start_block 24530000
+--start_block 26580000
 
 python3 get_tvl.py --name scroll --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \
 https://scroll.drpc.org \

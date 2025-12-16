@@ -11,7 +11,7 @@ https://rpc-bsc.48.club \
 https://bsc.rpc.blxrbdn.com \
 https://bsc.blockrazor.xyz \
 --num_threads 5 \
---start_block 67834000
+--start_block 71720000
 
 python3 get_tvl.py --name bsc --contract 0x27c81Cb1281a9643E7Ace9E843579316Be56456E  --endpoints \
 https://api.zan.top/bsc-mainnet \

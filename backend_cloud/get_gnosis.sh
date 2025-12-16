@@ -10,7 +10,7 @@ https://gnosis.drpc.org \
 https://rpc.gnosischain.com \
 https://rpc.gnosis.gateway.fm \
 --num_threads 5 \
---start_block 43030000
+--start_block 43650000
 #TODO: is start_block right?
 
 python3 get_tvl.py --name gnosis --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \
