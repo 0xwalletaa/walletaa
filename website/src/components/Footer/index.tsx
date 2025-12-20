@@ -7,7 +7,9 @@ const Footer: React.FC = () => {
     <DefaultFooter
       style={{
         background: 'none',
+        paddingBottom: 0,
       }}
+      copyright={false}
       links={[
         {
           key: 'github',
@@ -38,6 +40,27 @@ const Footer: React.FC = () => {
           ),
           href: 'https://t.me/+BrxklVaUBnRhOWIx',
           blankTarget: true,
+        },
+        {
+          key: 'donation',
+          title: (
+            <div style={{ marginTop: '8px', color: 'rgba(0, 0, 0, 0.45)', fontSize: '14px' }}>
+              <div>Donations are greatly appreciated!</div>
+              <div>
+                ETH:{' '}
+                <a
+                  href="https://etherscan.io/address/0x8EA35dd88e2e7ec04a3C5F9B36Bd9eda90424a32"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#1890ff' }}
+                >
+                  0x8EA35dd88e2e7ec04a3C5F9B36Bd9eda90424a32
+                </a>
+              </div>
+            </div>
+          ),
+          href: '',
+          blankTarget: false,
         },
       ]}
     />
