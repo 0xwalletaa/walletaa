@@ -604,13 +604,14 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
     block_conn = sqlite3.connect(block_db_path)
     block_timestamp_cursor = block_conn.cursor()
     
-    
+
     trace_cursor_read.execute("SELECT block_number, traces FROM traces WHERE used = 0 ORDER BY block_number ASC")
     
     wrong_block_number = 0
     # Process row by row to avoid loading all data at once
     for row in trace_cursor_read:  # Iterate cursor directly
         block_number, traces = row
+        print("update_info_by_trace dealding block:", block_number)
         if traces == "[]":
             continue
         
