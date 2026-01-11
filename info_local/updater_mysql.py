@@ -375,6 +375,7 @@ def update_info_by_tvl(mysql_db_name, tvl_db_path):
                 BERA_PRICE = requests.get("https://walletaa.com/api-binance/api/v3/ticker/price?symbol=BERAUSDT",timeout=10).json()['price']
             break
         except:
+            print("Price update failed, retrying...")
             time.sleep(1)
     end_time = time.time()
     print(f"Price update: {end_time - start_time} seconds")
@@ -676,6 +677,7 @@ def update_info_by_trace(mysql_db_name, trace_db_path, block_db_path):
 
     info_conn.close()
     block_conn.close()
+    trace_conn.close()
 
     trace_statistics = {
         'top10_calling_functions': top10_calling_functions,
