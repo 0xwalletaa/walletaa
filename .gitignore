@@ -26,7 +26,8 @@ backend/db.zip
 backend/test*.sh
 backend/check.sh
 *.zip
-*loop.log
+*loop*.log
+*.log
 server/updater_mysql_t.py
 info_local/batch_update.sh
 */syncer_token.txt
@@ -34,3 +35,4 @@ test*.sh
 test*.log
 *pending*.txt
 loop.sh
+backend_cloud/loop1.log
