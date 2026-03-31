@@ -1,5 +1,34 @@
 [
   {
+    "address": "0x3Fc8c2b6e4Ea901721aEF251C67bC7C2591a1e1F",
+    "name": "Poisoner",
+    "type": "Poisoner",
+    "provider": "Poisoner",
+    "code": "https://vscode.blockscan.com/ethereum/0x66e9d4bc80c1d04d045573c2f4631342fe6fc87d",
+    "repo": "",
+    "contractAccountStandard": "",
+    "verificationMethod": "",
+    "batchCall": true,
+    "executor": false,
+    "receiveETH": true,
+    "receiveNFT": false,
+    "recovery": false,
+    "sessionKey": false,
+    "storage": "Plain Layout",
+    "nativeETHApprovalAndTransfer": false,
+    "hooks": false,
+    "signature": "",
+    "txInitiationMethod": "",
+    "feePaymentMethod": "",
+    "upgradable": false,
+    "modularContractAccount": false,
+    "moduleRegistry": false,
+    "isContractAddress": true,
+    "audit": "",
+    "usage": "Poison users' transaction history and trick them into sending funds to attacker-controlled addresses.",
+    "manualReview": "@doublespending"
+  },
+  {
     "address": "0x1e68c71fa1b7c3efd4a576b5551d2e8004f96ea7",
     "name": "Poisoner",
     "type": "Poisoner",
@@ -117,7 +146,7 @@
     "manualReview": "@doublespending"
   },
   {
-    "address": "0x6640c1CCCaF07Dbe765eC05E294FE427cC92831C",
+    "address": "0x612373d7003d694220f7800eeaf8e3924c0951d3",
     "name": "CaliburEntry",
     "type": "Wallet",
     "provider": "Rainbow(Uniswap)",
