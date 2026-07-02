@@ -1,27 +1,9 @@
-python3 get_block.py --name uni --endpoints \
-https://unichain-rpc.publicnode.com \
-https://rpc.therpc.io/unichain \
-https://0xrpc.io/uni \
-https://unichain.drpc.org \
-https://mainnet.unichain.org \
-https://unichain.api.onfinality.io/public \
---num_threads 5 \
---start_block 41220000
+#!/bin/bash
+# endpoints 省略时由 rpc_manager 自动从 chainlist 缓存中探测存活端点
+# batch_size 省略时使用 rpc_manager.CHAIN_CONFIG 里该链的默认批大小
 
-python3 get_tvl.py --name uni --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \
-https://unichain-rpc.publicnode.com \
-https://rpc.therpc.io/unichain \
-https://0xrpc.io/uni \
-https://unichain.drpc.org \
-https://mainnet.unichain.org \
-https://unichain.api.onfinality.io/public \
---num_threads 5
+python3 get_block_batch.py --name uni --num_threads 5 --start_block 41220000
 
-python3 get_code.py --name uni --endpoints \
-https://unichain-rpc.publicnode.com \
-https://rpc.therpc.io/unichain \
-https://0xrpc.io/uni \
-https://unichain.drpc.org \
-https://mainnet.unichain.org \
-https://unichain.api.onfinality.io/public \
---num_threads 5
+python3 get_tvl.py --name uni --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --num_threads 5
+
+python3 get_code.py --name uni --num_threads 5

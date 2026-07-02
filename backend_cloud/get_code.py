@@ -24,8 +24,9 @@ import os
 
 # Add command line argument parsing
 parser = argparse.ArgumentParser(description='Process blockchain transaction data')
-parser.add_argument('--name', help='Blockchain network name')
-parser.add_argument('--endpoints', nargs='+', help='List of Web3 endpoints')
+parser.add_argument('--name', required=True, help='Blockchain network name')
+parser.add_argument('--endpoints', nargs='+', default=None,
+                    help='List of Web3 endpoints (omit to auto-discover alive endpoints via rpc_manager)')
 
 parser.add_argument('--num_threads', type=int, default=4, help='Number of parallel threads')
 parser.add_argument('--data_expiry', type=int, default=86400000, help='Data expiry time (seconds)')
@@ -42,6 +43,14 @@ NUM_THREADS = args.num_threads
 DATA_EXPIRY = args.data_expiry
 
 BLOCK_DB_PATH = args.block_db_path
+
+if not WEB3_ENPOINTS:
+    import rpc_manager
+    WEB3_ENPOINTS = rpc_manager.get_alive_endpoints(NAME)
+    if not WEB3_ENPOINTS:
+        print("No alive endpoints found, exiting")
+        exit(1)
+    print(f"Auto-discovered {len(WEB3_ENPOINTS)} endpoints")
 
 web3s = [
     Web3(Web3.HTTPProvider(endpoint)) for endpoint in WEB3_ENPOINTS

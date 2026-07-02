@@ -7,6 +7,10 @@ import sqlite3
 from flask import Flask, jsonify, request
 import argparse
 from functools import wraps
+import watermark
+import time
+import threading
+from collections import deque, defaultdict
 
 # Add command line argument parsing
 parser = argparse.ArgumentParser(description='Syncer server for blockchain data')
@@ -654,7 +658,15 @@ def delete_wrong_block(name):
         
         conn.commit()
         conn.close()
-        
+
+        # 回退水位线: 否则被删的块在 get_block 的水位线之前, 永远不会被重新获取
+        try:
+            block_db_path, _, _ = get_db_paths(name)
+            db_dir = os.path.dirname(os.path.abspath(block_db_path))
+            watermark.rollback_watermark(db_dir, name, min(block_numbers) - 1)
+        except Exception as e:
+            print(f"Error rolling back watermark for {name}: {e}")
+
         return jsonify({
             'success': True,
             'chain': name,
@@ -667,6 +679,214 @@ def delete_wrong_block(name):
             'success': False,
             'error': str(e)
         }), 500
+
+# ---- 抓块脚本上报的运行统计 (纯内存, 重启即清零) ----
+STATS_WINDOW = 3600  # 看板统计最近 1 小时
+STATS_LOCK = threading.Lock()
+STATS_EVENTS = defaultdict(deque)  # name -> deque[(ts, blocks_added, success, failed)]
+
+
+def _prune_stats(events, now):
+    while events and now - events[0][0] > STATS_WINDOW * 2:
+        events.popleft()
+
+
+@app.route('/<name>/report_stats', methods=['POST'])
+@require_token
+def report_stats(name):
+    """接收抓块脚本上报的增量统计"""
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    try:
+        data = request.get_json() or {}
+        blocks_added = int(data.get('blocks_added', 0))
+        success = int(data.get('success_requests', 0))
+        failed = int(data.get('failed_requests', 0))
+        now = time.time()
+        with STATS_LOCK:
+            events = STATS_EVENTS[name]
+            events.append((now, blocks_added, success, failed))
+            _prune_stats(events, now)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def _stats_1h(name):
+    """最近 1 小时的统计汇总"""
+    now = time.time()
+    blocks_added = success = failed = 0
+    with STATS_LOCK:
+        events = STATS_EVENTS.get(name)
+        if events:
+            _prune_stats(events, now)
+            for ts, b, ok, fail in events:
+                if now - ts <= STATS_WINDOW:
+                    blocks_added += b
+                    success += ok
+                    failed += fail
+    return {'blocks_added': blocks_added,
+            'success_requests': success,
+            'failed_requests': failed}
+
+
+def _chain_status(name):
+    """收集单条链的同步状态 (只用走索引的查询, 保证看板秒开)"""
+    status = {'chain': name}
+    block_db_path, code_db_path, tvl_db_path = get_db_paths(name)
+
+    try:
+        if not os.path.exists(block_db_path):
+            status['block'] = None
+        else:
+            conn = sqlite3.connect(block_db_path)
+            cursor = conn.cursor()
+            # 注意: MIN/MAX 必须分开查, 合并写会让 SQLite 放弃索引优化走全表扫描
+            cursor.execute("SELECT MIN(block_number) FROM blocks")
+            min_block = cursor.fetchone()[0]
+            cursor.execute("SELECT MAX(block_number) FROM blocks")
+            max_block = cursor.fetchone()[0]
+            latest_timestamp = None
+            if max_block is not None:
+                cursor.execute("SELECT timestamp FROM blocks WHERE block_number = ?", (max_block,))
+                row = cursor.fetchone()
+                latest_timestamp = row[0] if row else None
+            conn.close()
+            status['block'] = {
+                'min_block': min_block,
+                'max_block': max_block,
+                'latest_timestamp': latest_timestamp,
+                'db_size': os.path.getsize(block_db_path),
+            }
+    except Exception as e:
+        status['block'] = {'error': str(e)}
+
+    for key, db_path, table in (('tvl', tvl_db_path, 'author_balances'),
+                                ('code', code_db_path, 'codes')):
+        try:
+            if not os.path.exists(db_path):
+                status[key] = None
+                continue
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT MAX(last_update_timestamp) FROM {table}")
+            last_update = cursor.fetchone()[0]
+            conn.close()
+            status[key] = {
+                'last_update_timestamp': last_update,
+                'db_size': os.path.getsize(db_path),
+            }
+        except Exception as e:
+            status[key] = {'error': str(e)}
+
+    status['stats_1h'] = _stats_1h(name)
+    return status
+
+
+@app.route('/dashboard_data', methods=['GET'])
+def dashboard_data():
+    """看板数据: 所有链的起始块/最高块/最新块时间/库文件大小/最近1小时统计"""
+    chains = [_chain_status(name) for name in sorted(ALLOWED_NAMES)]
+    return jsonify({
+        'success': True,
+        'server_time': int(time.time()),
+        'chains': chains,
+    })
+
+
+DASHBOARD_HTML = """<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WalletAA Syncer Dashboard</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; margin: 24px;
+         background: #0d1117; color: #c9d1d9; }
+  h1 { font-size: 20px; }
+  .meta { color: #8b949e; font-size: 13px; margin-bottom: 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { padding: 8px 12px; border-bottom: 1px solid #21262d; text-align: right;
+           font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th { color: #8b949e; font-weight: 600; }
+  th:first-child, td:first-child { text-align: left; }
+  .ok { color: #3fb950; }
+  .warn { color: #d29922; }
+  .bad { color: #f85149; }
+  .dim { color: #8b949e; }
+</style>
+</head>
+<body>
+<h1>WalletAA Syncer Dashboard</h1>
+<div class="meta" id="meta">loading...</div>
+<table>
+  <thead><tr>
+    <th>chain</th><th>start block</th><th>highest block</th><th>latest block time</th>
+    <th>behind</th><th>blocks +1h</th><th>req ok 1h</th><th>req fail 1h</th>
+    <th>block db</th><th>tvl updated</th><th>code updated</th>
+  </tr></thead>
+  <tbody id="tbody"></tbody>
+</table>
+<script>
+function fmtSize(b) {
+  if (b == null) return '-';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let i = 0;
+  while (b >= 1024 && i < units.length - 1) { b /= 1024; i++; }
+  return b.toFixed(1) + ' ' + units[i];
+}
+function fmtTime(ts) {
+  if (!ts) return '-';
+  return new Date(ts * 1000).toLocaleString('sv-SE');
+}
+function fmtBehind(ts, now) {
+  if (!ts) return {text: '-', cls: 'dim'};
+  let s = now - ts;
+  if (s < 0) s = 0;
+  const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600),
+        m = Math.floor(s % 3600 / 60);
+  const text = d > 0 ? d + 'd ' + h + 'h' : (h > 0 ? h + 'h ' + m + 'm' : m + 'm');
+  const cls = s < 3600 ? 'ok' : (s < 86400 ? 'warn' : 'bad');
+  return {text, cls};
+}
+async function refresh() {
+  const resp = await fetch('dashboard_data');
+  const data = await resp.json();
+  document.getElementById('meta').textContent =
+    'server time: ' + fmtTime(data.server_time) + ' | auto refresh 30s';
+  const rows = data.chains.map(c => {
+    const b = c.block || {};
+    const behind = fmtBehind(b.latest_timestamp, data.server_time);
+    const s = c.stats_1h || {};
+    const failCls = s.failed_requests > 0 ? 'bad' : 'dim';
+    const addCls = s.blocks_added > 0 ? 'ok' : 'dim';
+    return '<tr><td>' + c.chain + '</td>' +
+      '<td>' + (b.min_block != null ? b.min_block.toLocaleString() : '-') + '</td>' +
+      '<td>' + (b.max_block != null ? b.max_block.toLocaleString() : '-') + '</td>' +
+      '<td>' + fmtTime(b.latest_timestamp) + '</td>' +
+      '<td class="' + behind.cls + '">' + behind.text + '</td>' +
+      '<td class="' + addCls + '">' + (s.blocks_added || 0).toLocaleString() + '</td>' +
+      '<td>' + (s.success_requests || 0).toLocaleString() + '</td>' +
+      '<td class="' + failCls + '">' + (s.failed_requests || 0).toLocaleString() + '</td>' +
+      '<td>' + fmtSize(b.db_size) + '</td>' +
+      '<td>' + (c.tvl ? fmtTime(c.tvl.last_update_timestamp) : '-') + '</td>' +
+      '<td>' + (c.code ? fmtTime(c.code.last_update_timestamp) : '-') + '</td></tr>';
+  });
+  document.getElementById('tbody').innerHTML = rows.join('');
+}
+refresh();
+setInterval(refresh, 30000);
+</script>
+</body>
+</html>"""
+
+
+@app.route('/dashboard', methods=['GET'])
+def dashboard():
+    """看板页面"""
+    return DASHBOARD_HTML
+
 
 if __name__ == '__main__':
     print(f"Starting syncer server on port {PORT}")

@@ -12,15 +12,21 @@ import random
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import requests
+import os
+import watermark
 
 # Add command line argument parsing
 parser = argparse.ArgumentParser(description='Process blockchain transaction data')
-parser.add_argument('--name', help='Blockchain network name')
-parser.add_argument('--endpoints', nargs='+', help='List of Web3 endpoints')
+parser.add_argument('--name', required=True, help='Blockchain network name')
+parser.add_argument('--endpoints', nargs='+', default=None,
+                    help='List of Web3 endpoints (omit to auto-discover alive endpoints via rpc_manager)')
 parser.add_argument('--start_block', type=int, help='Starting block number')
 parser.add_argument('--num_threads', type=int, default=4, help='Number of parallel threads')
 parser.add_argument('--block_db_path', type=str, default='', help='block_db_path')
-parser.add_argument('--batch_size', type=int, default=10, help='Number of blocks per batch request')
+parser.add_argument('--batch_size', type=int, default=None,
+                    help='Number of blocks per batch request (default: per-chain value from rpc_manager)')
+parser.add_argument('--stats_url', type=str, default='http://127.0.0.1:5000',
+                    help='syncer_server URL for reporting in-memory stats (empty string to disable)')
 
 args = parser.parse_args()
 
@@ -30,6 +36,68 @@ START_BLOCK = args.start_block
 NUM_THREADS = args.num_threads
 BLOCK_DB_PATH = args.block_db_path
 BATCH_SIZE = args.batch_size
+
+import rpc_manager
+
+if BATCH_SIZE is None:
+    BATCH_SIZE = rpc_manager.get_batch_size(NAME)
+    print(f"Using per-chain default batch size: {BATCH_SIZE}")
+
+if not WEB3_ENPOINTS:
+    # 自动发现存活且支持批量请求的端点
+    WEB3_ENPOINTS = rpc_manager.get_alive_endpoints(NAME, require_batch=True)
+    if not WEB3_ENPOINTS:
+        print("No alive batch-capable endpoints found, exiting")
+        exit(1)
+    print(f"Auto-discovered {len(WEB3_ENPOINTS)} endpoints")
+
+# ---- 运行统计 (纯内存, 定期把增量上报给 syncer_server 供看板展示) ----
+STATS_URL = args.stats_url.rstrip('/') if args.stats_url else ''
+STATS_LOCK = threading.Lock()
+STATS = {'blocks_added': 0, 'success_requests': 0, 'failed_requests': 0}
+
+def _load_stats_token():
+    try:
+        token_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'syncer_token.txt')
+        with open(token_file) as f:
+            token = f.read().strip()
+        return {'Authorization': f'Bearer {token}'} if token else {}
+    except Exception:
+        return {}
+
+STATS_HEADERS = _load_stats_token()
+
+def stats_add(blocks=0, ok=0, fail=0):
+    with STATS_LOCK:
+        STATS['blocks_added'] += blocks
+        STATS['success_requests'] += ok
+        STATS['failed_requests'] += fail
+
+def flush_stats():
+    """把累计的增量上报给 syncer_server, 失败则把数字加回去下次再报"""
+    if not STATS_URL:
+        return
+    with STATS_LOCK:
+        snapshot = dict(STATS)
+        for key in STATS:
+            STATS[key] = 0
+    if not any(snapshot.values()):
+        return
+    try:
+        requests.post(f'{STATS_URL}/{NAME}/report_stats', json=snapshot,
+                      headers={**STATS_HEADERS, 'Content-Type': 'application/json'},
+                      timeout=5)
+    except Exception:
+        with STATS_LOCK:
+            for key in STATS:
+                STATS[key] += snapshot[key]
+
+def _stats_reporter():
+    while True:
+        time.sleep(30)
+        flush_stats()
+
+threading.Thread(target=_stats_reporter, daemon=True).start()
 
 block_db_path = f'{NAME}_block.db'
 if BLOCK_DB_PATH != '':
@@ -118,9 +186,9 @@ def init_db():
 
 
 # Get all existing block numbers from database
-def get_existing_blocks(conn):
+def get_existing_blocks(conn, from_block):
     cursor = conn.cursor()
-    cursor.execute("SELECT block_number FROM blocks WHERE block_number >= ?", (START_BLOCK,))
+    cursor.execute("SELECT block_number FROM blocks WHERE block_number >= ?", (from_block,))
     existing_blocks = set(row[0] for row in cursor.fetchall())
     return existing_blocks
 
@@ -216,16 +284,18 @@ def process_block_batch(block_numbers):
         
         conn.commit()
         print(f"Batch committed: {len(all_block_data)} blocks")
+        stats_add(blocks=len(all_block_data), ok=1)
         return True
-    
+
     except requests.exceptions.RequestException as e:
         print(f"Network error for blocks {block_numbers[0]}-{block_numbers[-1]}: {str(e)}")
         conn.rollback()
-        
+        stats_add(fail=1)
         return False
     except Exception as e:
         print(f"Batch processing error for blocks {block_numbers[0]}-{block_numbers[-1]}: {str(e)}")
         conn.rollback()
+        stats_add(fail=1)
         return False
 
 def process_block_batch_with_retry(block_numbers):
@@ -276,18 +346,33 @@ def main():
         # Get latest block number
         latest_block = random.choice(web3s).eth.block_number
         print(f"Current latest block: {latest_block}")
-        
+
+        # 水位线: 之前某次遍历已确认连续无缺口的最高块, 直接从它后面开始扫
+        db_dir = os.path.dirname(os.path.abspath(block_db_path))
+        wm = watermark.read_watermark(db_dir, NAME)
+        effective_start = START_BLOCK
+        if wm is not None and wm + 1 > effective_start:
+            effective_start = wm + 1
+            print(f"Watermark found: contiguous until {wm}, scanning from {effective_start}")
+
         # Get all existing block numbers at once
-        existing_blocks = get_existing_blocks(conn)
-        print(f"Found {len(existing_blocks)} existing blocks in database")
-        
+        existing_blocks = get_existing_blocks(conn, effective_start)
+        print(f"Found {len(existing_blocks)} existing blocks in database (>= {effective_start})")
+
+        # 顺便推进水位线: 从 effective_start 起连续存在的最高块
+        contiguous = effective_start - 1
+        while contiguous + 1 in existing_blocks:
+            contiguous += 1
+        if contiguous >= effective_start:
+            watermark.write_watermark(db_dir, NAME, contiguous)
+
         blocks_needed = []
-        for block_number in range(START_BLOCK, latest_block):
+        for block_number in range(effective_start, latest_block):
             if block_number not in existing_blocks:
                 blocks_needed.append(block_number)
                 if len(blocks_needed) > 100000:
                     break
-        
+
         del existing_blocks
                 
         print(f"Number of blocks to process: {len(blocks_needed)}")
@@ -340,7 +425,8 @@ def main():
         print(f"Program error: {e}")
     finally:
         conn.close()
-        
+        flush_stats()
+
     print("\nProgram finished")
 
 if __name__ == "__main__":

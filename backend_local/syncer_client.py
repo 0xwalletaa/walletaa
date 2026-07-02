@@ -7,6 +7,7 @@ import sqlite3
 import requests
 import time
 import argparse
+import watermark
 
 # Add command line argument parsing
 parser = argparse.ArgumentParser(description='Syncer client for blockchain data')
@@ -134,10 +135,10 @@ def get_local_highest_block(name):
         print(f"Error getting local highest block: {e}")
         return 0
 
-def check_block_exists(cursor, block_number):
-    """Check if a specific block exists in local database"""
-    cursor.execute("SELECT 1 FROM blocks WHERE block_number = ? LIMIT 1", (block_number,))
-    return cursor.fetchone() is not None
+def get_existing_blocks(cursor, from_block):
+    """Load all existing block numbers >= from_block into a set (one query)"""
+    cursor.execute("SELECT block_number FROM blocks WHERE block_number >= ?", (from_block,))
+    return set(row[0] for row in cursor.fetchall())
 
 def sync_block_batch(conn, name, block_numbers):
     """Request and sync a batch of blocks from server
@@ -271,33 +272,49 @@ def sync_blocks(name, start_block):
             return False
         
         remote_highest = remote_data.get('highest_block', 0)
-        
+
         # Get local highest block
         local_highest = get_local_highest_block(name)
-        
-        print(f"  Start block: {start_block}")
+
+        # 水位线: 之前已确认连续无缺口的最高块, 直接从它后面开始扫描
+        effective_start = start_block
+        wm = watermark.read_watermark(DB_PATH, name)
+        if wm is not None and wm + 1 > effective_start:
+            effective_start = wm + 1
+            print(f"  Watermark: contiguous until {wm}")
+
+        print(f"  Start block: {start_block} (effective: {effective_start})")
         print(f"  Local highest: {local_highest}")
         print(f"  Remote highest: {remote_highest}")
-        
-        if start_block > remote_highest:
+
+        if effective_start > remote_highest:
             print(f"  No blocks to sync")
             conn.close()
             return True
-        
+
+        # 一次性载入已有块号 (代替原来逐块一条 SQL 的遍历)
+        existing_blocks = get_existing_blocks(cursor, effective_start)
+        print(f"  Found {len(existing_blocks)} existing blocks (>= {effective_start})")
+
+        # 推进水位线: 从 effective_start 起连续存在的最高块
+        contiguous = effective_start - 1
+        while contiguous + 1 in existing_blocks:
+            contiguous += 1
+        if contiguous >= effective_start:
+            watermark.write_watermark(DB_PATH, name, contiguous)
+
         # Iterate through blocks and collect missing ones
         batch_size = 1000
         total_synced = 0
         missing_blocks = []
-        
-        print(f"  Scanning blocks from {start_block} to {remote_highest}...")
-        
-        for block_num in range(start_block, remote_highest + 1):
-            exists = check_block_exists(cursor, block_num)
-            
-            if not exists:
+
+        print(f"  Scanning blocks from {effective_start} to {remote_highest}...")
+
+        for block_num in range(effective_start, remote_highest + 1):
+            if block_num not in existing_blocks:
                 # Block is missing, add to list
                 missing_blocks.append(block_num)
-                
+
                 # Check if batch is full
                 if len(missing_blocks) >= batch_size:
                     # Request this batch
@@ -305,13 +322,9 @@ def sync_blocks(name, start_block):
                     print(f"  Syncing {len(missing_blocks)} missing blocks: {blocks_str}")
                     synced = sync_block_batch(conn, name, missing_blocks)
                     total_synced += synced
-                    
+
                     # Clear batch
                     missing_blocks = []
-            
-            # Progress indicator every 10000 blocks
-            if (block_num - start_block) % 10000 == 0 and block_num > start_block:
-                print(f"  Scanned up to block {block_num}...")
         
         # Don't forget the last batch if it exists
         if missing_blocks:
@@ -533,6 +546,8 @@ def sync_wrong(name):
                 # Remove file after successful sync
                 os.remove(wrong_block_file_path)
                 print(f"  Wrong block file removed: {wrong_block_file_path}")
+                # 回退本地水位线, 否则被删的块在水位线之前, 不会被重新下载
+                watermark.rollback_watermark(DB_PATH, name, min(block_numbers) - 1)
             else:
                 print(f"  Failed to sync wrong blocks after {max_retries} retries")
                 

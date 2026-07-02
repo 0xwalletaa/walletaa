@@ -1,40 +1,9 @@
-python3 get_block.py --name gnosis --endpoints \
-https://gnosis.oat.farm \
-https://gnosis-pokt.nodies.app \
-https://rpc.ap-southeast-1.gateway.fm/v4/gnosis/non-archival/mainnet \
-https://1rpc.io/gnosis \
-https://gnosis-mainnet.public.blastapi.io \
-https://gnosis-rpc.publicnode.com \
-https://endpoints.omniatech.io/v1/gnosis/mainnet/public \
-https://gnosis.drpc.org \
-https://rpc.gnosischain.com \
-https://rpc.gnosis.gateway.fm \
---num_threads 5 \
---start_block 45140000
-#TODO: is start_block right?
+#!/bin/bash
+# endpoints 省略时由 rpc_manager 自动从 chainlist 缓存中探测存活端点
+# batch_size 省略时使用 rpc_manager.CHAIN_CONFIG 里该链的默认批大小
 
-python3 get_tvl.py --name gnosis --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --endpoints \
-https://gnosis.oat.farm \
-https://gnosis-pokt.nodies.app \
-https://rpc.ap-southeast-1.gateway.fm/v4/gnosis/non-archival/mainnet \
-https://1rpc.io/gnosis \
-https://gnosis-mainnet.public.blastapi.io \
-https://gnosis-rpc.publicnode.com \
-https://endpoints.omniatech.io/v1/gnosis/mainnet/public \
-https://gnosis.drpc.org \
-https://rpc.gnosischain.com \
-https://rpc.gnosis.gateway.fm \
---num_threads 5
+python3 get_block_batch.py --name gnosis --num_threads 5 --start_block 45140000
 
-python3 get_code.py --name gnosis --endpoints \
-https://gnosis.oat.farm \
-https://gnosis-pokt.nodies.app \
-https://rpc.ap-southeast-1.gateway.fm/v4/gnosis/non-archival/mainnet \
-https://1rpc.io/gnosis \
-https://gnosis-mainnet.public.blastapi.io \
-https://gnosis-rpc.publicnode.com \
-https://endpoints.omniatech.io/v1/gnosis/mainnet/public \
-https://gnosis.drpc.org \
-https://rpc.gnosischain.com \
-https://rpc.gnosis.gateway.fm \
---num_threads 5
+python3 get_tvl.py --name gnosis --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --num_threads 5
+
+python3 get_code.py --name gnosis --num_threads 5

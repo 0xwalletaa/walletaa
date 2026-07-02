@@ -1,47 +1,9 @@
-python3 get_block_batch.py --name arb --endpoints \
-https://rpc.owlracle.info/arb/70d38ce1826c4a60bb2a8e05a6c8b20f \
-https://arbitrum-one.rpc.grove.city/v1/01fdb492 \
-https://arbitrum-one-public.nodies.app \
-https://arbitrum-one-rpc.publicnode.com \
-https://arbitrum.drpc.org \
-https://rpc.poolz.finance/arbitrum \
-https://arbitrum.public.blockpi.network/v1/rpc/public \
-https://public-arb-mainnet.fastnode.io \
-https://arbitrum.rpc.subquery.network/public \
-https://arb-one-mainnet.gateway.tatum.io \
-https://arb1.lava.build \
-https://api.zan.top/arb-one \
-https://arbitrum.gateway.tenderly.co \
-https://arb1.arbitrum.io/rpc \
-https://arbitrum-one.public.blastapi.io \
-https://1rpc.io/arb \
---num_threads 10 \
---start_block 429900000
+#!/bin/bash
+# endpoints 省略时由 rpc_manager 自动从 chainlist 缓存中探测存活端点
+# batch_size 省略时使用 rpc_manager.CHAIN_CONFIG 里该链的默认批大小
 
-python3 get_tvl.py --name arb --contract 0x3aF42ae5A628e7bC0824B9b786DA512cFd18D4e9  --endpoints \
-https://arbitrum.rpc.subquery.network/public \
-https://arbitrum.meowrpc.com \
-https://arbitrum.gateway.tenderly.co \
-https://rpc.therpc.io/arbitrum \
-https://arbitrum.drpc.org \
-https://arbitrum-one-rpc.publicnode.com \
-https://arb-pokt.nodies.app \
-https://arb1.lava.build \
-https://arbitrum-one.public.blastapi.io \
-https://1rpc.io/arb \
-https://arb1.arbitrum.io/rpc \
---num_threads 5
+python3 get_block_batch.py --name arb --num_threads 10 --start_block 429900000
 
-python3 get_code.py --name arb --endpoints \
-https://arbitrum.rpc.subquery.network/public \
-https://arbitrum.meowrpc.com \
-https://arbitrum.gateway.tenderly.co \
-https://rpc.therpc.io/arbitrum \
-https://arbitrum.drpc.org \
-https://arbitrum-one-rpc.publicnode.com \
-https://arb-pokt.nodies.app \
-https://arb1.lava.build \
-https://arbitrum-one.public.blastapi.io \
-https://1rpc.io/arb \
-https://arb1.arbitrum.io/rpc \
---num_threads 5
+python3 get_tvl.py --name arb --contract 0x3aF42ae5A628e7bC0824B9b786DA512cFd18D4e9 --num_threads 5
+
+python3 get_code.py --name arb --num_threads 5

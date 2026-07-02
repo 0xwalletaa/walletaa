@@ -1,46 +1,9 @@
-python3 get_block.py --name base --endpoints \
-https://base.llamarpc.com \
-https://base.api.onfinality.io/public \
-https://base-mainnet.public.blastapi.io \
-https://base-pokt.nodies.app \
-https://base.drpc.org \
-https://base.meowrpc.com \
-https://1rpc.io/base \
-https://endpoints.omniatech.io/v1/base/mainnet/public \
-https://mainnet.base.org \
-https://api.zan.top/base-mainnet \
-https://base.gateway.tenderly.co \
-https://base.rpc.subquery.network/public \
-https://base.gateway.tenderly.co \
---num_threads 5 \
---start_block 43360000
+#!/bin/bash
+# endpoints 省略时由 rpc_manager 自动从 chainlist 缓存中探测存活端点
+# batch_size 省略时使用 rpc_manager.CHAIN_CONFIG 里该链的默认批大小
 
-python3 get_tvl.py --name base --contract 0x16Eef38116c2081fbC4d4E54F81d0D08640ff00F  --endpoints \
-https://base.api.onfinality.io/public \
-https://base-mainnet.public.blastapi.io \
-https://base-pokt.nodies.app \
-https://base.drpc.org \
-https://base.meowrpc.com \
-https://endpoints.omniatech.io/v1/base/mainnet/public \
-https://mainnet.base.org \
-https://api.zan.top/base-mainnet \
-https://base.gateway.tenderly.co \
-https://base.rpc.subquery.network/public \
-https://base.gateway.tenderly.co \
---num_threads 5
+python3 get_block_batch.py --name base --num_threads 5 --start_block 43360000
 
-python3 get_code.py --name base --endpoints \
-https://base.llamarpc.com \
-https://base.api.onfinality.io/public \
-https://base-mainnet.public.blastapi.io \
-https://base-pokt.nodies.app \
-https://base.drpc.org \
-https://base.meowrpc.com \
-https://1rpc.io/base \
-https://endpoints.omniatech.io/v1/base/mainnet/public \
-https://mainnet.base.org \
-https://api.zan.top/base-mainnet \
-https://base.gateway.tenderly.co \
-https://base.rpc.subquery.network/public \
-https://base.gateway.tenderly.co \
---num_threads 5
+python3 get_tvl.py --name base --contract 0x16Eef38116c2081fbC4d4E54F81d0D08640ff00F --num_threads 5
+
+python3 get_code.py --name base --num_threads 5
