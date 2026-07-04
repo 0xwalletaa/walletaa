@@ -258,6 +258,13 @@ def process_block_batch(block_numbers):
             for tx in transactions:
                 tx_type = int(tx.get('type', '0x0'), 16)
                 if tx_type == 4:
+                    # 部分公共节点返回的 type4 交易缺 authorizationList (脏数据),
+                    # 整批拒收, 让重试机制换节点再抓
+                    if 'authorizationList' not in tx:
+                        print(f"Dirty type4 tx without authorizationList in block "
+                              f"#{block_number} from {endpoint_url}, rejecting batch")
+                        stats_add(fail=1)
+                        return False
                     type4_count += 1
                     tx_hash = tx['hash']
                     # Store transaction data as JSON

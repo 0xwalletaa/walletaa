@@ -298,13 +298,15 @@ def update_info_by_block(mysql_db_name, block_db_path):
     
     # Process row by row to avoid loading all data at once
     for row in block_tx_cursor:  # Iterate cursor directly
-        block_number, tx_hash, tx_data_str = row
-        
-        tx_hash = "0x"+tx_hash
+        block_number, raw_tx_hash, tx_data_str = row
+
+        # 旧单块抓取存的哈希不带 0x, 批量抓取存的带 0x: 统一规范化,
+        # 查重必须用规范化后的哈希, 否则 "0x0x..." 永远查不中导致主键冲突
+        tx_hash = raw_tx_hash if raw_tx_hash.startswith("0x") else "0x" + raw_tx_hash
         info_cursor.execute("SELECT tx_hash FROM transactions WHERE tx_hash = %s", (tx_hash,))
         if info_cursor.fetchone() is not None:
-            # 如果交易已存在于MySQL中，标记为已使用
-            block_update_cursor.execute("UPDATE type4_transactions SET used = 1 WHERE tx_hash = ?", (tx_hash[2:],))
+            # 如果交易已存在于MySQL中，标记为已使用 (用 sqlite 里的原始键)
+            block_update_cursor.execute("UPDATE type4_transactions SET used = 1 WHERE tx_hash = ?", (raw_tx_hash,))
             block_conn.commit()
             continue
         if "authorizationList" not in tx_data_str:
@@ -358,9 +360,9 @@ def update_info_by_block(mysql_db_name, block_db_path):
             info_cursor.execute("INSERT INTO relayers (relayer_address, tx_count, authorization_count, authorization_fee) VALUES (%s, %s, %s, %s)", (type4_tx['relayer_address'] , 1, len(type4_tx['authorization_list']),  type4_tx['authorization_fee']))
             
         info_conn.commit()
-        
-        # 标记交易为已使用
-        block_update_cursor.execute("UPDATE type4_transactions SET used = 1 WHERE tx_hash = ?", (tx_hash[2:],))
+
+        # 标记交易为已使用 (用 sqlite 里的原始键)
+        block_update_cursor.execute("UPDATE type4_transactions SET used = 1 WHERE tx_hash = ?", (raw_tx_hash,))
         block_conn.commit()
         
         tx_processed += 1
