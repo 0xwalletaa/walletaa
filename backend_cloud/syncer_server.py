@@ -854,13 +854,14 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 </style>
 </head>
 <body>
-<h1>WalletAA Syncer Dashboard</h1>
+<h1>WalletAA Syncer Dashboard <span id="total" class="dim" style="font-size:14px; font-weight:400;"></span></h1>
 <div class="meta" id="meta">loading...</div>
 <table>
   <thead><tr>
     <th>chain</th><th>start block</th><th>highest block</th><th>latest block time</th>
     <th>behind</th><th>blocks +1h</th><th>req ok 1h</th><th>req fail 1h</th>
-    <th>block db</th><th>tvl updated</th><th>code updated</th>
+    <th>block db</th><th>tvl db</th><th>code db</th>
+    <th>tvl updated</th><th>code updated</th>
   </tr></thead>
   <tbody id="tbody"></tbody>
 </table>
@@ -906,9 +907,15 @@ async function refresh() {
       '<td>' + (s.success_requests || 0).toLocaleString() + '</td>' +
       '<td class="' + failCls + '">' + (s.failed_requests || 0).toLocaleString() + '</td>' +
       '<td>' + fmtSize(b.db_size) + '</td>' +
+      '<td>' + fmtSize(c.tvl ? c.tvl.db_size : null) + '</td>' +
+      '<td>' + fmtSize(c.code ? c.code.db_size : null) + '</td>' +
       '<td>' + (c.tvl ? fmtTime(c.tvl.last_update_timestamp) : '-') + '</td>' +
       '<td>' + (c.code ? fmtTime(c.code.last_update_timestamp) : '-') + '</td></tr>';
   });
+  const totalSize = data.chains.reduce((sum, c) =>
+    sum + ((c.block && c.block.db_size) || 0) + ((c.tvl && c.tvl.db_size) || 0) +
+    ((c.code && c.code.db_size) || 0), 0);
+  document.getElementById('total').textContent = 'total db size: ' + fmtSize(totalSize);
   document.getElementById('tbody').innerHTML = rows.join('');
 }
 refresh();
