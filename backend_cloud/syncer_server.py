@@ -851,11 +851,21 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .warn { color: #d29922; }
   .bad { color: #f85149; }
   .dim { color: #8b949e; }
+  .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  th:first-child, td:first-child {
+    position: sticky; left: 0; background: #0d1117;
+  }
+  @media (max-width: 600px) {
+    body { margin: 12px; }
+    h1 { font-size: 16px; }
+    th, td { padding: 6px 8px; font-size: 12px; }
+  }
 </style>
 </head>
 <body>
 <h1>WalletAA Syncer Dashboard <span id="total" class="dim" style="font-size:14px; font-weight:400;"></span></h1>
 <div class="meta" id="meta">loading...</div>
+<div class="tablewrap">
 <table>
   <thead><tr>
     <th>chain</th><th>start block</th><th>highest block</th><th>latest block time</th>
@@ -865,6 +875,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   </tr></thead>
   <tbody id="tbody"></tbody>
 </table>
+</div>
 <script>
 function fmtSize(b) {
   if (b == null) return '-';
