@@ -7,3 +7,5 @@ python3 get_block_batch.py --name bsc --num_threads 5 --start_block 85280000
 python3 get_tvl.py --name bsc --contract 0x27c81Cb1281a9643E7Ace9E843579316Be56456E --num_threads 5
 
 python3 get_code.py --name bsc --num_threads 5
+
+python3 clean_block.py --name bsc

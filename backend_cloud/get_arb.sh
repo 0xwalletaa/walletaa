@@ -7,3 +7,5 @@ python3 get_block_batch.py --name arb --num_threads 10 --start_block 429900000
 python3 get_tvl.py --name arb --contract 0x3aF42ae5A628e7bC0824B9b786DA512cFd18D4e9 --num_threads 5
 
 python3 get_code.py --name arb --num_threads 5
+
+python3 clean_block.py --name arb

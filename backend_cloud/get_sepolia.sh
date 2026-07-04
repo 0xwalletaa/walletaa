@@ -7,3 +7,5 @@ python3 get_block_batch.py --name sepolia --num_threads 4 --start_block 9100000
 python3 get_tvl.py --name sepolia --contract 0x89038D59C4Bd24970150c92B4f48A819f38d9c69 --num_threads 4
 
 python3 get_code.py --name sepolia --num_threads 4
+
+python3 clean_block.py --name sepolia

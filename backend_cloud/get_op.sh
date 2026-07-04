@@ -7,3 +7,5 @@ python3 get_block_batch.py --name op --num_threads 5 --start_block 148950000
 python3 get_tvl.py --name op --contract 0x89038D59C4Bd24970150c92B4f48A819f38d9c69 --num_threads 5
 
 python3 get_code.py --name op --num_threads 5
+
+python3 clean_block.py --name op

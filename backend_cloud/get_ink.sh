@@ -7,3 +7,5 @@ python3 get_block_batch.py --name ink --num_threads 3 --start_block 40010000
 python3 get_tvl.py --name ink --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --num_threads 3
 
 python3 get_code.py --name ink --num_threads 3
+
+python3 clean_block.py --name ink

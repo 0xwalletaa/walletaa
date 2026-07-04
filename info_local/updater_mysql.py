@@ -14,6 +14,46 @@ DB_PATH = os.environ.get("DB_PATH")
 DATA_EXPIRY = 86400
 
 
+def read_local_watermark():
+    """读区块目录下的 {NAME}_good_* 水位文件, 没有返回 None"""
+    import glob as glob_module
+    import re as re_module
+    best = None
+    for path in glob_module.glob(f'{DB_PATH}/{NAME}_good_*'):
+        m = re_module.match(rf'{NAME}_good_(\d+)$', os.path.basename(path))
+        if m:
+            block = int(m.group(1))
+            if best is None or block > best:
+                best = block
+    return best
+
+
+def write_confirmed(block):
+    """签发确认文件 {NAME}_confirmed_{block}: 表示该高度以下的块全部下载、解析、验证完毕。
+
+    只前进不后退; 新文件建好后清理旧的。
+    """
+    import glob as glob_module
+    import re as re_module
+    if block is None:
+        return
+    existing = []
+    for path in glob_module.glob(f'{DB_PATH}/{NAME}_confirmed_*'):
+        m = re_module.match(rf'{NAME}_confirmed_(\d+)$', os.path.basename(path))
+        if m:
+            existing.append((path, int(m.group(1))))
+    if existing and block <= max(b for _, b in existing):
+        return
+    new_path = f'{DB_PATH}/{NAME}_confirmed_{block}'
+    open(new_path, 'w').close()
+    for path, _ in existing:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+    print(f"[confirmed] {NAME}: verified up to {block}")
+
+
 def get_mysql_connection(mysql_db_name, with_database=True):
     """Helper function to create MySQL connection"""
     if with_database:
@@ -350,6 +390,7 @@ def update_info_by_block(mysql_db_name, block_db_path):
 
     info_conn.close()
     block_conn.close()
+    return wrong_block_number
     
 
 def update_info_by_tvl(mysql_db_name, tvl_db_path):
@@ -716,10 +757,18 @@ if __name__ == "__main__":
 
     create_db_if_not_exists(mysql_db_name)
     create_used_col_and_index(mysql_db_name, block_db_path)
+
+    # 进门先拍照: 确认的范围只能是"开始消费之前"就已下载到的水位
+    watermark_at_start = read_local_watermark()
+
     start_time = time.time()
-    update_info_by_block(mysql_db_name, block_db_path)
+    wrong_block_number = update_info_by_block(mysql_db_name, block_db_path)
     end_time = time.time()
     print(f"Block update: {end_time - start_time} seconds")
+
+    # 本轮完整消费且无坏块 → 签发确认: 该水位以下全部下载+解析+验证完毕
+    if wrong_block_number == 0:
+        write_confirmed(watermark_at_start)
 
     # 根据 --no-tvl 参数决定是否执行 TVL 更新
     if not args.no_tvl:

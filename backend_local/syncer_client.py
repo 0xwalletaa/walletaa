@@ -560,6 +560,61 @@ def sync_wrong(name):
         print(f"  Exception: {e}")
         return False
 
+def sync_confirm(name):
+    """Upload confirmed height to server.
+
+    updater 完整消费且无坏块后会在区块目录签发 {name}_confirmed_{block} 文件,
+    表示该高度以下全部下载+解析+验证完毕。上传给云端后, 云端 clean_block
+    据此可以安全瘦身块库。上传成功才删本地文件, 失败留到下轮重试。
+    """
+    try:
+        import glob
+        import re
+        print(f"\n[{name}] Syncing confirmed height...")
+
+        confirmed_files = []
+        for path in glob.glob(f'{DB_PATH}/{name}_confirmed_*'):
+            m = re.match(rf'{re.escape(name)}_confirmed_(\d+)$', os.path.basename(path))
+            if m:
+                confirmed_files.append((path, int(m.group(1))))
+
+        if not confirmed_files:
+            print(f"  No confirmed file found")
+            return True
+
+        height = max(block for _, block in confirmed_files)
+        print(f"  Confirmed height: {height}")
+
+        max_retries = 3
+        for retry in range(max_retries):
+            try:
+                response = requests.post(
+                    f"{SERVER_URL}/{name}/confirm_height",
+                    json={'height': height},
+                    headers={**get_auth_headers(), 'Content-Type': 'application/json'},
+                    timeout=10
+                )
+                if response.status_code == 200 and response.json().get('success'):
+                    print(f"  Confirmed height {height} uploaded")
+                    for path, _ in confirmed_files:
+                        try:
+                            os.remove(path)
+                        except OSError:
+                            pass
+                    return True
+                print(f"  HTTP {response.status_code}: {response.text[:100]} (retry {retry + 1}/{max_retries})")
+            except Exception as e:
+                print(f"  Exception uploading confirmed height: {e} (retry {retry + 1}/{max_retries})")
+            if retry < max_retries - 1:
+                time.sleep(2)
+
+        print(f"  Failed to upload confirmed height, will retry next round")
+        return False
+    except Exception as e:
+        print(f"  Exception: {e}")
+        return False
+
+
 def sync_pending(name):
     """Sync pending addresses to server
     
@@ -817,8 +872,11 @@ def main():
         # Upload mode: Sync pending addresses and wrong blocks to server
         # 1. Sync wrong blocks
         sync_wrong(NAME)
-        
-        # 2. Sync pending addresses
+
+        # 2. Sync confirmed height
+        sync_confirm(NAME)
+
+        # 3. Sync pending addresses
         sync_pending(NAME)
     
     elapsed_time = time.time() - start_time

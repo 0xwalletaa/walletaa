@@ -596,6 +596,42 @@ def add_code_addresses(name):
             'error': str(e)
         }), 500
 
+@app.route('/<name>/confirm_height', methods=['POST'])
+@require_token
+def confirm_height(name):
+    """接收本地上报的确认高度: 该高度以下的块本地已全部下载+解析+验证。
+
+    收到时只记录 {name}_confirmed_{height} 文件 (只前进), 不做任何删除;
+    实际瘦身由 clean_block.py 在抓块循环的安静点执行。
+    """
+    error_response = validate_chain_name(name)
+    if error_response:
+        return error_response
+    try:
+        data = request.get_json()
+        if not data or 'height' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'height field is required in request body'
+            }), 400
+
+        height = int(data['height'])
+        if height <= 0:
+            return jsonify({'success': False, 'error': 'height must be positive'}), 400
+
+        block_db_path, _, _ = get_db_paths(name)
+        db_dir = os.path.dirname(os.path.abspath(block_db_path))
+        effective = watermark.write_confirmed(db_dir, name, height)
+
+        return jsonify({
+            'success': True,
+            'chain': name,
+            'confirmed_height': effective
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/<name>/delete_wrong_block', methods=['POST'])
 @require_token
 def delete_wrong_block(name):

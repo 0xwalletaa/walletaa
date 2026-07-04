@@ -7,3 +7,5 @@ python3 get_block_batch.py --name base --num_threads 5 --start_block 43360000
 python3 get_tvl.py --name base --contract 0x16Eef38116c2081fbC4d4E54F81d0D08640ff00F --num_threads 5
 
 python3 get_code.py --name base --num_threads 5
+
+python3 clean_block.py --name base

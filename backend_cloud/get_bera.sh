@@ -7,3 +7,5 @@ python3 get_block_batch.py --name bera --num_threads 4 --start_block 18240000
 python3 get_tvl.py --name bera --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --num_threads 4
 
 python3 get_code.py --name bera --num_threads 4
+
+python3 clean_block.py --name bera

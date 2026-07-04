@@ -7,3 +7,5 @@ python3 get_block_batch.py --name uni --num_threads 5 --start_block 41220000
 python3 get_tvl.py --name uni --contract 0xc86bDf9661c62646194ef29b1b8f5Fe226E8C97E --num_threads 5
 
 python3 get_code.py --name uni --num_threads 5
+
+python3 clean_block.py --name uni
