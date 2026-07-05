@@ -69,4 +69,11 @@ ol {
   .ant-drawer-content {
     background-color: #fff !important;
   }
+
+  // 修复移动端侧边栏遮罩不跟随滚动的问题:
+  // ProLayout 以 inline 模式渲染侧边栏 Drawer(position: absolute,只有一屏高),
+  // 页面下滑后遮罩留在文档顶部,改为 fixed 让遮罩始终覆盖整个视口
+  .ant-layout > .ant-drawer.ant-drawer-inline {
+    position: fixed;
+  }
 }
