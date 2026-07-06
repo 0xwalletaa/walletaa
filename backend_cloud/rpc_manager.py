@@ -45,6 +45,14 @@ CHAIN_CONFIG = {
     'scroll':  {'chain_id': 534352,   'batch_size': 10, 'lag_tolerance': 80},
 }
 
+# 已证实有问题的端点, 按 URL 子串匹配直接从候选里剔除
+BLOCKLIST = [
+    'arbitrum-one.rpc.sentio.xyz',  # type4 交易缺 authorizationList (脏数据)
+    'arb-one.api.pocket.network',   # 历史块批量请求随机返回 null
+    'api.zan.top/arb-one',          # 生产批大小下 429 限流
+    'arb1.arbitrum.io',             # 生产批大小下 429 限流
+]
+
 
 def log(msg):
     print(f"[rpc_manager] {msg}", file=sys.stderr, flush=True)
@@ -135,6 +143,8 @@ def get_candidate_urls(name):
         if not isinstance(url, str) or not url.startswith('https://'):
             continue
         if '${' in url or ' ' in url:  # 带占位符的跳过
+            continue
+        if any(bad in url for bad in BLOCKLIST):
             continue
         if url not in urls:
             urls.append(url)
