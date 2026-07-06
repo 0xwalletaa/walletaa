@@ -48,10 +48,6 @@ CHAIN_CONFIG = {
 # 已证实有问题的端点, 按 URL 子串匹配直接从候选里剔除
 BLOCKLIST = [
     'arbitrum-one.rpc.sentio.xyz',  # type4 交易缺 authorizationList (脏数据)
-    'arb-one.api.pocket.network',   # 历史块批量请求随机返回 null
-    'api.zan.top/arb-one',          # 生产批大小下 429 限流
-    'arb1.arbitrum.io',             # 生产批大小下 429 限流
-    'arbitrum-one.public.blastapi.io',  # 软限流: HTTP 200 但批量里大半 result 为 null
 ]
 
 
