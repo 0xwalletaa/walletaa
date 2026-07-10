@@ -51,6 +51,8 @@ BLOCKLIST = [
     'arb-mainnet.g.alchemy.com',    # 公共 demo key, 配额极小, 429 大户
     'arb-one.api.pocket.network',   # 批量请求 500 / 整批返回 null
     'arb1.arbitrum.io',             # 零压力下也对本 IP 批量 429, 与并发无关
+    'arbitrum-one-rpc.publicnode.com',  # 3 并发下 1000+ 次 429/小时 (全量日志实测)
+    'api.zan.top/arb-one',          # 3 并发下 ~900 次 429/小时 (全量日志实测)
 ]
 
 
