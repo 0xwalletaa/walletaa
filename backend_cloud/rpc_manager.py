@@ -48,6 +48,9 @@ CHAIN_CONFIG = {
 # 已证实有问题的端点, 按 URL 子串匹配直接从候选里剔除
 BLOCKLIST = [
     'arbitrum-one.rpc.sentio.xyz',  # type4 交易缺 authorizationList (脏数据)
+    'arb-mainnet.g.alchemy.com',    # 公共 demo key, 配额极小, 429 大户
+    'arb-one.api.pocket.network',   # 批量请求 500 / 整批返回 null
+    'arb1.arbitrum.io',             # 零压力下也对本 IP 批量 429, 与并发无关
 ]
 
 
