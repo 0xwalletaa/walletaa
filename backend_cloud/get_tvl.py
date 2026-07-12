@@ -55,8 +55,10 @@ stats = StatsReporter(NAME, 'tvl', args.stats_url)
 
 if not WEB3_ENPOINTS:
     import rpc_manager
-    # require_batch: 和抓块用同一个经过批量试压的严筛端点池, 杂牌节点进不来
-    WEB3_ENPOINTS = rpc_manager.get_alive_endpoints(NAME, require_batch=True)
+    # require_batch: 和抓块用同一个经过批量试压的严筛端点池, 杂牌节点进不来;
+    # for_eth_call: 再剔除抓块可用但扛不住重合约调用的端点
+    WEB3_ENPOINTS = rpc_manager.get_alive_endpoints(NAME, require_batch=True,
+                                                    for_eth_call=True)
     if not WEB3_ENPOINTS:
         print("No alive endpoints found, exiting")
         exit(1)

@@ -55,11 +55,16 @@ BLOCKLIST = [
     'api.zan.top/arb-one',          # 3 并发下 ~900 次 429/小时 (全量日志实测)
     'rpc-bsc.48.club',              # 任何批大小都整批返回 null
     '0.48.club',                    # 同上 (48.club 另一入口)
+]
+
+# 抓块正常但干不了重 eth_call (500 地址余额合约调用) 的端点:
+# 只在 tvl 获取时额外剔除, 区块获取继续用它们
+ETH_CALL_BLOCKLIST = [
     'rpc.flashbots.net',            # 交易中继, eth_call 一律 403
-    'mainnet.gateway.tenderly.co',  # 重 eth_call 一律 408 (op 的 tenderly 入口正常, 只封 mainnet)
+    'mainnet.gateway.tenderly.co',  # 重 eth_call 一律 408 (op 的 tenderly 入口正常)
     'gateway.tenderly.co/public/mainnet',  # 同上
-    'eth.meowrpc.com',              # 不支持 eth_call (bsc 入口也撑不住批量, 已另行过滤)
-    'api.zan.top/opt-mainnet',      # 429 限流, 与其 arb 入口同款
+    'eth.meowrpc.com',              # 明确回 "eth_call is not supported"
+    'api.zan.top/opt-mainnet',      # 重调用 429 限流, 与其 arb 入口同款
 ]
 
 
@@ -212,13 +217,20 @@ def probe_endpoint(url, chain_id, require_batch=False, timeout=8, batch_test_siz
 
 
 def get_alive_endpoints(name, require_batch=False, max_endpoints=None,
-                        num_threads=32, timeout=8):
-    """返回指定链当前存活 (且不严重落后) 的端点列表"""
+                        num_threads=32, timeout=8, for_eth_call=False):
+    """返回指定链当前存活 (且不严重落后) 的端点列表。
+
+    for_eth_call=True 时额外剔除 ETH_CALL_BLOCKLIST (抓块可用但扛不住
+    重合约调用的端点), 供 get_tvl 使用。
+    """
     config = CHAIN_CONFIG[name]
     chain_id = config['chain_id']
     lag_tolerance = config['lag_tolerance']
 
     candidates = get_candidate_urls(name)
+    if for_eth_call:
+        candidates = [u for u in candidates
+                      if not any(bad in u for bad in ETH_CALL_BLOCKLIST)]
     if not candidates:
         return []
 
