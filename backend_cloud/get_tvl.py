@@ -32,6 +32,8 @@ parser.add_argument('--num_threads', type=int, default=4, help='Number of parall
 parser.add_argument('--data_expiry', type=int, default=86400, help='Data expiry time (seconds)')
 parser.add_argument('--limit', type=int, default=500000, help='Processing limit')
 parser.add_argument('--block_db_path', type=str, default='', help='block_db_path')
+parser.add_argument('--stats_url', type=str, default='http://127.0.0.1:5000',
+                    help='syncer_server base URL for stats reporting (empty to disable)')
 
 args = parser.parse_args()
 
@@ -47,6 +49,9 @@ DATA_EXPIRY = args.data_expiry
 LIMIT = args.limit
 
 BLOCK_DB_PATH = args.block_db_path
+
+from stats_reporter import StatsReporter
+stats = StatsReporter(NAME, 'tvl', args.stats_url)
 
 if not WEB3_ENPOINTS:
     import rpc_manager
@@ -208,10 +213,12 @@ def get_address_balances(author_addresses):
                 'usdc_balance': str(balance_data[4] / (10 ** 6)),
                 'dai_balance': str(balance_data[5] / (10 ** 18)),
             })
-        
+
+        stats.add(ok=1)
         return balances
     except Exception as e:
         print(f"Error getting address balances: {e}")
+        stats.add(fail=1)
         return []
 
 def get_unfresh_author_addresses():
@@ -285,6 +292,7 @@ def update_author_balance(author_addresses):
                      balance['usdt_balance'], balance['usdc_balance'], balance['dai_balance'], current_timestamp, last_update_timestamp)
                 )
             conn.commit()
+            stats.add(updated=len(balances))
             print(f"Updated balances for {len(balances)} addresses, balance changed count: {balance_changed_count}")
     except Exception as e:
         print(f"Error updating author {author_addresses} information: {e}")
@@ -321,8 +329,9 @@ def main():
                 error_count += 1
     
     print(f"\nProcessing complete! Success: {success_count}, Failed: {error_count}")
-    
+
+    stats.flush()
     print("\nProgram finished")
 
 if __name__ == "__main__":
-    main() 
+    main()

@@ -332,7 +332,8 @@ def get_tvl(name):
             })
         
         conn.close()
-        
+
+        _record_stats(name, 'tvl_down', updated=len(tvl_data), ok=1)
         return jsonify({
             'success': True,
             'chain': name,
@@ -385,7 +386,8 @@ def get_code(name):
             })
         
         conn.close()
-        
+
+        _record_stats(name, 'code_down', updated=len(code_data), ok=1)
         return jsonify({
             'success': True,
             'chain': name,
@@ -716,10 +718,22 @@ def delete_wrong_block(name):
             'error': str(e)
         }), 500
 
-# ---- 抓块脚本上报的运行统计 (纯内存, 重启即清零) ----
+# ---- 抓取脚本上报的运行统计 (纯内存, 重启即清零) ----
 STATS_WINDOW = 3600  # 看板统计最近 1 小时
+# block=抓块, tvl/code=余额与代码刷新 (脚本上报);
+# tvl_down/code_down=本地增量拉取 (get_tvl/get_code 接口服务端直接计数)
+STATS_KINDS = ('block', 'tvl', 'code', 'tvl_down', 'code_down')
 STATS_LOCK = threading.Lock()
-STATS_EVENTS = defaultdict(deque)  # name -> deque[(ts, blocks_added, success, failed)]
+STATS_EVENTS = defaultdict(deque)  # (name, kind) -> deque[(ts, updated, success, failed)]
+
+
+def _record_stats(name, kind, updated=0, ok=0, fail=0):
+    """服务端内部直接记一笔统计 (与 /report_stats 同一存储)"""
+    now = time.time()
+    with STATS_LOCK:
+        events = STATS_EVENTS[(name, kind)]
+        events.append((now, updated, ok, fail))
+        _prune_stats(events, now)
 
 
 def _prune_stats(events, now):
@@ -730,41 +744,62 @@ def _prune_stats(events, now):
 @app.route('/<name>/report_stats', methods=['POST'])
 @require_token
 def report_stats(name):
-    """接收抓块脚本上报的增量统计"""
+    """接收抓取脚本上报的增量统计。
+
+    kind 区分来源: block (get_block_batch, 不传时的默认值, 兼容旧脚本) /
+    tvl (get_tvl) / code (get_code)。blocks_added 在 tvl/code 语义下是
+    成功更新的记录数。
+    """
     error_response = validate_chain_name(name)
     if error_response:
         return error_response
     try:
         data = request.get_json() or {}
-        blocks_added = int(data.get('blocks_added', 0))
+        kind = data.get('kind', 'block')
+        if kind not in STATS_KINDS:
+            return jsonify({'success': False,
+                            'error': f'unknown kind: {kind}'}), 400
+        updated = int(data.get('blocks_added', 0))
         success = int(data.get('success_requests', 0))
         failed = int(data.get('failed_requests', 0))
         now = time.time()
         with STATS_LOCK:
-            events = STATS_EVENTS[name]
-            events.append((now, blocks_added, success, failed))
+            events = STATS_EVENTS[(name, kind)]
+            events.append((now, updated, success, failed))
             _prune_stats(events, now)
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-def _stats_1h(name):
-    """最近 1 小时的统计汇总"""
+def _stats_1h_kind(name, kind):
+    """单一 kind 最近 1 小时的统计汇总"""
     now = time.time()
-    blocks_added = success = failed = 0
+    updated = success = failed = 0
     with STATS_LOCK:
-        events = STATS_EVENTS.get(name)
+        events = STATS_EVENTS.get((name, kind))
         if events:
             _prune_stats(events, now)
-            for ts, b, ok, fail in events:
+            for ts, u, ok, fail in events:
                 if now - ts <= STATS_WINDOW:
-                    blocks_added += b
+                    updated += u
                     success += ok
                     failed += fail
-    return {'blocks_added': blocks_added,
-            'success_requests': success,
-            'failed_requests': failed}
+    return updated, success, failed
+
+
+def _stats_1h(name):
+    """最近 1 小时的统计汇总: block 沿用旧字段名, tvl/code 挂子字典"""
+    blocks_added, success, failed = _stats_1h_kind(name, 'block')
+    result = {'blocks_added': blocks_added,
+              'success_requests': success,
+              'failed_requests': failed}
+    for kind in ('tvl', 'code', 'tvl_down', 'code_down'):
+        updated, ok, fail = _stats_1h_kind(name, kind)
+        result[kind] = {'updated': updated,
+                        'success_requests': ok,
+                        'failed_requests': fail}
+    return result
 
 
 def _chain_status(name):
@@ -870,6 +905,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <thead><tr>
     <th>chain</th><th>start block</th><th>highest block</th><th>latest block time</th>
     <th>behind</th><th>blocks +1h</th><th>req ok 1h</th><th>req fail 1h</th>
+    <th>tvl req 1h</th><th>code req 1h</th>
+    <th>tvl dl 1h</th><th>code dl 1h</th>
     <th>block db</th><th>tvl db</th><th>code db</th>
     <th>tvl updated</th><th>code updated</th>
   </tr></thead>
@@ -909,6 +946,17 @@ async function refresh() {
     const s = c.stats_1h || {};
     const failCls = s.failed_requests > 0 ? 'bad' : 'dim';
     const addCls = s.blocks_added > 0 ? 'ok' : 'dim';
+    const fmtKind = k => {
+      if (!k || (!k.success_requests && !k.failed_requests)) return '<td class="dim">-</td>';
+      const cls = k.failed_requests > 0 ? 'bad' : 'ok';
+      return '<td class="' + cls + '" title="updated: ' + (k.updated || 0).toLocaleString() + '">' +
+        k.success_requests.toLocaleString() + ' / ' + k.failed_requests.toLocaleString() + '</td>';
+    };
+    const fmtDown = k => {
+      if (!k || !k.success_requests) return '<td class="dim">-</td>';
+      return '<td class="ok" title="requests: ' + k.success_requests.toLocaleString() + '">' +
+        (k.updated || 0).toLocaleString() + '</td>';
+    };
     return '<tr><td>' + c.chain + '</td>' +
       '<td>' + (b.min_block != null ? b.min_block.toLocaleString() : '-') + '</td>' +
       '<td>' + (b.max_block != null ? b.max_block.toLocaleString() : '-') + '</td>' +
@@ -917,6 +965,8 @@ async function refresh() {
       '<td class="' + addCls + '">' + (s.blocks_added || 0).toLocaleString() + '</td>' +
       '<td>' + (s.success_requests || 0).toLocaleString() + '</td>' +
       '<td class="' + failCls + '">' + (s.failed_requests || 0).toLocaleString() + '</td>' +
+      fmtKind(s.tvl) + fmtKind(s.code) +
+      fmtDown(s.tvl_down) + fmtDown(s.code_down) +
       '<td>' + fmtSize(b.db_size) + '</td>' +
       '<td>' + fmtSize(c.tvl ? c.tvl.db_size : null) + '</td>' +
       '<td>' + fmtSize(c.code ? c.code.db_size : null) + '</td>' +

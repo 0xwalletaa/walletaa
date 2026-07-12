@@ -31,6 +31,8 @@ parser.add_argument('--endpoints', nargs='+', default=None,
 parser.add_argument('--num_threads', type=int, default=4, help='Number of parallel threads')
 parser.add_argument('--data_expiry', type=int, default=86400000, help='Data expiry time (seconds)')
 parser.add_argument('--block_db_path', type=str, default='', help='block_db_path')
+parser.add_argument('--stats_url', type=str, default='http://127.0.0.1:5000',
+                    help='syncer_server base URL for stats reporting (empty to disable)')
 
 args = parser.parse_args()
 
@@ -43,6 +45,9 @@ NUM_THREADS = args.num_threads
 DATA_EXPIRY = args.data_expiry
 
 BLOCK_DB_PATH = args.block_db_path
+
+from stats_reporter import StatsReporter
+stats = StatsReporter(NAME, 'code', args.stats_url)
 
 if not WEB3_ENPOINTS:
     import rpc_manager
@@ -91,9 +96,11 @@ def get_code(code_address):
         # Randomly select a Web3 node
         web3 = random.choice(web3s)
         code = web3.eth.get_code(Web3.to_checksum_address(code_address))
+        stats.add(ok=1)
         return HexBytes(code).hex()
     except Exception as e:
         print(f"Error getting code for address {code_address}: {e}")
+        stats.add(fail=1)
         return None
 
 def is_data_fresh(code_address):
@@ -167,6 +174,7 @@ def update_code(code_address):
                  code, current_timestamp, last_update_timestamp)
             )
             conn.commit()
+            stats.add(updated=1)
             print(f"Updated code for address {code_address}: {code[:10]}... (changed: {code_changed})")
     except Exception as e:
         print(f"Error updating address {code_address} information: {e}")
@@ -216,8 +224,9 @@ def main():
                 error_count += 1
     
     print(f"\nProcessing complete! Success: {success_count}, Failed: {error_count}")
-    
+
+    stats.flush()
     print("\nProgram finished")
 
 if __name__ == "__main__":
-    main() 
+    main()
