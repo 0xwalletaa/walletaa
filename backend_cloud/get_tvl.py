@@ -234,7 +234,13 @@ def get_unfresh_author_addresses():
     """Get all author addresses that are not fresh"""
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT author_address FROM author_balances WHERE timestamp < ? LIMIT ?", (int(time.time()) - DATA_EXPIRY, LIMIT))
+    # 过滤脏行: ecrecover 失败的哨兵值 'error' 曾一路漏进库里, 编进批次会
+    # 让整批 500 个地址的合约调用陪葬, 且该行永远刷不新、每轮必炸
+    cursor.execute(
+        "SELECT author_address FROM author_balances "
+        "WHERE timestamp < ? AND author_address LIKE '0x%' AND LENGTH(author_address) = 42 "
+        "LIMIT ?",
+        (int(time.time()) - DATA_EXPIRY, LIMIT))
     return [row[0] for row in cursor.fetchall()]
 
 def update_author_balance(author_addresses):

@@ -430,7 +430,12 @@ def add_tvl_addresses(name):
                 'success': False,
                 'error': 'addresses must be a list'
             }), 400
-        
+
+        # 挡掉非法地址 (如本地 ecrecover 失败漏上来的哨兵值 'error'),
+        # 它们一旦入库会让 get_tvl 的整批合约调用失败
+        addresses = [a for a in addresses
+                     if isinstance(a, str) and a.startswith('0x') and len(a) == 42]
+
         if len(addresses) == 0:
             return jsonify({
                 'success': True,
@@ -534,7 +539,12 @@ def add_code_addresses(name):
                 'success': False,
                 'error': 'addresses must be a list'
             }), 400
-        
+
+        # 挡掉非法地址 (如本地 ecrecover 失败漏上来的哨兵值 'error'),
+        # 它们一旦入库会让 get_tvl 的整批合约调用失败
+        addresses = [a for a in addresses
+                     if isinstance(a, str) and a.startswith('0x') and len(a) == 42]
+
         if len(addresses) == 0:
             return jsonify({
                 'success': True,
