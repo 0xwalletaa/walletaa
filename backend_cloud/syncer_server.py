@@ -811,7 +811,8 @@ def _chain_status(name):
         if not os.path.exists(block_db_path):
             status['block'] = None
         else:
-            conn = sqlite3.connect(block_db_path)
+            # timeout=2: 抓取进程频繁提交时别为看板等锁太久, 拿不到就下轮再看
+            conn = sqlite3.connect(block_db_path, timeout=2)
             cursor = conn.cursor()
             # 注意: MIN/MAX 必须分开查, 合并写会让 SQLite 放弃索引优化走全表扫描
             cursor.execute("SELECT MIN(block_number) FROM blocks")
@@ -839,7 +840,7 @@ def _chain_status(name):
             if not os.path.exists(db_path):
                 status[key] = None
                 continue
-            conn = sqlite3.connect(db_path)
+            conn = sqlite3.connect(db_path, timeout=2)
             cursor = conn.cursor()
             cursor.execute(f"SELECT MAX(last_update_timestamp) FROM {table}")
             last_update = cursor.fetchone()[0]
@@ -1001,5 +1002,7 @@ if __name__ == '__main__':
     else:
         print(f"Authentication: DISABLED (no token.txt found)")
     print("")
-    app.run(host='0.0.0.0', port=PORT, debug=False)
+    # threaded: tvl/code 全量刷新期间写库频繁, 单线程模式下一个慢请求
+    # (或被写锁拖住的看板查询) 会堵死包括 report_stats 在内的所有请求
+    app.run(host='0.0.0.0', port=PORT, debug=False, threaded=True)
 
