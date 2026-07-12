@@ -76,6 +76,12 @@ def get_db_connection():
     """Get thread-local database connection"""
     if not hasattr(thread_local, "db_connection"):
         thread_local.db_connection = sqlite3.connect(code_db_path)
+        # WAL: 刷新期间写提交密集, 别把看板/下载的读查询锁在门外
+        # (转换需要独占, 拿不到就保持原模式, 后续连接会再试)
+        try:
+            thread_local.db_connection.execute('PRAGMA journal_mode=WAL')
+        except sqlite3.OperationalError:
+            pass
         # Create table to store author balance information (if not exists)
         cursor = thread_local.db_connection.cursor()
         cursor.execute('''
