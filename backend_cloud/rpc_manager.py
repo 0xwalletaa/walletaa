@@ -34,7 +34,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CHAIN_CONFIG = {
     'mainnet': {'chain_id': 1,        'batch_size': 5,  'lag_tolerance': 30},
     'sepolia': {'chain_id': 11155111, 'batch_size': 10, 'lag_tolerance': 30},
-    'bsc':     {'chain_id': 56,       'batch_size': 5,  'lag_tolerance': 300},
+    'bsc':     {'chain_id': 56,       'batch_size': 15, 'lag_tolerance': 300},
     'op':      {'chain_id': 10,       'batch_size': 20, 'lag_tolerance': 100},
     'arb':     {'chain_id': 42161,    'batch_size': 30, 'lag_tolerance': 1000},
     'base':    {'chain_id': 8453,     'batch_size': 15, 'lag_tolerance': 100},
@@ -53,6 +53,8 @@ BLOCKLIST = [
     'arb1.arbitrum.io',             # 零压力下也对本 IP 批量 429, 与并发无关
     'arbitrum-one-rpc.publicnode.com',  # 3 并发下 1000+ 次 429/小时 (全量日志实测)
     'api.zan.top/arb-one',          # 3 并发下 ~900 次 429/小时 (全量日志实测)
+    'rpc-bsc.48.club',              # 任何批大小都整批返回 null
+    '0.48.club',                    # 同上 (48.club 另一入口)
 ]
 
 
