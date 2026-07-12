@@ -166,7 +166,7 @@ def ecrecover(auth):
 def get_db_connection():
     """Get thread-local database connection"""
     if not hasattr(thread_local, "db_connection"):
-        thread_local.db_connection = sqlite3.connect(tvl_db_path)
+        thread_local.db_connection = sqlite3.connect(tvl_db_path, timeout=60)
         # WAL: 全量刷新期间写提交密集, 别把看板/下载的读查询锁在门外
         # (转换需要独占, 拿不到就保持原模式, 后续连接会再试)
         try:
