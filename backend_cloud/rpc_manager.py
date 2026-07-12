@@ -55,6 +55,11 @@ BLOCKLIST = [
     'api.zan.top/arb-one',          # 3 并发下 ~900 次 429/小时 (全量日志实测)
     'rpc-bsc.48.club',              # 任何批大小都整批返回 null
     '0.48.club',                    # 同上 (48.club 另一入口)
+    'rpc.flashbots.net',            # 交易中继, eth_call 一律 403
+    'mainnet.gateway.tenderly.co',  # 重 eth_call 一律 408 (op 的 tenderly 入口正常, 只封 mainnet)
+    'gateway.tenderly.co/public/mainnet',  # 同上
+    'eth.meowrpc.com',              # 不支持 eth_call (bsc 入口也撑不住批量, 已另行过滤)
+    'api.zan.top/opt-mainnet',      # 429 限流, 与其 arb 入口同款
 ]
 
 
